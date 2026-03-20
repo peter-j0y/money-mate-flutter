@@ -10,14 +10,22 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:money_mate/main.dart';
 
 void main() {
-  testWidgets('Bottom navigation switches tab content', (WidgetTester tester) async {
+  testWidgets('Bottom navigation switches tab content', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(const MoneyMateApp());
 
-    expect(find.text('계좌와 카드 자산을 한 번에 확인해요'), findsOneWidget);
+    expect(find.text('2024년 3월'), findsOneWidget);
+    expect(find.text('달력'), findsOneWidget);
 
-    await tester.tap(find.text('가계부'));
+    await tester.tap(find.text('자산'));
     await tester.pump();
 
-    expect(find.text('카테고리별 지출 통계'), findsOneWidget);
+    expect(find.text('내 자산'), findsOneWidget);
+
+    await tester.tap(find.text('더보기'));
+    await tester.pump();
+
+    expect(find.text('설정 및 계정 관리'), findsOneWidget);
   });
 }
