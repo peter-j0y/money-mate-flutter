@@ -29,6 +29,7 @@
 - Run `flutter analyze && flutter test` before opening a PR.
 
 ## Commit & Pull Request Guidelines
+- Write commit message & PR in Korean.
 - This repository currently has no commit history yet; adopt a consistent convention now.
 - Recommended commit style: Conventional Commits (e.g., `feat: add asset add bottom sheet`, `fix: adjust chart legend overflow`).
 - PRs should include:
@@ -44,3 +45,4 @@
 
 ## Rules
 - Always response in Korean.
+- Reply by adding a one-point lesson related to the code you modified.
