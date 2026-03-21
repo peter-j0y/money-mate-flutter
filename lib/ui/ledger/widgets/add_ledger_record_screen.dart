@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:money_mate/ui/core/ledger_record_type_toggle.dart';
+import 'package:money_mate/ui/ledger/widgets/ledger_record_type_toggle.dart';
 import 'package:money_mate/ui/ledger/view_models/add_ledger_record_view_model.dart';
 
 import '../../../data/model/entities/ledger_record.dart';
