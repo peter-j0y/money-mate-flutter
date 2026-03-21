@@ -21,6 +21,7 @@ class AddLedgerRecordViewModel extends ChangeNotifier {
     required String category,
     required int amount,
     required DateTime date,
+    ExpensePaymentMethod? paymentMethod,
     String? memo,
   }) async {
     if (amount <= 0) {
@@ -40,6 +41,7 @@ class AddLedgerRecordViewModel extends ChangeNotifier {
           category: category,
           amount: amount,
           date: date,
+          paymentMethod: paymentMethod,
           memo: memo,
         ),
       );

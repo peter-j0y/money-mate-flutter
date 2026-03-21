@@ -18,6 +18,8 @@ class LedgerRecords extends Table {
 
   DateTimeColumn get date => dateTime()();
 
+  TextColumn get paymentMethod => text().nullable()();
+
   TextColumn get memo => text().nullable()();
 
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();

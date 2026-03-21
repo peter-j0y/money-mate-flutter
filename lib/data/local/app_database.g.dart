@@ -60,6 +60,17 @@ class $LedgerRecordsTable extends LedgerRecords
     type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _paymentMethodMeta = const VerificationMeta(
+    'paymentMethod',
+  );
+  @override
+  late final GeneratedColumn<String> paymentMethod = GeneratedColumn<String>(
+    'payment_method',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _memoMeta = const VerificationMeta('memo');
   @override
   late final GeneratedColumn<String> memo = GeneratedColumn<String>(
@@ -88,6 +99,7 @@ class $LedgerRecordsTable extends LedgerRecords
     category,
     amount,
     date,
+    paymentMethod,
     memo,
     createdAt,
   ];
@@ -138,6 +150,15 @@ class $LedgerRecordsTable extends LedgerRecords
     } else if (isInserting) {
       context.missing(_dateMeta);
     }
+    if (data.containsKey('payment_method')) {
+      context.handle(
+        _paymentMethodMeta,
+        paymentMethod.isAcceptableOrUnknown(
+          data['payment_method']!,
+          _paymentMethodMeta,
+        ),
+      );
+    }
     if (data.containsKey('memo')) {
       context.handle(
         _memoMeta,
@@ -184,6 +205,10 @@ class $LedgerRecordsTable extends LedgerRecords
             DriftSqlType.dateTime,
             data['${effectivePrefix}date'],
           )!,
+      paymentMethod: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payment_method'],
+      ),
       memo: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}memo'],
@@ -208,6 +233,7 @@ class LedgerRecord extends DataClass implements Insertable<LedgerRecord> {
   final String category;
   final int amount;
   final DateTime date;
+  final String? paymentMethod;
   final String? memo;
   final DateTime createdAt;
   const LedgerRecord({
@@ -216,6 +242,7 @@ class LedgerRecord extends DataClass implements Insertable<LedgerRecord> {
     required this.category,
     required this.amount,
     required this.date,
+    this.paymentMethod,
     this.memo,
     required this.createdAt,
   });
@@ -227,6 +254,9 @@ class LedgerRecord extends DataClass implements Insertable<LedgerRecord> {
     map['category'] = Variable<String>(category);
     map['amount'] = Variable<int>(amount);
     map['date'] = Variable<DateTime>(date);
+    if (!nullToAbsent || paymentMethod != null) {
+      map['payment_method'] = Variable<String>(paymentMethod);
+    }
     if (!nullToAbsent || memo != null) {
       map['memo'] = Variable<String>(memo);
     }
@@ -241,6 +271,10 @@ class LedgerRecord extends DataClass implements Insertable<LedgerRecord> {
       category: Value(category),
       amount: Value(amount),
       date: Value(date),
+      paymentMethod:
+          paymentMethod == null && nullToAbsent
+              ? const Value.absent()
+              : Value(paymentMethod),
       memo: memo == null && nullToAbsent ? const Value.absent() : Value(memo),
       createdAt: Value(createdAt),
     );
@@ -257,6 +291,7 @@ class LedgerRecord extends DataClass implements Insertable<LedgerRecord> {
       category: serializer.fromJson<String>(json['category']),
       amount: serializer.fromJson<int>(json['amount']),
       date: serializer.fromJson<DateTime>(json['date']),
+      paymentMethod: serializer.fromJson<String?>(json['paymentMethod']),
       memo: serializer.fromJson<String?>(json['memo']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
@@ -270,6 +305,7 @@ class LedgerRecord extends DataClass implements Insertable<LedgerRecord> {
       'category': serializer.toJson<String>(category),
       'amount': serializer.toJson<int>(amount),
       'date': serializer.toJson<DateTime>(date),
+      'paymentMethod': serializer.toJson<String?>(paymentMethod),
       'memo': serializer.toJson<String?>(memo),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
@@ -281,6 +317,7 @@ class LedgerRecord extends DataClass implements Insertable<LedgerRecord> {
     String? category,
     int? amount,
     DateTime? date,
+    Value<String?> paymentMethod = const Value.absent(),
     Value<String?> memo = const Value.absent(),
     DateTime? createdAt,
   }) => LedgerRecord(
@@ -289,6 +326,8 @@ class LedgerRecord extends DataClass implements Insertable<LedgerRecord> {
     category: category ?? this.category,
     amount: amount ?? this.amount,
     date: date ?? this.date,
+    paymentMethod:
+        paymentMethod.present ? paymentMethod.value : this.paymentMethod,
     memo: memo.present ? memo.value : this.memo,
     createdAt: createdAt ?? this.createdAt,
   );
@@ -299,6 +338,10 @@ class LedgerRecord extends DataClass implements Insertable<LedgerRecord> {
       category: data.category.present ? data.category.value : this.category,
       amount: data.amount.present ? data.amount.value : this.amount,
       date: data.date.present ? data.date.value : this.date,
+      paymentMethod:
+          data.paymentMethod.present
+              ? data.paymentMethod.value
+              : this.paymentMethod,
       memo: data.memo.present ? data.memo.value : this.memo,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
@@ -312,6 +355,7 @@ class LedgerRecord extends DataClass implements Insertable<LedgerRecord> {
           ..write('category: $category, ')
           ..write('amount: $amount, ')
           ..write('date: $date, ')
+          ..write('paymentMethod: $paymentMethod, ')
           ..write('memo: $memo, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
@@ -319,8 +363,16 @@ class LedgerRecord extends DataClass implements Insertable<LedgerRecord> {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, type, category, amount, date, memo, createdAt);
+  int get hashCode => Object.hash(
+    id,
+    type,
+    category,
+    amount,
+    date,
+    paymentMethod,
+    memo,
+    createdAt,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -330,6 +382,7 @@ class LedgerRecord extends DataClass implements Insertable<LedgerRecord> {
           other.category == this.category &&
           other.amount == this.amount &&
           other.date == this.date &&
+          other.paymentMethod == this.paymentMethod &&
           other.memo == this.memo &&
           other.createdAt == this.createdAt);
 }
@@ -340,6 +393,7 @@ class LedgerRecordsCompanion extends UpdateCompanion<LedgerRecord> {
   final Value<String> category;
   final Value<int> amount;
   final Value<DateTime> date;
+  final Value<String?> paymentMethod;
   final Value<String?> memo;
   final Value<DateTime> createdAt;
   const LedgerRecordsCompanion({
@@ -348,6 +402,7 @@ class LedgerRecordsCompanion extends UpdateCompanion<LedgerRecord> {
     this.category = const Value.absent(),
     this.amount = const Value.absent(),
     this.date = const Value.absent(),
+    this.paymentMethod = const Value.absent(),
     this.memo = const Value.absent(),
     this.createdAt = const Value.absent(),
   });
@@ -357,6 +412,7 @@ class LedgerRecordsCompanion extends UpdateCompanion<LedgerRecord> {
     required String category,
     required int amount,
     required DateTime date,
+    this.paymentMethod = const Value.absent(),
     this.memo = const Value.absent(),
     this.createdAt = const Value.absent(),
   }) : type = Value(type),
@@ -369,6 +425,7 @@ class LedgerRecordsCompanion extends UpdateCompanion<LedgerRecord> {
     Expression<String>? category,
     Expression<int>? amount,
     Expression<DateTime>? date,
+    Expression<String>? paymentMethod,
     Expression<String>? memo,
     Expression<DateTime>? createdAt,
   }) {
@@ -378,6 +435,7 @@ class LedgerRecordsCompanion extends UpdateCompanion<LedgerRecord> {
       if (category != null) 'category': category,
       if (amount != null) 'amount': amount,
       if (date != null) 'date': date,
+      if (paymentMethod != null) 'payment_method': paymentMethod,
       if (memo != null) 'memo': memo,
       if (createdAt != null) 'created_at': createdAt,
     });
@@ -389,6 +447,7 @@ class LedgerRecordsCompanion extends UpdateCompanion<LedgerRecord> {
     Value<String>? category,
     Value<int>? amount,
     Value<DateTime>? date,
+    Value<String?>? paymentMethod,
     Value<String?>? memo,
     Value<DateTime>? createdAt,
   }) {
@@ -398,6 +457,7 @@ class LedgerRecordsCompanion extends UpdateCompanion<LedgerRecord> {
       category: category ?? this.category,
       amount: amount ?? this.amount,
       date: date ?? this.date,
+      paymentMethod: paymentMethod ?? this.paymentMethod,
       memo: memo ?? this.memo,
       createdAt: createdAt ?? this.createdAt,
     );
@@ -421,6 +481,9 @@ class LedgerRecordsCompanion extends UpdateCompanion<LedgerRecord> {
     if (date.present) {
       map['date'] = Variable<DateTime>(date.value);
     }
+    if (paymentMethod.present) {
+      map['payment_method'] = Variable<String>(paymentMethod.value);
+    }
     if (memo.present) {
       map['memo'] = Variable<String>(memo.value);
     }
@@ -438,6 +501,7 @@ class LedgerRecordsCompanion extends UpdateCompanion<LedgerRecord> {
           ..write('category: $category, ')
           ..write('amount: $amount, ')
           ..write('date: $date, ')
+          ..write('paymentMethod: $paymentMethod, ')
           ..write('memo: $memo, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
@@ -463,6 +527,7 @@ typedef $$LedgerRecordsTableCreateCompanionBuilder =
       required String category,
       required int amount,
       required DateTime date,
+      Value<String?> paymentMethod,
       Value<String?> memo,
       Value<DateTime> createdAt,
     });
@@ -473,6 +538,7 @@ typedef $$LedgerRecordsTableUpdateCompanionBuilder =
       Value<String> category,
       Value<int> amount,
       Value<DateTime> date,
+      Value<String?> paymentMethod,
       Value<String?> memo,
       Value<DateTime> createdAt,
     });
@@ -508,6 +574,11 @@ class $$LedgerRecordsTableFilterComposer
 
   ColumnFilters<DateTime> get date => $composableBuilder(
     column: $table.date,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get paymentMethod => $composableBuilder(
+    column: $table.paymentMethod,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -556,6 +627,11 @@ class $$LedgerRecordsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get paymentMethod => $composableBuilder(
+    column: $table.paymentMethod,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get memo => $composableBuilder(
     column: $table.memo,
     builder: (column) => ColumnOrderings(column),
@@ -590,6 +666,11 @@ class $$LedgerRecordsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get date =>
       $composableBuilder(column: $table.date, builder: (column) => column);
+
+  GeneratedColumn<String> get paymentMethod => $composableBuilder(
+    column: $table.paymentMethod,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<String> get memo =>
       $composableBuilder(column: $table.memo, builder: (column) => column);
@@ -638,6 +719,7 @@ class $$LedgerRecordsTableTableManager
                 Value<String> category = const Value.absent(),
                 Value<int> amount = const Value.absent(),
                 Value<DateTime> date = const Value.absent(),
+                Value<String?> paymentMethod = const Value.absent(),
                 Value<String?> memo = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
               }) => LedgerRecordsCompanion(
@@ -646,6 +728,7 @@ class $$LedgerRecordsTableTableManager
                 category: category,
                 amount: amount,
                 date: date,
+                paymentMethod: paymentMethod,
                 memo: memo,
                 createdAt: createdAt,
               ),
@@ -656,6 +739,7 @@ class $$LedgerRecordsTableTableManager
                 required String category,
                 required int amount,
                 required DateTime date,
+                Value<String?> paymentMethod = const Value.absent(),
                 Value<String?> memo = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
               }) => LedgerRecordsCompanion.insert(
@@ -664,6 +748,7 @@ class $$LedgerRecordsTableTableManager
                 category: category,
                 amount: amount,
                 date: date,
+                paymentMethod: paymentMethod,
                 memo: memo,
                 createdAt: createdAt,
               ),

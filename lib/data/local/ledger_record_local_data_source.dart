@@ -11,10 +11,11 @@ class LedgerRecordLocalDataSource {
   Future<int> addRecord(LedgerEntryDraft draft) {
     return _database.insertLedgerRecord(
       LedgerRecordsCompanion.insert(
-        type: _typeToText(draft.type),
+        type: _typeToDto(draft.type),
         category: draft.category,
         amount: draft.amount,
         date: draft.date,
+        paymentMethod: Value(_paymentMethodToDto(draft.paymentMethod)),
         memo: Value(draft.memo),
       ),
     );
@@ -34,10 +35,11 @@ class LedgerRecordLocalDataSource {
         .map(
           (row) => LedgerEntry(
             id: row.id,
-            type: _typeFromText(row.type),
+            type: _typeToUi(row.type),
             category: row.category,
             amount: row.amount,
             date: row.date,
+            paymentMethod: _paymentMethodToUi(row.paymentMethod),
             memo: row.memo,
             createdAt: row.createdAt,
           ),
@@ -45,13 +47,51 @@ class LedgerRecordLocalDataSource {
         .toList(growable: false);
   }
 
-  LedgerRecordType _typeFromText(String value) {
-    return value == 'income'
-        ? LedgerRecordType.income
-        : LedgerRecordType.expense;
+  LedgerRecordType _typeToUi(String value) {
+    switch (value.toLowerCase()) {
+      case 'income':
+      case '수입':
+        return LedgerRecordType.income;
+      case 'expense':
+      case '지출':
+      default:
+        return LedgerRecordType.expense;
+    }
   }
 
-  String _typeToText(LedgerRecordType type) {
+  String _typeToDto(LedgerRecordType type) {
     return type == LedgerRecordType.income ? 'income' : 'expense';
+  }
+
+  String? _paymentMethodToDto(ExpensePaymentMethod? value) {
+    return value?.code;
+  }
+
+  ExpensePaymentMethod? _paymentMethodToUi(String? value) {
+    if (value == null || value.isEmpty) {
+      return null;
+    }
+
+    final normalizedCode = _legacyPaymentMethodKoreanToCode(value);
+    return ExpensePaymentMethodX.fromCode(normalizedCode);
+  }
+
+  String _legacyPaymentMethodKoreanToCode(String value) {
+    switch (value) {
+      case '현금':
+        return 'cash';
+      case '신용카드':
+        return 'credit_card';
+      case '체크카드':
+        return 'debit_card';
+      case '계좌이체':
+        return 'bank_transfer';
+      case '포인트':
+        return 'points';
+      case '기타':
+        return 'other';
+      default:
+        return value;
+    }
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:money_mate/ui/ledger/widgets/expense_payment_method_selector.dart';
 import 'package:money_mate/ui/ledger/widgets/ledger_record_type_toggle.dart';
 import 'package:money_mate/ui/ledger/view_models/add_ledger_record_view_model.dart';
 
@@ -19,6 +20,8 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
   int _selectedTypeIndex = 1;
   int _selectedExpenseCategoryIndex = -1;
   int _selectedIncomeCategoryIndex = -1;
+  ExpensePaymentMethod _selectedExpensePaymentMethod =
+      ExpensePaymentMethod.creditCard;
   final FocusNode _amountFocusNode = FocusNode();
   final TextEditingController _amountController = TextEditingController(
     text: '0',
@@ -117,6 +120,15 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
     ),
   ];
 
+  static const List<ExpensePaymentMethod> _expensePaymentMethods = [
+    ExpensePaymentMethod.cash,
+    ExpensePaymentMethod.creditCard,
+    ExpensePaymentMethod.debitCard,
+    ExpensePaymentMethod.bankTransfer,
+    ExpensePaymentMethod.points,
+    ExpensePaymentMethod.other,
+  ];
+
   List<_LedgerCategoryOption> get _categoryOptions {
     return _selectedTypeIndex == 0
         ? _incomeCategoryOptions
@@ -174,14 +186,15 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
     }
 
     final selectedCategory = _categoryOptions[_selectedCategoryIndex].label;
+    final isExpense = _selectedTypeIndex == 1;
+    final selectedPaymentMethod =
+        isExpense ? _selectedExpensePaymentMethod : null;
     final isSuccess = await _viewModel.saveRecord(
-      type:
-          _selectedTypeIndex == 0
-              ? LedgerRecordType.income
-              : LedgerRecordType.expense,
+      type: isExpense ? LedgerRecordType.expense : LedgerRecordType.income,
       category: selectedCategory,
       amount: _amountValue,
       date: _selectedDate,
+      paymentMethod: selectedPaymentMethod,
       memo:
           _memoController.text.trim().isEmpty
               ? null
@@ -373,6 +386,17 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
                         );
                       },
                     ),
+                    if (_selectedTypeIndex == 1) ...[
+                      const SizedBox(height: 24),
+                      ExpensePaymentMethodSelector(
+                        options: _expensePaymentMethods,
+                        selectedMethod: _selectedExpensePaymentMethod,
+                        onChanged:
+                            (method) => setState(
+                              () => _selectedExpensePaymentMethod = method,
+                            ),
+                      ),
+                    ],
                     const SizedBox(height: 24),
                     const _SectionLabel(text: '메모'),
                     const SizedBox(height: 8),
