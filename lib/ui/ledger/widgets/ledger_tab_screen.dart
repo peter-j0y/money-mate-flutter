@@ -103,7 +103,8 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
   }
 
   String _currencyText(int amount) {
-    final reversed = amount.toString().split('').reversed.toList();
+    final sign = amount < 0 ? '-' : '';
+    final reversed = amount.abs().toString().split('').reversed.toList();
     final buffer = StringBuffer();
     for (var i = 0; i < reversed.length; i++) {
       if (i > 0 && i % 3 == 0) {
@@ -111,7 +112,7 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
       }
       buffer.write(reversed[i]);
     }
-    return '${buffer.toString().split('').reversed.join()}원';
+    return '$sign${buffer.toString().split('').reversed.join()}원';
   }
 
   @override
