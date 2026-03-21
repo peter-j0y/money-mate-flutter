@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 class LedgerIncomeSummaryCard extends StatelessWidget {
   const LedgerIncomeSummaryCard({
     super.key,
-    this.incomeText = '₩0',
-    this.expenseText = '₩0',
-    this.savableText = '₩0',
+    this.incomeText = '0원',
+    this.expenseText = '0원',
+    this.savableText = '0원',
   });
 
   final String incomeText;
@@ -69,14 +69,12 @@ class _SummaryValueColumn extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.only(right: 1),
       decoration: BoxDecoration(
-        border: showRightBorder
-            ? const Border(
-                right: BorderSide(
-                  color: Color(0xFFE2E8F0),
-                  width: 1,
-                ),
-              )
-            : null,
+        border:
+            showRightBorder
+                ? const Border(
+                  right: BorderSide(color: Color(0xFFE2E8F0), width: 1),
+                )
+                : null,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -96,7 +94,7 @@ class _SummaryValueColumn extends StatelessWidget {
             style: TextStyle(
               fontSize: 14,
               height: 20 / 14,
-              fontWeight: FontWeight.w400,
+              fontWeight: FontWeight.w600,
               color: valueColor,
             ),
           ),
