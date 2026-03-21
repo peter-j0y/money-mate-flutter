@@ -45,10 +45,10 @@ class LedgerCalendar extends StatelessWidget {
     );
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(12, 14, 12, 12),
+      padding: const EdgeInsets.fromLTRB(0, 12, 0, 12),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(24),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         children: [
@@ -94,7 +94,7 @@ class LedgerCalendar extends StatelessWidget {
                         color:
                             isSelected
                                 ? const Color(0xFF137FEC)
-                                : const Color(0xFFF8FAFC),
+                                : Colors.white,
                         width: 1,
                       ),
                     ),

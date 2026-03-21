@@ -118,77 +118,77 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-            child: LedgerTopNavigationBar(
-              selectedView: _selectedView,
-              onChanged: (view) => setState(() => _selectedView = view),
+      child: Container(
+        color: const Color(0xFFF8FAFC),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: LedgerTopNavigationBar(
+                selectedView: _selectedView,
+                onChanged: (view) => setState(() => _selectedView = view),
+              ),
             ),
-          ),
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(0, 0, 0, 140),
-              children: [
-                LedgerMonthSelector(
-                  monthLabel: _monthLabel,
-                  onPreviousTap: () => _changeMonth(-1),
-                  onNextTap: () => _changeMonth(1),
-                ),
-                const SizedBox(height: 12),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: LedgerIncomeSummaryCard(
-                    incomeText: _currencyText(_viewModel.monthlyIncomeTotal),
-                    expenseText: _currencyText(_viewModel.monthlyExpenseTotal),
-                    savableText: _currencyText(_viewModel.monthlySavableTotal),
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: [
+                  LedgerMonthSelector(
+                    monthLabel: _monthLabel,
+                    onPreviousTap: () => _changeMonth(-1),
+                    onNextTap: () => _changeMonth(1),
                   ),
-                ),
-                if (_selectedView == LedgerViewType.calendar) ...[
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: LedgerCalendar(
-                      displayedMonth: _currentMonth,
-                      selectedDate: _selectedDate,
-                      dailyIncomeTotalsByDate:
-                          _viewModel.dailyIncomeTotalsByDate,
-                      dailyExpenseTotalsByDate:
-                          _viewModel.dailyExpenseTotalsByDate,
-                      onDateTap: (date) {
-                        setState(() {
-                          _selectedDate = date;
-                        });
-
-                        final selectedMonth = DateTime(date.year, date.month);
-                        if (!_isSameMonth(_currentMonth, selectedMonth)) {
-                          setState(() {
-                            _currentMonth = selectedMonth;
-                          });
-                          _viewModel.loadMonth(_currentMonth);
-                        }
-
-                        widget.onSelectedDateChanged?.call(date);
-                      },
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    child: LedgerIncomeSummaryCard(
+                      incomeText: _currencyText(_viewModel.monthlyIncomeTotal),
+                      expenseText: _currencyText(_viewModel.monthlyExpenseTotal),
+                      savableText: _currencyText(_viewModel.monthlySavableTotal),
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: SelectedDateLedgerSection(
+                  if (_selectedView == LedgerViewType.calendar) ...[
+                    const SizedBox(height: 12),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: LedgerCalendar(
+                        displayedMonth: _currentMonth,
+                        selectedDate: _selectedDate,
+                        dailyIncomeTotalsByDate:
+                            _viewModel.dailyIncomeTotalsByDate,
+                        dailyExpenseTotalsByDate:
+                            _viewModel.dailyExpenseTotalsByDate,
+                        onDateTap: (date) {
+                          setState(() {
+                            _selectedDate = date;
+                          });
+
+                          final selectedMonth = DateTime(date.year, date.month);
+                          if (!_isSameMonth(_currentMonth, selectedMonth)) {
+                            setState(() {
+                              _currentMonth = selectedMonth;
+                            });
+                            _viewModel.loadMonth(_currentMonth);
+                          }
+
+                          widget.onSelectedDateChanged?.call(date);
+                        },
+                      ),
+                    ),
+                    SelectedDateLedgerSection(
                       selectedDate: _selectedDate,
                       items: _selectedDateItems,
                       isLoading: _viewModel.isLoading,
                       errorMessage: _viewModel.errorMessage,
                       selectedDateLabelBuilder: _selectedDateLabel,
                     ),
-                  ),
+                    const SizedBox(height: 80),
+                  ],
                 ],
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
