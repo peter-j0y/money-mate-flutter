@@ -16,8 +16,7 @@ class LedgerTopNavigationBar extends StatelessWidget {
     return Container(
       height: 46,
       decoration: BoxDecoration(
-        color: const Color(0xCCFFFFFF),
-        borderRadius: BorderRadius.circular(12),
+        color: const Color(0xFFF8FAFC),
       ),
       child: Row(
         children: [
@@ -54,7 +53,6 @@ class _TopNavItem extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(8),
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 4),
