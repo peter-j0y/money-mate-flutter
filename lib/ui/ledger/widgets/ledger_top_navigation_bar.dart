@@ -62,9 +62,9 @@ class _TopNavItem extends StatelessWidget {
             child: Text(
               label,
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 20,
                 height: 28 / 18,
-                fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 color:
                     isSelected
                         ? const Color(0xFF0F172A)
