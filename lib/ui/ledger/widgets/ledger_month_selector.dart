@@ -15,7 +15,7 @@ class LedgerMonthSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 5),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 5),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

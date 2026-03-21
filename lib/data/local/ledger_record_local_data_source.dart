@@ -22,7 +22,14 @@ class LedgerRecordLocalDataSource {
 
   Future<List<LedgerEntry>> fetchMonthlyRecords(DateTime month) async {
     final rows = await _database.fetchMonthlyRecords(month);
+    return _mapToLedgerEntries(rows);
+  }
 
+  Stream<List<LedgerEntry>> watchMonthlyRecords(DateTime month) {
+    return _database.watchMonthlyRecords(month).map(_mapToLedgerEntries);
+  }
+
+  List<LedgerEntry> _mapToLedgerEntries(List<LedgerRecord> rows) {
     return rows
         .map(
           (row) => LedgerEntry(

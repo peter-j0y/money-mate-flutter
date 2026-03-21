@@ -5,16 +5,24 @@ class LedgerCalendar extends StatelessWidget {
     super.key,
     required this.displayedMonth,
     this.selectedDate,
+    this.dailyIncomeTotalsByDate = const {},
+    this.dailyExpenseTotalsByDate = const {},
     this.onDateTap,
   });
 
   final DateTime displayedMonth;
   final DateTime? selectedDate;
+  final Map<DateTime, int> dailyIncomeTotalsByDate;
+  final Map<DateTime, int> dailyExpenseTotalsByDate;
   final ValueChanged<DateTime>? onDateTap;
 
   @override
   Widget build(BuildContext context) {
-    final firstDayOfMonth = DateTime(displayedMonth.year, displayedMonth.month, 1);
+    final firstDayOfMonth = DateTime(
+      displayedMonth.year,
+      displayedMonth.month,
+      1,
+    );
     final lastDayOfMonth = DateTime(
       displayedMonth.year,
       displayedMonth.month + 1,
@@ -62,59 +70,67 @@ class LedgerCalendar extends StatelessWidget {
             itemCount: days.length,
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 7,
-              mainAxisExtent: 56,
+              mainAxisExtent: 74,
             ),
             itemBuilder: (context, index) {
               final day = days[index];
+              final normalizedDay = DateTime(day.year, day.month, day.day);
               final isCurrentMonth = day.month == displayedMonth.month;
               final isSelected = _isSameDate(day, selectedDate);
+              final incomeTotal = dailyIncomeTotalsByDate[normalizedDay] ?? 0;
+              final expenseTotal = dailyExpenseTotalsByDate[normalizedDay] ?? 0;
 
               return InkWell(
                 borderRadius: BorderRadius.circular(8),
                 onTap: () => onDateTap?.call(day),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: isSelected
-                        ? const Color.fromRGBO(19, 127, 236, 0.05)
-                        : Colors.transparent,
+                    color:
+                        isSelected
+                            ? const Color.fromRGBO(19, 127, 236, 0.05)
+                            : Colors.transparent,
                     border: Border(
                       top: BorderSide(
-                        color: isSelected ? const Color(0xFF137FEC) : const Color(0xFFF8FAFC),
+                        color:
+                            isSelected
+                                ? const Color(0xFF137FEC)
+                                : const Color(0xFFF8FAFC),
                         width: 1,
                       ),
                     ),
                   ),
                   padding: EdgeInsets.only(top: 4),
-                  child: isSelected
-                      ? Column(
-                          children: [
-                            Text(
-                              '${day.day}',
-                              style: const TextStyle(
-                                fontSize: 14,
-                                height: 20 / 14,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFF137FEC),
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                          ],
-                        )
-                      : Align(
-                          alignment: Alignment.topCenter,
-                          child: Text(
-                            '${day.day}',
-                            style: TextStyle(
-                              fontSize: 14,
-                              height: 20 / 14,
-                              fontWeight: FontWeight.w500,
-                              color: _dayTextColor(
-                                day: day,
-                                isCurrentMonth: isCurrentMonth,
-                              ),
-                            ),
-                          ),
+                  child: Column(
+                    children: [
+                      Text(
+                        '${day.day}',
+                        style: TextStyle(
+                          fontSize: 14,
+                          height: 20 / 14,
+                          fontWeight:
+                              isSelected ? FontWeight.w700 : FontWeight.w500,
+                          color:
+                              isSelected
+                                  ? const Color(0xFF137FEC)
+                                  : _dayTextColor(
+                                    day: day,
+                                    isCurrentMonth: isCurrentMonth,
+                                  ),
                         ),
+                      ),
+                      const SizedBox(height: 2),
+                      if (isCurrentMonth && incomeTotal > 0)
+                        _AdaptiveCalendarAmountText(
+                          text: '+${_wonText(incomeTotal)}',
+                          color: const Color(0xFF137FEC),
+                        ),
+                      if (isCurrentMonth && expenseTotal > 0)
+                        _AdaptiveCalendarAmountText(
+                          text: '-${_wonText(expenseTotal)}',
+                          color: const Color(0xFFF43F5E),
+                        ),
+                    ],
+                  ),
                 ),
               );
             },
@@ -123,6 +139,7 @@ class LedgerCalendar extends StatelessWidget {
       ),
     );
   }
+
   bool _isSameDate(DateTime a, DateTime? b) {
     if (b == null) {
       return false;
@@ -130,10 +147,7 @@ class LedgerCalendar extends StatelessWidget {
     return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 
-  Color _dayTextColor({
-    required DateTime day,
-    required bool isCurrentMonth,
-  }) {
+  Color _dayTextColor({required DateTime day, required bool isCurrentMonth}) {
     if (isCurrentMonth && day.weekday == DateTime.sunday) {
       return const Color(0xFFEF4444);
     }
@@ -141,6 +155,51 @@ class LedgerCalendar extends StatelessWidget {
       return const Color(0xFF3B82F6);
     }
     return isCurrentMonth ? const Color(0xFF0F172A) : const Color(0xFF94A3B8);
+  }
+
+  String _wonText(int amount) {
+    final reversed = amount.toString().split('').reversed.toList();
+    final buffer = StringBuffer();
+    for (var i = 0; i < reversed.length; i++) {
+      if (i > 0 && i % 3 == 0) {
+        buffer.write(',');
+      }
+      buffer.write(reversed[i]);
+    }
+    return buffer.toString().split('').reversed.join();
+  }
+}
+
+class _AdaptiveCalendarAmountText extends StatelessWidget {
+  const _AdaptiveCalendarAmountText({required this.text, required this.color});
+
+  final String text;
+  final Color color;
+
+  static const double _fontSize = 10;
+  static const double _lineHeightRatio = 14 / 10;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: _fontSize * _lineHeightRatio,
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        alignment: Alignment.center,
+        child: Text(
+          text,
+          maxLines: 1,
+          softWrap: false,
+          style: TextStyle(
+            fontSize: _fontSize,
+            height: _lineHeightRatio,
+            fontWeight: FontWeight.w400,
+            color: color,
+          ),
+        ),
+      ),
+    );
   }
 }
 

@@ -25,7 +25,11 @@ class LedgerRecords extends Table {
 
 @DriftDatabase(tables: [LedgerRecords])
 class AppDatabase extends _$AppDatabase {
-  AppDatabase() : super(_openConnection());
+  AppDatabase._internal() : super(_openConnection());
+
+  static final AppDatabase _instance = AppDatabase._internal();
+
+  factory AppDatabase() => _instance;
 
   @override
   int get schemaVersion => 1;
@@ -35,20 +39,31 @@ class AppDatabase extends _$AppDatabase {
   }
 
   Future<List<LedgerRecord>> fetchMonthlyRecords(DateTime month) {
+    final query = _monthlyRecordsQuery(month);
+    return query.get();
+  }
+
+  Stream<List<LedgerRecord>> watchMonthlyRecords(DateTime month) {
+    final query = _monthlyRecordsQuery(month);
+    return query.watch();
+  }
+
+  SimpleSelectStatement<$LedgerRecordsTable, LedgerRecord> _monthlyRecordsQuery(
+    DateTime month,
+  ) {
     final start = DateTime(month.year, month.month, 1);
     final end = DateTime(month.year, month.month + 1, 1);
 
-    return (select(ledgerRecords)
-          ..where(
-            (tbl) =>
-                tbl.date.isBiggerOrEqualValue(start) &
-                tbl.date.isSmallerThanValue(end),
-          )
-          ..orderBy([
-            (tbl) => OrderingTerm.desc(tbl.date),
-            (tbl) => OrderingTerm.desc(tbl.id),
-          ]))
-        .get();
+    return select(ledgerRecords)
+      ..where(
+        (tbl) =>
+            tbl.date.isBiggerOrEqualValue(start) &
+            tbl.date.isSmallerThanValue(end),
+      )
+      ..orderBy([
+        (tbl) => OrderingTerm.desc(tbl.date),
+        (tbl) => OrderingTerm.desc(tbl.id),
+      ]);
   }
 }
 
