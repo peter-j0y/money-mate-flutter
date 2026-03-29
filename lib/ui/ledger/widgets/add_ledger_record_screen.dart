@@ -193,6 +193,7 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
       initialDate: _selectedDate,
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
+      locale: const Locale('ko', 'KR'),
     );
 
     if (pickedDate != null) {
@@ -221,124 +222,156 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
               ),
             ),
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 96),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const _SectionLabel(text: '날짜'),
-                    const SizedBox(height: 8),
-                    LedgerDateCard(
-                      date: _selectedDate,
-                      dateTextBuilder: _koreanDateText,
-                      onTap: _pickDate,
-                    ),
-                    const SizedBox(height: 24),
-                    const _SectionLabel(text: '금액'),
-                    const SizedBox(height: 8),
-                    LedgerAmountField.editable(
-                      controller: _amountController,
-                      focusNode: _amountFocusNode,
-                      inputFormatters: const [_AmountInputFormatter()],
-                    ),
-                    const Divider(
-                      height: 2,
-                      thickness: 2,
-                      color: AppColors.surfaceMuted,
-                    ),
-                    const SizedBox(height: 24),
-                    const _SectionLabel(text: '유형'),
-                    const SizedBox(height: 8),
-                    LedgerRecordTypeToggle(
-                      selectedIndex: _selectedTypeIndex,
-                      onChanged:
-                          (index) => setState(() => _selectedTypeIndex = index),
-                    ),
-                    const SizedBox(height: 24),
-                    const _SectionLabel(text: '카테고리'),
-                    const SizedBox(height: 8),
-                    LedgerCategoryGrid(
-                      options: _categoryOptions,
-                      selectedIndex: _selectedCategoryIndex,
-                      onCategoryTap: _onCategoryTap,
-                    ),
-                    if (_selectedTypeIndex == 1) ...[
-                      const SizedBox(height: 24),
-                      ExpensePaymentMethodSelector(
-                        options: _expensePaymentMethods,
-                        selectedMethod: _selectedExpensePaymentMethod,
-                        onChanged:
-                            (method) => setState(
-                              () => _selectedExpensePaymentMethod = method,
-                            ),
-                      ),
-                    ],
-                    const SizedBox(height: 24),
-                    const _SectionLabel(text: '메모'),
-                    const SizedBox(height: 8),
-                    LedgerMemoSection.editable(controller: _memoController),
-                  ],
-                ),
-              ),
-            ),
-            AnimatedBuilder(
-              animation: _viewModel,
-              builder: (context, child) {
-                return Container(
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        AppColors.rgba_255_255_255_0,
-                        AppColors.rgba_255_255_255_09,
-                        AppColors.white,
+              child: Stack(
+                children: [
+                  SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const _SectionLabel(text: '날짜'),
+                        const SizedBox(height: 8),
+                        LedgerDateCard(
+                          date: _selectedDate,
+                          dateTextBuilder: _koreanDateText,
+                          onTap: _pickDate,
+                        ),
+                        const SizedBox(height: 24),
+                        const _SectionLabel(text: '금액'),
+                        const SizedBox(height: 8),
+                        LedgerAmountField.editable(
+                          controller: _amountController,
+                          focusNode: _amountFocusNode,
+                          inputFormatters: const [_AmountInputFormatter()],
+                        ),
+                        const Divider(
+                          height: 2,
+                          thickness: 2,
+                          color: AppColors.surfaceMuted,
+                        ),
+                        const SizedBox(height: 24),
+                        const _SectionLabel(text: '유형'),
+                        const SizedBox(height: 8),
+                        LedgerRecordTypeToggle(
+                          selectedIndex: _selectedTypeIndex,
+                          onChanged:
+                              (index) =>
+                                  setState(() => _selectedTypeIndex = index),
+                        ),
+                        const SizedBox(height: 24),
+                        const _SectionLabel(text: '카테고리'),
+                        const SizedBox(height: 8),
+                        LedgerCategoryGrid(
+                          options: _categoryOptions,
+                          selectedIndex: _selectedCategoryIndex,
+                          onCategoryTap: _onCategoryTap,
+                        ),
+                        if (_selectedTypeIndex == 1) ...[
+                          const SizedBox(height: 24),
+                          ExpensePaymentMethodSelector(
+                            options: _expensePaymentMethods,
+                            selectedMethod: _selectedExpensePaymentMethod,
+                            onChanged:
+                                (method) => setState(
+                                  () => _selectedExpensePaymentMethod = method,
+                                ),
+                          ),
+                        ],
+                        const SizedBox(height: 24),
+                        const _SectionLabel(text: '메모'),
+                        const SizedBox(height: 8),
+                        LedgerMemoSection.editable(controller: _memoController),
                       ],
                     ),
                   ),
-                  padding: EdgeInsets.fromLTRB(16, 16, 16, safeAreaBottom + 8),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 60,
-                    child: FilledButton(
-                      style: FilledButton.styleFrom(
-                        backgroundColor:
-                            isSubmitEnabledUi
-                                ? AppColors.primary
-                                : AppColors.hexFFCBD5E1,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                        elevation: 0,
-                        shadowColor:
-                            isSubmitEnabledUi
-                                ? AppColors.rgba_19_127_236_025
-                                : AppColors.overlay,
-                      ),
-                      onPressed: _viewModel.isSaving ? null : _onSubmitTap,
-                      child:
-                          _viewModel.isSaving
-                              ? const SizedBox(
-                                width: 22,
-                                height: 22,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2.4,
-                                  color: AppColors.white,
-                                ),
-                              )
-                              : const Text(
-                                '추가하기',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  height: 28 / 18,
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColors.white,
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: AnimatedBuilder(
+                      animation: _viewModel,
+                      builder: (context, child) {
+                        return SizedBox(
+                          width: double.infinity,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const SizedBox(
+                                width: double.infinity,
+                                height: 28,
+                                child: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        AppColors.rgba_255_255_255_0,
+                                        AppColors.rgba_255_255_255_05,
+                                        AppColors.white,
+                                      ],
+                                      stops: [0, 0.6, 1],
+                                    ),
+                                  ),
                                 ),
                               ),
+                              Container(
+                                color: AppColors.white,
+                                padding: EdgeInsets.fromLTRB(
+                                  16,
+                                  0,
+                                  16,
+                                  safeAreaBottom + 8,
+                                ),
+                                child: SizedBox(
+                                  width: double.infinity,
+                                  height: 60,
+                                  child: FilledButton(
+                                    style: FilledButton.styleFrom(
+                                      backgroundColor:
+                                          isSubmitEnabledUi
+                                              ? AppColors.primary
+                                              : AppColors.hexFFCBD5E1,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(24),
+                                      ),
+                                      elevation: 0,
+                                      shadowColor:
+                                          isSubmitEnabledUi
+                                              ? AppColors.rgba_19_127_236_025
+                                              : AppColors.overlay,
+                                    ),
+                                    onPressed:
+                                        _viewModel.isSaving
+                                            ? null
+                                            : _onSubmitTap,
+                                    child:
+                                        _viewModel.isSaving
+                                            ? const SizedBox(
+                                              width: 22,
+                                              height: 22,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2.4,
+                                                color: AppColors.white,
+                                              ),
+                                            )
+                                            : const Text(
+                                              '추가하기',
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                height: 28 / 18,
+                                                fontWeight: FontWeight.w500,
+                                                color: AppColors.white,
+                                              ),
+                                            ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
                   ),
-                );
-              },
+                ],
+              ),
             ),
           ],
         ),

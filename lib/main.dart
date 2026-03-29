@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:money_mate/ui/ledger/widgets/add_ledger_record_screen.dart';
 import 'package:money_mate/ui/asset/assets_tab_screen.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
@@ -20,6 +21,13 @@ class MoneyMateApp extends StatelessWidget {
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: ThemeMode.light,
+      locale: const Locale('ko', 'KR'),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('ko', 'KR'), Locale('en', 'US')],
       home: const HomeScreen(),
     );
   }
@@ -75,11 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
                 backgroundColor: AppColors.primary,
                 shape: const CircleBorder(),
-                child: Icon(
-                  Icons.add,
-                  color: AppColors.inverseText,
-                  size: 28,
-                ),
+                child: Icon(Icons.add, color: AppColors.inverseText, size: 28),
               )
               : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
@@ -113,9 +117,7 @@ class _TabPage extends StatelessWidget {
               subtitle,
               style: Theme.of(
                 context,
-              ).textTheme.bodyLarge?.copyWith(
-                color: AppColors.textSecondary,
-              ),
+              ).textTheme.bodyLarge?.copyWith(color: AppColors.textSecondary),
             ),
             const Spacer(),
             Container(
