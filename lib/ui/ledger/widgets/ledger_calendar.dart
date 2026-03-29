@@ -18,6 +18,10 @@ class LedgerCalendar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final isTodaySelected = _isSameDate(today, selectedDate);
+
     final firstDayOfMonth = DateTime(
       displayedMonth.year,
       displayedMonth.month,
@@ -77,6 +81,9 @@ class LedgerCalendar extends StatelessWidget {
               final normalizedDay = DateTime(day.year, day.month, day.day);
               final isCurrentMonth = day.month == displayedMonth.month;
               final isSelected = _isSameDate(day, selectedDate);
+              final isToday = _isSameDate(day, today);
+              final shouldShowTodayMarker =
+                  isToday && !isSelected && !isTodaySelected;
               final incomeTotal = dailyIncomeTotalsByDate[normalizedDay] ?? 0;
               final expenseTotal = dailyExpenseTotalsByDate[normalizedDay] ?? 0;
 
@@ -92,9 +99,7 @@ class LedgerCalendar extends StatelessWidget {
                     border: Border(
                       top: BorderSide(
                         color:
-                            isSelected
-                                ? const Color(0xFF137FEC)
-                                : Colors.white,
+                            isSelected ? const Color(0xFF137FEC) : Colors.white,
                         width: 1,
                       ),
                     ),
@@ -102,21 +107,40 @@ class LedgerCalendar extends StatelessWidget {
                   padding: EdgeInsets.only(top: 4),
                   child: Column(
                     children: [
-                      Text(
-                        '${day.day}',
-                        style: TextStyle(
-                          fontSize: 14,
-                          height: 20 / 14,
-                          fontWeight:
-                              isSelected ? FontWeight.w700 : FontWeight.w500,
-                          color:
-                              isSelected
-                                  ? const Color(0xFF137FEC)
-                                  : _dayTextColor(
-                                    day: day,
-                                    isCurrentMonth: isCurrentMonth,
-                                  ),
-                        ),
+                      Stack(
+                        clipBehavior: Clip.none,
+                        alignment: Alignment.center,
+                        children: [
+                          Text(
+                            '${day.day}',
+                            style: TextStyle(
+                              fontSize: 14,
+                              height: 20 / 14,
+                              fontWeight:
+                                  isSelected || shouldShowTodayMarker
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
+                              color:
+                                  isSelected
+                                      ? const Color(0xFF137FEC)
+                                      : _dayTextColor(
+                                        day: day,
+                                        isCurrentMonth: isCurrentMonth,
+                                      ),
+                            ),
+                          ),
+                          if (shouldShowTodayMarker)
+                            const Positioned(
+                              top: -5,
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  color: Color(0xFFFACC15),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: SizedBox(width: 5, height: 5),
+                              ),
+                            ),
+                        ],
                       ),
                       const SizedBox(height: 2),
                       if (isCurrentMonth && incomeTotal > 0)

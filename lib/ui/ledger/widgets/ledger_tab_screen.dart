@@ -77,12 +77,20 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
   String get _monthLabel => '${_currentMonth.year}년 ${_currentMonth.month}월';
 
   void _changeMonth(int monthDelta) {
+    late final DateTime nextMonth;
+    late final DateTime firstDayOfNextMonth;
+
     setState(() {
-      _currentMonth = DateTime(
+      nextMonth = DateTime(
         _currentMonth.year,
         _currentMonth.month + monthDelta,
       );
+      _currentMonth = nextMonth;
+      firstDayOfNextMonth = DateTime(nextMonth.year, nextMonth.month, 1);
+      _selectedDate = firstDayOfNextMonth;
     });
+
+    widget.onSelectedDateChanged?.call(firstDayOfNextMonth);
     _viewModel.loadMonth(_currentMonth);
   }
 
