@@ -6,6 +6,7 @@ import 'package:money_mate/ui/ledger/widgets/ledger_view_toggle.dart';
 
 import 'ledger_income_summary_card.dart';
 import 'ledger_month_selector.dart';
+import 'ledger_record_detail_screen.dart';
 import 'ledger_top_navigation_bar.dart';
 import 'selected_date_ledger_section.dart';
 
@@ -143,8 +144,12 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
                     padding: EdgeInsets.symmetric(horizontal: 16),
                     child: LedgerIncomeSummaryCard(
                       incomeText: _currencyText(_viewModel.monthlyIncomeTotal),
-                      expenseText: _currencyText(_viewModel.monthlyExpenseTotal),
-                      savableText: _currencyText(_viewModel.monthlySavableTotal),
+                      expenseText: _currencyText(
+                        _viewModel.monthlyExpenseTotal,
+                      ),
+                      savableText: _currencyText(
+                        _viewModel.monthlySavableTotal,
+                      ),
                     ),
                   ),
                   if (_selectedView == LedgerViewType.calendar) ...[
@@ -181,6 +186,15 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
                       isLoading: _viewModel.isLoading,
                       errorMessage: _viewModel.errorMessage,
                       selectedDateLabelBuilder: _selectedDateLabel,
+                      onItemTap: (item) {
+                        Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder:
+                                (context) =>
+                                    LedgerRecordDetailScreen(entry: item),
+                          ),
+                        );
+                      },
                     ),
                     const SizedBox(height: 80),
                   ],

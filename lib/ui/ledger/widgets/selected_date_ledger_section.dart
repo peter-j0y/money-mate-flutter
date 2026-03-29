@@ -10,6 +10,7 @@ class SelectedDateLedgerSection extends StatelessWidget {
     required this.isLoading,
     required this.errorMessage,
     required this.selectedDateLabelBuilder,
+    required this.onItemTap,
   });
 
   final DateTime? selectedDate;
@@ -17,6 +18,7 @@ class SelectedDateLedgerSection extends StatelessWidget {
   final bool isLoading;
   final String? errorMessage;
   final String Function(DateTime) selectedDateLabelBuilder;
+  final ValueChanged<LedgerEntry> onItemTap;
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +94,7 @@ class SelectedDateLedgerSection extends StatelessWidget {
             ...items.map(
               (item) => Padding(
                 padding: const EdgeInsets.only(bottom: 8),
-                child: _DailyLedgerListTile(item: item),
+                child: _DailyLedgerListTile(item: item, onTap: onItemTap),
               ),
             ),
         ],
@@ -136,9 +138,10 @@ class _StateCard extends StatelessWidget {
 }
 
 class _DailyLedgerListTile extends StatelessWidget {
-  const _DailyLedgerListTile({required this.item});
+  const _DailyLedgerListTile({required this.item, required this.onTap});
 
   final LedgerEntry item;
+  final ValueChanged<LedgerEntry> onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -149,89 +152,92 @@ class _DailyLedgerListTile extends StatelessWidget {
     final style = _LedgerCategoryStyle.from(item);
     final subtitle = _truncateSubtitle(item.memo?.trim());
     final hasSubtitle = subtitle != null && subtitle.isNotEmpty;
-    final rightBottomText =
-        isIncome ? null : item.paymentMethod?.koreanLabel;
+    final rightBottomText = isIncome ? null : item.paymentMethod?.koreanLabel;
     final hasRightBottomText =
         rightBottomText != null && rightBottomText.isNotEmpty;
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
         borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: style.iconBackgroundColor,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(style.icon, color: style.iconColor, size: 20),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item.category,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    height: 20 / 14,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF0F172A),
-                  ),
-                ),
-                if (hasSubtitle) ...[
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      height: 16 / 12,
-                      fontWeight: FontWeight.w400,
-                      color: Color(0xFF94A3B8),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
+        onTap: () => onTap(item),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
             children: [
-              Text(
-                '$amountPrefix${_wonText(item.amount)}',
-                style: TextStyle(
-                  fontSize: 16,
-                  height: 24 / 16,
-                  fontWeight: FontWeight.w500,
-                  color: amountColor,
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: style.iconBackgroundColor,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(style.icon, color: style.iconColor, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item.category,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        height: 20 / 14,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFF0F172A),
+                      ),
+                    ),
+                    if (hasSubtitle) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          height: 16 / 12,
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xFF94A3B8),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ),
-              if (hasRightBottomText) ...[
-                const SizedBox(height: 1),
-                Text(
-                  rightBottomText,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 10,
-                    height: 15 / 10,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF94A3B8),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    '$amountPrefix${_wonText(item.amount)}',
+                    style: TextStyle(
+                      fontSize: 16,
+                      height: 24 / 16,
+                      fontWeight: FontWeight.w500,
+                      color: amountColor,
+                    ),
                   ),
-                ),
-              ],
+                  if (hasRightBottomText) ...[
+                    const SizedBox(height: 1),
+                    Text(
+                      rightBottomText,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 10,
+                        height: 15 / 10,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFF94A3B8),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
