@@ -11,7 +11,7 @@ class ExpensePaymentMethodSelector extends StatelessWidget {
   });
 
   final List<ExpensePaymentMethod> options;
-  final ExpensePaymentMethod selectedMethod;
+  final ExpensePaymentMethod? selectedMethod;
   final ValueChanged<ExpensePaymentMethod> onChanged;
 
   @override

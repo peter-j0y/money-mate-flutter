@@ -25,8 +25,7 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
   int _selectedTypeIndex = 1;
   int _selectedExpenseCategoryIndex = -1;
   int _selectedIncomeCategoryIndex = -1;
-  ExpensePaymentMethod _selectedExpensePaymentMethod =
-      ExpensePaymentMethod.creditCard;
+  ExpensePaymentMethod? _selectedExpensePaymentMethod;
   final FocusNode _amountFocusNode = FocusNode();
   final TextEditingController _amountController = TextEditingController(
     text: '0',
@@ -70,6 +69,7 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
   void initState() {
     super.initState();
     _selectedDate = widget.initialDate ?? DateTime.now();
+    _amountController.addListener(_onAmountChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) {
         return;
@@ -80,6 +80,7 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
 
   @override
   void dispose() {
+    _amountController.removeListener(_onAmountChanged);
     _viewModel.dispose();
     _amountFocusNode.dispose();
     _amountController.dispose();
@@ -87,16 +88,70 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
     super.dispose();
   }
 
+  void _onAmountChanged() {
+    if (!mounted) {
+      return;
+    }
+    setState(() {});
+  }
+
   int get _amountValue {
     final digits = _amountController.text.replaceAll(RegExp(r'[^0-9]'), '');
     return int.tryParse(digits) ?? 0;
   }
 
-  Future<void> _saveRecord() async {
+  bool get _isTypeSelected {
+    return _selectedTypeIndex == 0 || _selectedTypeIndex == 1;
+  }
+
+  bool get _isDateSelected => true;
+
+  bool get _isFormValid {
+    return _isDateSelected &&
+        _amountValue > 0 &&
+        _isTypeSelected &&
+        _selectedCategoryIndex >= 0 &&
+        (_selectedTypeIndex != 1 || _selectedExpensePaymentMethod != null);
+  }
+
+  String? get _validationMessage {
+    if (!_isDateSelected) {
+      return '날짜를 선택해 주세요.';
+    }
+    if (_amountValue <= 0) {
+      return '금액은 0원보다 커야 합니다.';
+    }
+    if (!_isTypeSelected) {
+      return '유형을 선택해 주세요.';
+    }
     if (_selectedCategoryIndex < 0) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('카테고리를 선택해 주세요.')));
+      return '카테고리를 선택해 주세요.';
+    }
+    if (_selectedTypeIndex == 1 && _selectedExpensePaymentMethod == null) {
+      return '지출 수단을 선택해 주세요.';
+    }
+    return null;
+  }
+
+  void _showValidationToast(String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  Future<void> _onSubmitTap() async {
+    final validationMessage = _validationMessage;
+    if (validationMessage != null) {
+      _showValidationToast(validationMessage);
+      return;
+    }
+    await _saveRecord();
+  }
+
+  Future<void> _saveRecord() async {
+    final validationMessage = _validationMessage;
+    if (validationMessage != null) {
+      _showValidationToast(validationMessage);
       return;
     }
 
@@ -147,6 +202,7 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
   @override
   Widget build(BuildContext context) {
     final safeAreaBottom = MediaQuery.paddingOf(context).bottom;
+    final isSubmitEnabledUi = _isFormValid;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -245,14 +301,20 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
                     height: 60,
                     child: FilledButton(
                       style: FilledButton.styleFrom(
-                        backgroundColor: const Color(0xFF137FEC),
+                        backgroundColor:
+                            isSubmitEnabledUi
+                                ? const Color(0xFF137FEC)
+                                : const Color(0xFFCBD5E1),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24),
                         ),
                         elevation: 0,
-                        shadowColor: const Color.fromRGBO(19, 127, 236, 0.25),
+                        shadowColor:
+                            isSubmitEnabledUi
+                                ? const Color.fromRGBO(19, 127, 236, 0.25)
+                                : Colors.transparent,
                       ),
-                      onPressed: _viewModel.isSaving ? null : _saveRecord,
+                      onPressed: _viewModel.isSaving ? null : _onSubmitTap,
                       child:
                           _viewModel.isSaving
                               ? const SizedBox(
