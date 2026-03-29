@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/ui/core/design_system/design_system.dart';
 
 class LedgerMonthSelector extends StatelessWidget {
   const LedgerMonthSelector({
@@ -19,10 +20,7 @@ class LedgerMonthSelector extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _ArrowButton(
-            icon: Icons.chevron_left_rounded,
-            onTap: onPreviousTap,
-          ),
+          _ArrowButton(icon: Icons.chevron_left_rounded, onTap: onPreviousTap),
           const SizedBox(width: 24),
           Text(
             monthLabel,
@@ -30,14 +28,11 @@ class LedgerMonthSelector extends StatelessWidget {
               fontSize: 18,
               height: 1.4,
               fontWeight: FontWeight.w500,
-              color: Color(0xFF0F172A),
+              color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(width: 24),
-          _ArrowButton(
-            icon: Icons.chevron_right_rounded,
-            onTap: onNextTap,
-          ),
+          _ArrowButton(icon: Icons.chevron_right_rounded, onTap: onNextTap),
         ],
       ),
     );
@@ -45,10 +40,7 @@ class LedgerMonthSelector extends StatelessWidget {
 }
 
 class _ArrowButton extends StatelessWidget {
-  const _ArrowButton({
-    required this.icon,
-    this.onTap,
-  });
+  const _ArrowButton({required this.icon, this.onTap});
 
   final IconData icon;
   final VoidCallback? onTap;
@@ -59,15 +51,11 @@ class _ArrowButton extends StatelessWidget {
       width: 20,
       height: 20,
       child: Material(
-        color: Colors.transparent,
+        color: AppColors.overlay,
         child: InkWell(
           borderRadius: BorderRadius.circular(10),
           onTap: onTap,
-          child: Icon(
-            icon,
-            size: 18,
-            color: const Color(0xFF94A3B8),
-          ),
+          child: Icon(icon, size: 18, color: AppColors.textTertiary),
         ),
       ),
     );

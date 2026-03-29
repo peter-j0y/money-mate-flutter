@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/ui/core/design_system/design_system.dart';
 
 class LedgerMemoSection extends StatelessWidget {
   const LedgerMemoSection.editable({
@@ -32,7 +33,7 @@ class LedgerMemoSection extends StatelessWidget {
     if (controller != null) {
       return Container(
         decoration: BoxDecoration(
-          color: const Color(0xFFF8FAFC),
+          color: AppColors.background,
           borderRadius: BorderRadius.circular(24),
         ),
         padding: const EdgeInsets.all(5),
@@ -44,7 +45,7 @@ class LedgerMemoSection extends StatelessWidget {
             fontSize: 16,
             height: 24 / 16,
             fontWeight: FontWeight.w500,
-            color: Color(0xFF0F172A),
+            color: AppColors.textPrimary,
           ),
           decoration: InputDecoration(
             hintText: placeholderText,
@@ -52,7 +53,7 @@ class LedgerMemoSection extends StatelessWidget {
               fontSize: 16,
               height: 24 / 16,
               fontWeight: FontWeight.w500,
-              color: Color(0xFF94A3B8),
+              color: AppColors.textTertiary,
             ),
             border: InputBorder.none,
             contentPadding: EdgeInsets.fromLTRB(12, 8, 12, 8),
@@ -67,7 +68,7 @@ class LedgerMemoSection extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(24),
       ),
       padding: const EdgeInsets.fromLTRB(17, 13, 17, 13),
@@ -77,7 +78,7 @@ class LedgerMemoSection extends StatelessWidget {
           fontSize: 16,
           height: 24 / 16,
           fontWeight: FontWeight.w500,
-          color: hasMemo ? const Color(0xFF0F172A) : const Color(0xFF94A3B8),
+          color: hasMemo ? AppColors.textPrimary : AppColors.textTertiary,
         ),
       ),
     );

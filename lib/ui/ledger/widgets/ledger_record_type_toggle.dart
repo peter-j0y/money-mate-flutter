@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/ui/core/design_system/design_system.dart';
 
 class LedgerRecordTypeToggle extends StatelessWidget {
   const LedgerRecordTypeToggle({
@@ -51,7 +52,7 @@ class _RecordTypeButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.transparent,
+      color: AppColors.overlay,
       child: InkWell(
         borderRadius: BorderRadius.circular(24),
         onTap: onTap,
@@ -59,9 +60,9 @@ class _RecordTypeButton extends StatelessWidget {
           height: 48,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFF137FEC) : const Color(0xFFF1F5F9),
+            color: isSelected ? AppColors.primary : AppColors.surfaceMuted,
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Colors.transparent, width: 2),
+            border: Border.all(color: AppColors.overlay, width: 2),
           ),
           child: Text(
             label,
@@ -69,7 +70,7 @@ class _RecordTypeButton extends StatelessWidget {
               fontSize: 14,
               height: 20 / 14,
               fontWeight: FontWeight.w500,
-              color: isSelected ? Colors.white : const Color(0xFF64748B),
+              color: isSelected ? AppColors.white : AppColors.textSecondary,
             ),
           ),
         ),

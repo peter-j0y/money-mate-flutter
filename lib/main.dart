@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:money_mate/ui/ledger/widgets/add_ledger_record_screen.dart';
 import 'package:money_mate/ui/asset/assets_tab_screen.dart';
+import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:money_mate/ui/ledger/widgets/ledger_tab_screen.dart';
 import 'package:money_mate/ui/core/bottom_navigation_bar.dart';
 
@@ -16,11 +17,9 @@ class MoneyMateApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Money Mate',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF2D6A4F)),
-        scaffoldBackgroundColor: Colors.white,
-        useMaterial3: true,
-      ),
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      themeMode: ThemeMode.light,
       home: const HomeScreen(),
     );
   }
@@ -61,26 +60,28 @@ class _HomeScreenState extends State<HomeScreen> {
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),
       ),
-      floatingActionButton: _currentIndex == 0
-          ? FloatingActionButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (context) => AddLedgerRecordScreen(
-                      initialDate: _selectedLedgerDate,
+      floatingActionButton:
+          _currentIndex == 0
+              ? FloatingActionButton(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder:
+                          (context) => AddLedgerRecordScreen(
+                            initialDate: _selectedLedgerDate,
+                          ),
                     ),
-                  ),
-                );
-              },
-              backgroundColor: const Color(0xFF137FEC),
-              shape: const CircleBorder(),
-              child: const Icon(
-                Icons.add,
-                color: Colors.white,
-                size: 28,
-              ),
-            )
-          : null,
+                  );
+                },
+                backgroundColor: AppColors.primary,
+                shape: const CircleBorder(),
+                child: Icon(
+                  Icons.add,
+                  color: AppColors.inverseText,
+                  size: 28,
+                ),
+              )
+              : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
@@ -104,7 +105,7 @@ class _TabPage extends StatelessWidget {
               title,
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                 fontWeight: FontWeight.w800,
-                color: const Color(0xFF0F172A),
+                color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
@@ -112,22 +113,24 @@ class _TabPage extends StatelessWidget {
               subtitle,
               style: Theme.of(
                 context,
-              ).textTheme.bodyLarge?.copyWith(color: const Color(0xFF64748B)),
+              ).textTheme.bodyLarge?.copyWith(
+                color: AppColors.textSecondary,
+              ),
             ),
             const Spacer(),
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                border: Border.all(color: AppColors.border),
               ),
               child: const Text(
                 'Figma 디자인 값을 연결해 픽셀 단위로 맞출 준비가 되어 있습니다.',
                 style: TextStyle(
                   fontSize: 14,
-                  color: Color(0xFF334155),
+                  color: AppColors.hexFF334155,
                   height: 1.5,
                 ),
               ),

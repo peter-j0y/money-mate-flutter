@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/ui/core/design_system/design_system.dart';
 
 class AssetAllocationSectionsList extends StatelessWidget {
   const AssetAllocationSectionsList({super.key});
@@ -14,8 +15,8 @@ class AssetAllocationSectionsList extends StatelessWidget {
     _SectionData(
       title: '미국 주식',
       summaryText: '목표보다 많아요 (+5%)',
-      summaryBackground: Color(0xFFFFF1F2),
-      summaryTextColor: Color(0xFFF43F5E),
+      summaryBackground: AppColors.hexFFFFF1F2,
+      summaryTextColor: AppColors.hexFFF43F5E,
       items: [
         _AssetItemData(
           name: '애플 (AAPL)',
@@ -23,10 +24,10 @@ class AssetAllocationSectionsList extends StatelessWidget {
           amount: '₩24,503,200',
           target: '목표: 15%',
           current: '(현재 18%)',
-          currentColor: Color(0xFF34D399),
+          currentColor: AppColors.hexFF34D399,
           tip: '조금 줄여도 좋아요',
-          tipBackground: Color(0xFFFFF1F2),
-          tipColor: Color(0xFFFB7185),
+          tipBackground: AppColors.hexFFFFF1F2,
+          tipColor: AppColors.hexFFFB7185,
           logoUrl: _aaplLogoUrl,
         ),
         _AssetItemData(
@@ -35,10 +36,10 @@ class AssetAllocationSectionsList extends StatelessWidget {
           amount: '₩18,240,500',
           target: '목표: 12%',
           current: '(현재 13%)',
-          currentColor: Color(0xFF34D399),
+          currentColor: AppColors.hexFF34D399,
           tip: '거의 딱 맞아요',
-          tipBackground: Color(0xFFECFDF5),
-          tipColor: Color(0xFF10B981),
+          tipBackground: AppColors.hexFFECFDF5,
+          tipColor: AppColors.hexFF10B981,
           logoUrl: _msftLogoUrl,
         ),
         _AssetItemData(
@@ -47,10 +48,10 @@ class AssetAllocationSectionsList extends StatelessWidget {
           amount: '₩8,940,000',
           target: '목표: 10%',
           current: '(현재 6%)',
-          currentColor: Color(0xFFFB7185),
+          currentColor: AppColors.hexFFFB7185,
           tip: '더 채워야 해요',
-          tipBackground: Color(0xFFFFF1F2),
-          tipColor: Color(0xFFF43F5E),
+          tipBackground: AppColors.hexFFFFF1F2,
+          tipColor: AppColors.hexFFF43F5E,
           logoUrl: _tslaLogoUrl,
         ),
       ],
@@ -58,8 +59,8 @@ class AssetAllocationSectionsList extends StatelessWidget {
     _SectionData(
       title: '코인',
       summaryText: '목표와 비슷해요',
-      summaryBackground: Color(0xFFECFDF5),
-      summaryTextColor: Color(0xFF10B981),
+      summaryBackground: AppColors.hexFFECFDF5,
+      summaryTextColor: AppColors.hexFF10B981,
       items: [
         _AssetItemData(
           name: '비트코인 (BTC)',
@@ -67,10 +68,10 @@ class AssetAllocationSectionsList extends StatelessWidget {
           amount: '₩12,000,000',
           target: '목표: 20%',
           current: '(현재 19%)',
-          currentColor: Color(0xFF10B981),
+          currentColor: AppColors.hexFF10B981,
           tip: '좋은 비중이에요',
-          tipBackground: Color(0xFFECFDF5),
-          tipColor: Color(0xFF10B981),
+          tipBackground: AppColors.hexFFECFDF5,
+          tipColor: AppColors.hexFF10B981,
           fallbackIcon: Icons.currency_bitcoin_rounded,
         ),
         _AssetItemData(
@@ -79,10 +80,10 @@ class AssetAllocationSectionsList extends StatelessWidget {
           amount: '₩6,850,000',
           target: '목표: 10%',
           current: '(현재 11%)',
-          currentColor: Color(0xFF10B981),
+          currentColor: AppColors.hexFF10B981,
           tip: '거의 딱 맞아요',
-          tipBackground: Color(0xFFECFDF5),
-          tipColor: Color(0xFF10B981),
+          tipBackground: AppColors.hexFFECFDF5,
+          tipColor: AppColors.hexFF10B981,
           fallbackIcon: Icons.token_rounded,
         ),
       ],
@@ -90,8 +91,8 @@ class AssetAllocationSectionsList extends StatelessWidget {
     _SectionData(
       title: '현금',
       summaryText: '목표보다 적어요 (-3%)',
-      summaryBackground: Color(0xFFFFF1F2),
-      summaryTextColor: Color(0xFFF43F5E),
+      summaryBackground: AppColors.hexFFFFF1F2,
+      summaryTextColor: AppColors.hexFFF43F5E,
       items: [
         _AssetItemData(
           name: '원화 예수금',
@@ -99,10 +100,10 @@ class AssetAllocationSectionsList extends StatelessWidget {
           amount: '₩3,200,000',
           target: '목표: 10%',
           current: '(현재 8%)',
-          currentColor: Color(0xFFFB7185),
+          currentColor: AppColors.hexFFFB7185,
           tip: '더 채워야 해요',
-          tipBackground: Color(0xFFFFF1F2),
-          tipColor: Color(0xFFF43F5E),
+          tipBackground: AppColors.hexFFFFF1F2,
+          tipColor: AppColors.hexFFF43F5E,
           fallbackIcon: Icons.account_balance_wallet_rounded,
         ),
         _AssetItemData(
@@ -111,10 +112,10 @@ class AssetAllocationSectionsList extends StatelessWidget {
           amount: '₩5,940,000',
           target: '목표: 8%',
           current: '(현재 9%)',
-          currentColor: Color(0xFF10B981),
+          currentColor: AppColors.hexFF10B981,
           tip: '좋은 비중이에요',
-          tipBackground: Color(0xFFECFDF5),
-          tipColor: Color(0xFF10B981),
+          tipBackground: AppColors.hexFFECFDF5,
+          tipColor: AppColors.hexFF10B981,
           fallbackIcon: Icons.attach_money_rounded,
         ),
       ],
@@ -154,7 +155,7 @@ class _AssetSection extends StatelessWidget {
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontSize: 18,
                   height: 28 / 18,
-                  color: const Color(0xFF1E293B),
+                  color: AppColors.hexFF1E293B,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -197,12 +198,12 @@ class _AssetCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(17),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFF3F4F6)),
+        border: Border.all(color: AppColors.hexFFF3F4F6),
         boxShadow: const [
           BoxShadow(
-            color: Color.fromRGBO(0, 0, 0, 0.05),
+            color: AppColors.rgba_0_0_0_005,
             blurRadius: 8,
             offset: Offset(0, 2),
           ),
@@ -217,11 +218,11 @@ class _AssetCard extends StatelessWidget {
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF9FAFB),
+                    color: AppColors.hexFFF9FAFB,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: const [
                       BoxShadow(
-                        color: Color.fromRGBO(0, 0, 0, 0.05),
+                        color: AppColors.rgba_0_0_0_005,
                         blurRadius: 4,
                         offset: Offset(0, 2),
                         blurStyle: BlurStyle.inner,
@@ -242,7 +243,7 @@ class _AssetCard extends StatelessWidget {
                           fontSize: 14,
                           height: 20 / 14,
                           fontWeight: FontWeight.w700,
-                          color: const Color(0xFF1E293B),
+                          color: AppColors.hexFF1E293B,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -253,7 +254,7 @@ class _AssetCard extends StatelessWidget {
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           fontSize: 12,
                           height: 16 / 12,
-                          color: const Color(0xFF64748B),
+                          color: AppColors.hexFF64748B,
                         ),
                       ),
                     ],
@@ -272,7 +273,7 @@ class _AssetCard extends StatelessWidget {
                   fontSize: 14,
                   height: 20 / 14,
                   fontWeight: FontWeight.w700,
-                  color: const Color(0xFF1E293B),
+                  color: AppColors.hexFF1E293B,
                 ),
               ),
               const SizedBox(height: 2),
@@ -283,7 +284,7 @@ class _AssetCard extends StatelessWidget {
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       fontSize: 12,
                       height: 16 / 12,
-                      color: const Color(0xFF94A3B8),
+                      color: AppColors.hexFF94A3B8,
                     ),
                   ),
                   const SizedBox(width: 6),
@@ -342,7 +343,7 @@ class _AssetLogo extends StatelessWidget {
             return Icon(
               item.fallbackIcon ?? Icons.insert_chart_rounded,
               size: 20,
-              color: const Color(0xFF64748B),
+              color: AppColors.hexFF64748B,
             );
           },
         ),
@@ -352,7 +353,7 @@ class _AssetLogo extends StatelessWidget {
     return Icon(
       item.fallbackIcon ?? Icons.insert_chart_rounded,
       size: 20,
-      color: const Color(0xFF64748B),
+      color: AppColors.hexFF64748B,
     );
   }
 }

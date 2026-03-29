@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:flutter/services.dart';
 import 'package:money_mate/ui/ledger/widgets/ledger_category_grid.dart';
 import 'package:money_mate/ui/ledger/widgets/expense_payment_method_selector.dart';
@@ -205,7 +206,7 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
     final isSubmitEnabledUi = _isFormValid;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -243,7 +244,7 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
                     const Divider(
                       height: 2,
                       thickness: 2,
-                      color: Color(0xFFF1F5F9),
+                      color: AppColors.surfaceMuted,
                     ),
                     const SizedBox(height: 24),
                     const _SectionLabel(text: '유형'),
@@ -289,9 +290,9 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Color.fromRGBO(255, 255, 255, 0),
-                        Color.fromRGBO(255, 255, 255, 0.9),
-                        Colors.white,
+                        AppColors.rgba_255_255_255_0,
+                        AppColors.rgba_255_255_255_09,
+                        AppColors.white,
                       ],
                     ),
                   ),
@@ -303,16 +304,16 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
                       style: FilledButton.styleFrom(
                         backgroundColor:
                             isSubmitEnabledUi
-                                ? const Color(0xFF137FEC)
-                                : const Color(0xFFCBD5E1),
+                                ? AppColors.primary
+                                : AppColors.hexFFCBD5E1,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24),
                         ),
                         elevation: 0,
                         shadowColor:
                             isSubmitEnabledUi
-                                ? const Color.fromRGBO(19, 127, 236, 0.25)
-                                : Colors.transparent,
+                                ? AppColors.rgba_19_127_236_025
+                                : AppColors.overlay,
                       ),
                       onPressed: _viewModel.isSaving ? null : _onSubmitTap,
                       child:
@@ -322,7 +323,7 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
                                 height: 22,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2.4,
-                                  color: Colors.white,
+                                  color: AppColors.white,
                                 ),
                               )
                               : const Text(
@@ -331,7 +332,7 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
                                   fontSize: 18,
                                   height: 28 / 18,
                                   fontWeight: FontWeight.w500,
-                                  color: Colors.white,
+                                  color: AppColors.white,
                                 ),
                               ),
                     ),
@@ -364,7 +365,7 @@ class _SectionLabel extends StatelessWidget {
         fontSize: 14,
         height: 20 / 14,
         fontWeight: FontWeight.w500,
-        color: Color(0xFF64748B),
+        color: AppColors.textSecondary,
       ),
     );
   }

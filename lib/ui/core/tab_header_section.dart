@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/ui/core/design_system/design_system.dart';
 
 class TabHeaderSection extends StatelessWidget {
-  const TabHeaderSection({
-    super.key,
-    required this.title,
-  });
+  const TabHeaderSection({super.key, required this.title});
 
   final String title;
 
@@ -23,7 +21,7 @@ class TabHeaderSection extends StatelessWidget {
                 height: 22.5 / 18,
                 fontWeight: FontWeight.w500,
                 letterSpacing: -0.45,
-                color: Color(0xFF1E293B),
+                color: AppColors.hexFF1E293B,
               ),
             ),
           ),

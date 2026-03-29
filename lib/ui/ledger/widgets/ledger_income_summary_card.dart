@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/ui/core/design_system/design_system.dart';
 
 class LedgerIncomeSummaryCard extends StatelessWidget {
   const LedgerIncomeSummaryCard({
@@ -17,7 +18,7 @@ class LedgerIncomeSummaryCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(4, 16, 4, 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -26,7 +27,7 @@ class LedgerIncomeSummaryCard extends StatelessWidget {
             child: _SummaryValueColumn(
               title: '수입',
               value: incomeText,
-              valueColor: const Color(0xFF137FEC),
+              valueColor: AppColors.primary,
               showRightBorder: true,
             ),
           ),
@@ -34,7 +35,7 @@ class LedgerIncomeSummaryCard extends StatelessWidget {
             child: _SummaryValueColumn(
               title: '지출',
               value: expenseText,
-              valueColor: const Color(0xFFF43F5E),
+              valueColor: AppColors.danger,
               showRightBorder: true,
             ),
           ),
@@ -42,7 +43,7 @@ class LedgerIncomeSummaryCard extends StatelessWidget {
             child: _SummaryValueColumn(
               title: '저축 가능',
               value: savableText,
-              valueColor: const Color(0xFF10B981),
+              valueColor: AppColors.success,
             ),
           ),
         ],
@@ -72,7 +73,7 @@ class _SummaryValueColumn extends StatelessWidget {
         border:
             showRightBorder
                 ? const Border(
-                  right: BorderSide(color: Color(0xFFE2E8F0), width: 1),
+                  right: BorderSide(color: AppColors.border, width: 1),
                 )
                 : null,
       ),
@@ -85,7 +86,7 @@ class _SummaryValueColumn extends StatelessWidget {
               fontSize: 14,
               height: 1.5,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF4D545E),
+              color: AppColors.hexFF4D545E,
             ),
           ),
           const SizedBox(height: 4),

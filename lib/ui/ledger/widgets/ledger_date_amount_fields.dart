@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:flutter/services.dart';
 
 class LedgerDateCard extends StatelessWidget {
@@ -18,7 +19,7 @@ class LedgerDateCard extends StatelessWidget {
     final content = Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
@@ -30,14 +31,14 @@ class LedgerDateCard extends StatelessWidget {
                 fontSize: 16,
                 height: 24 / 16,
                 fontWeight: FontWeight.w500,
-                color: Color(0xFF0F172A),
+                color: AppColors.textPrimary,
               ),
             ),
           ),
           const Icon(
             Icons.calendar_today_outlined,
             size: 20,
-            color: Color(0xFF94A3B8),
+            color: AppColors.textTertiary,
           ),
         ],
       ),
@@ -90,7 +91,7 @@ class LedgerAmountField extends StatelessWidget {
                 fontSize: 36,
                 height: 36 / 30,
                 fontWeight: FontWeight.w700,
-                color: Color(0xFF0F172A),
+                color: AppColors.textPrimary,
               ),
               decoration: const InputDecoration(
                 isCollapsed: true,
@@ -106,7 +107,7 @@ class LedgerAmountField extends StatelessWidget {
                   fontSize: 36,
                   height: 36 / 30,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF0F172A),
+                  color: AppColors.textPrimary,
                 ),
               ),
             );
@@ -123,7 +124,7 @@ class LedgerAmountField extends StatelessWidget {
               fontSize: 20,
               height: 28 / 20,
               fontWeight: FontWeight.w500,
-              color: Color(0xFF1E293B),
+              color: AppColors.hexFF1E293B,
             ),
           ),
         ),

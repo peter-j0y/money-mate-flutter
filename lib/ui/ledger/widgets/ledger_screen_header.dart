@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/ui/core/design_system/design_system.dart';
 
 class LedgerScreenHeaderAction {
   const LedgerScreenHeaderAction({
     required this.label,
     required this.onTap,
-    this.color = const Color(0xFF137FEC),
+    this.color = AppColors.primary,
   });
 
   final String label;
@@ -47,7 +48,7 @@ class LedgerScreenHeader extends StatelessWidget {
                   icon: const Icon(
                     Icons.close_rounded,
                     size: 24,
-                    color: Color(0xFF1E293B),
+                    color: AppColors.hexFF1E293B,
                   ),
                 ),
               ),
@@ -59,7 +60,7 @@ class LedgerScreenHeader extends StatelessWidget {
                 fontSize: 18,
                 height: 22.5 / 18,
                 fontWeight: FontWeight.w500,
-                color: Color(0xFF0F172A),
+                color: AppColors.textPrimary,
               ),
             ),
             if (actions.isNotEmpty)
@@ -72,7 +73,7 @@ class LedgerScreenHeader extends StatelessWidget {
                       if (i > 0) const SizedBox(width: 8),
                       _LedgerHeaderActionButton(action: actions[i]),
                     ],
-                    const SizedBox(width: 16)
+                    const SizedBox(width: 16),
                   ],
                 ),
               ),

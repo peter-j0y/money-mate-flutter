@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/ui/core/design_system/design_system.dart';
 
 class MoneyMateBottomNavigationBar extends StatelessWidget {
   const MoneyMateBottomNavigationBar({
@@ -14,13 +15,13 @@ class MoneyMateBottomNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const selectedColor = Color(0xFF137FEC);
-    const unselectedColor = Color(0xFF94A3B8);
+    const selectedColor = AppColors.hexFF137FEC;
+    const unselectedColor = AppColors.hexFF94A3B8;
 
     return Container(
       decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Color(0xFFF1F5F9), width: 1)),
+        color: AppColors.white,
+        border: Border(top: BorderSide(color: AppColors.hexFFF1F5F9, width: 1)),
       ),
       child: SafeArea(
         top: false,

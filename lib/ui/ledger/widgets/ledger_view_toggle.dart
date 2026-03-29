@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/ui/core/design_system/design_system.dart';
 
-enum LedgerViewType {
-  calendar,
-  monthly,
-}
+enum LedgerViewType { calendar, monthly }
 
 class LedgerViewToggle extends StatelessWidget {
   const LedgerViewToggle({
@@ -48,7 +46,7 @@ class SegmentedToggle extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
-          color: const Color(0xFFF1F5F9),
+          color: AppColors.surfaceMuted,
           borderRadius: BorderRadius.circular(24),
         ),
         child: Row(
@@ -81,24 +79,25 @@ class _ToggleButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.transparent,
+      color: AppColors.overlay,
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 6),
           decoration: BoxDecoration(
-            color: isSelected ? Colors.white : Colors.transparent,
+            color: isSelected ? AppColors.white : AppColors.overlay,
             borderRadius: BorderRadius.circular(16),
-            boxShadow: isSelected
-                ? const [
-                    BoxShadow(
-                      color: Color.fromRGBO(0, 0, 0, 0.05),
-                      blurRadius: 2,
-                      offset: Offset(0, 1),
-                    ),
-                  ]
-                : null,
+            boxShadow:
+                isSelected
+                    ? const [
+                      BoxShadow(
+                        color: AppColors.rgba_0_0_0_005,
+                        blurRadius: 2,
+                        offset: Offset(0, 1),
+                      ),
+                    ]
+                    : null,
           ),
           alignment: Alignment.center,
           child: Text(
@@ -107,9 +106,7 @@ class _ToggleButton extends StatelessWidget {
               fontSize: 16,
               height: 20 / 14,
               fontWeight: FontWeight.w500,
-              color: isSelected
-                  ? const Color(0xFF137FEC)
-                  : const Color(0xFF64748B),
+              color: isSelected ? AppColors.primary : AppColors.textSecondary,
             ),
           ),
         ),

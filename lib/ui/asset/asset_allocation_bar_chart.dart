@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/ui/core/design_system/design_system.dart';
 
 class AssetAllocationBarChart extends StatelessWidget {
   const AssetAllocationBarChart({
@@ -11,10 +12,10 @@ class AssetAllocationBarChart extends StatelessWidget {
   final VoidCallback? onAddAssetTap;
 
   static const List<_AssetSegment> _segments = [
-    _AssetSegment(label: '미국 주식', ratio: 0.45, color: Color(0xFF34D399)),
-    _AssetSegment(label: '코인', ratio: 0.30, color: Color(0xFFA78BFA)),
-    _AssetSegment(label: '현금', ratio: 0.15, color: Color(0xFF38BDF8)),
-    _AssetSegment(label: '기타', ratio: 0.10, color: Color(0xFFFB923C)),
+    _AssetSegment(label: '미국 주식', ratio: 0.45, color: AppColors.hexFF34D399),
+    _AssetSegment(label: '코인', ratio: 0.30, color: AppColors.hexFFA78BFA),
+    _AssetSegment(label: '현금', ratio: 0.15, color: AppColors.hexFF38BDF8),
+    _AssetSegment(label: '기타', ratio: 0.10, color: AppColors.hexFFFB923C),
   ];
 
   @override
@@ -25,7 +26,7 @@ class AssetAllocationBarChart extends StatelessWidget {
           children: [
             Expanded(
               child: _ActionPillButton(
-                backgroundColor: const Color(0xFFFFE69A),
+                backgroundColor: AppColors.hexFFFFE69A,
                 icon: Icons.add_rounded,
                 label: '자산 추가',
                 onTap: onAddAssetTap,
@@ -34,7 +35,7 @@ class AssetAllocationBarChart extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: _ActionPillButton(
-                backgroundColor: const Color(0xFFB8F2E6),
+                backgroundColor: AppColors.hexFFB8F2E6,
                 icon: Icons.tune_rounded,
                 label: '비중 설정하기',
                 onTap: onHeaderTap,
@@ -46,10 +47,10 @@ class AssetAllocationBarChart extends StatelessWidget {
         Container(
           height: 20,
           decoration: BoxDecoration(
-            color: const Color(0xFFF3F4F6),
+            color: AppColors.hexFFF3F4F6,
             borderRadius: BorderRadius.circular(9999),
             boxShadow: const [
-              BoxShadow(color: Color(0xFFF9FAFB), spreadRadius: 4),
+              BoxShadow(color: AppColors.hexFFF9FAFB, spreadRadius: 4),
             ],
           ),
           clipBehavior: Clip.antiAlias,
@@ -98,7 +99,7 @@ class _ActionPillButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
+      color: AppColors.white,
       borderRadius: BorderRadius.circular(9999),
       child: InkWell(
         onTap: onTap,
@@ -106,12 +107,12 @@ class _ActionPillButton extends StatelessWidget {
         child: Ink(
           padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 13),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.white,
             borderRadius: BorderRadius.circular(9999),
-            border: Border.all(color: const Color(0xFFF3F4F6)),
+            border: Border.all(color: AppColors.hexFFF3F4F6),
             boxShadow: const [
               BoxShadow(
-                color: Color.fromRGBO(0, 0, 0, 0.05),
+                color: AppColors.rgba_0_0_0_005,
                 blurRadius: 2,
                 offset: Offset(0, 1),
               ),
@@ -128,7 +129,7 @@ class _ActionPillButton extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 alignment: Alignment.center,
-                child: Icon(icon, size: 14, color: const Color(0xFF4A4A4A)),
+                child: Icon(icon, size: 14, color: AppColors.hexFF4A4A4A),
               ),
               const SizedBox(width: 8),
               Text(
@@ -137,7 +138,7 @@ class _ActionPillButton extends StatelessWidget {
                   fontSize: 14,
                   height: 20 / 14,
                   fontWeight: FontWeight.w700,
-                  color: const Color(0xFF4A4A4A),
+                  color: AppColors.hexFF4A4A4A,
                 ),
               ),
             ],
@@ -167,7 +168,7 @@ class _LegendItem extends StatelessWidget {
             shape: BoxShape.circle,
             boxShadow: const [
               BoxShadow(
-                color: Color.fromRGBO(0, 0, 0, 0.05),
+                color: AppColors.rgba_0_0_0_005,
                 blurRadius: 2,
                 offset: Offset(0, 1),
               ),
@@ -180,7 +181,7 @@ class _LegendItem extends StatelessWidget {
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
             fontSize: 12,
             height: 16 / 12,
-            color: const Color(0xFF64748B),
+            color: AppColors.hexFF64748B,
           ),
         ),
       ],

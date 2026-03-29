@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/ui/core/design_system/design_system.dart';
 
 class LedgerCalendar extends StatelessWidget {
   const LedgerCalendar({
@@ -51,20 +52,20 @@ class LedgerCalendar extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(0, 12, 0, 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         children: [
           const Row(
             children: [
-              _WeekdayLabel(text: '일', color: Color(0xFFEF4444)),
+              _WeekdayLabel(text: '일', color: AppColors.hexFFEF4444),
               _WeekdayLabel(text: '월'),
               _WeekdayLabel(text: '화'),
               _WeekdayLabel(text: '수'),
               _WeekdayLabel(text: '목'),
               _WeekdayLabel(text: '금'),
-              _WeekdayLabel(text: '토', color: Color(0xFF3B82F6)),
+              _WeekdayLabel(text: '토', color: AppColors.hexFF3B82F6),
             ],
           ),
           const SizedBox(height: 8),
@@ -94,12 +95,14 @@ class LedgerCalendar extends StatelessWidget {
                   decoration: BoxDecoration(
                     color:
                         isSelected
-                            ? const Color.fromRGBO(19, 127, 236, 0.05)
-                            : Colors.transparent,
+                            ? AppColors.rgba_19_127_236_005
+                            : AppColors.overlay,
                     border: Border(
                       top: BorderSide(
                         color:
-                            isSelected ? const Color(0xFF137FEC) : Colors.white,
+                            isSelected
+                                ? AppColors.primary
+                                : AppColors.white,
                         width: 1,
                       ),
                     ),
@@ -122,7 +125,7 @@ class LedgerCalendar extends StatelessWidget {
                                       : FontWeight.w500,
                               color:
                                   isSelected
-                                      ? const Color(0xFF137FEC)
+                                      ? AppColors.primary
                                       : _dayTextColor(
                                         day: day,
                                         isCurrentMonth: isCurrentMonth,
@@ -134,7 +137,7 @@ class LedgerCalendar extends StatelessWidget {
                               top: -5,
                               child: DecoratedBox(
                                 decoration: BoxDecoration(
-                                  color: Color(0xFFFACC15),
+                                  color: AppColors.hexFFFACC15,
                                   shape: BoxShape.circle,
                                 ),
                                 child: SizedBox(width: 5, height: 5),
@@ -146,12 +149,12 @@ class LedgerCalendar extends StatelessWidget {
                       if (isCurrentMonth && incomeTotal > 0)
                         _AdaptiveCalendarAmountText(
                           text: '+${_wonText(incomeTotal)}',
-                          color: const Color(0xFF137FEC),
+                          color: AppColors.primary,
                         ),
                       if (isCurrentMonth && expenseTotal > 0)
                         _AdaptiveCalendarAmountText(
                           text: '-${_wonText(expenseTotal)}',
-                          color: const Color(0xFFF43F5E),
+                          color: AppColors.danger,
                         ),
                     ],
                   ),
@@ -173,12 +176,12 @@ class LedgerCalendar extends StatelessWidget {
 
   Color _dayTextColor({required DateTime day, required bool isCurrentMonth}) {
     if (isCurrentMonth && day.weekday == DateTime.sunday) {
-      return const Color(0xFFEF4444);
+      return AppColors.hexFFEF4444;
     }
     if (isCurrentMonth && day.weekday == DateTime.saturday) {
-      return const Color(0xFF3B82F6);
+      return AppColors.hexFF3B82F6;
     }
-    return isCurrentMonth ? const Color(0xFF0F172A) : const Color(0xFF94A3B8);
+    return isCurrentMonth ? AppColors.textPrimary : AppColors.textTertiary;
   }
 
   String _wonText(int amount) {
@@ -228,10 +231,7 @@ class _AdaptiveCalendarAmountText extends StatelessWidget {
 }
 
 class _WeekdayLabel extends StatelessWidget {
-  const _WeekdayLabel({
-    required this.text,
-    this.color = const Color(0xFF64748B),
-  });
+  const _WeekdayLabel({required this.text, this.color = AppColors.textSecondary});
 
   final String text;
   final Color color;

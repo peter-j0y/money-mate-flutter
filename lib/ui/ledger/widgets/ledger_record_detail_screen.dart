@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:flutter/services.dart';
 import 'package:money_mate/data/model/entities/ledger_record.dart';
 import 'package:money_mate/data/repositories/ledger_record_repository.dart';
@@ -282,19 +283,19 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.white,
           content: const Text('삭제하면 기록을 다시 복구할 수 없어요. 정말로 삭제할까요?'),
           actions: [
             TextButton(
               style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFF137FEC),
+                foregroundColor: AppColors.primary,
               ),
               onPressed: () => Navigator.of(dialogContext).pop(false),
               child: const Text('취소'),
             ),
             TextButton(
               style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFF137FEC),
+                foregroundColor: AppColors.primary,
               ),
               onPressed: () => Navigator.of(dialogContext).pop(true),
               child: const Text('삭제'),
@@ -312,7 +313,7 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
     final safeAreaBottom = MediaQuery.paddingOf(context).bottom;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -323,7 +324,7 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
               actions: [
                 LedgerScreenHeaderAction(
                   label: '삭제',
-                  color: const Color(0xFFF43F5E),
+                  color: AppColors.danger,
                   onTap: _onDeleteTap,
                 ),
               ],
@@ -353,7 +354,7 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
                     const Divider(
                       height: 2,
                       thickness: 2,
-                      color: Color(0xFFF1F5F9),
+                      color: AppColors.surfaceMuted,
                     ),
                     const SizedBox(height: 24),
                     const _SectionLabel(text: '유형'),
@@ -396,7 +397,7 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
                       onTap: _markTapped,
                       placeholder:
                           _isMemoInitiallyEmpty
-                              ? '기존 메모가 없어요. 내용을 추가해 주세요.'
+                              ? '기존 메모가 없어요. 내용을 추가해 보세요.'
                               : null,
                     ),
                   ],
@@ -414,9 +415,9 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
                             colors: [
-                              Color.fromRGBO(255, 255, 255, 0),
-                              Color.fromRGBO(255, 255, 255, 0.9),
-                              Colors.white,
+                              AppColors.rgba_255_255_255_0,
+                              AppColors.rgba_255_255_255_09,
+                              AppColors.white,
                             ],
                           ),
                         ),
@@ -431,17 +432,12 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
                           height: 60,
                           child: FilledButton(
                             style: FilledButton.styleFrom(
-                              backgroundColor: const Color(0xFF137FEC),
+                              backgroundColor: AppColors.primary,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(24),
                               ),
                               elevation: 0,
-                              shadowColor: const Color.fromRGBO(
-                                19,
-                                127,
-                                236,
-                                0.25,
-                              ),
+                              shadowColor: AppColors.rgba_19_127_236_025,
                             ),
                             onPressed:
                                 _isUpdating || _isDeleting ? null : _onSaveTap,
@@ -452,7 +448,7 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
                                       height: 22,
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2.4,
-                                        color: Colors.white,
+                                        color: AppColors.white,
                                       ),
                                     )
                                     : const Text(
@@ -461,7 +457,7 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
                                         fontSize: 18,
                                         height: 28 / 18,
                                         fontWeight: FontWeight.w500,
-                                        color: Colors.white,
+                                        color: AppColors.white,
                                       ),
                                     ),
                           ),
@@ -470,7 +466,7 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
                       : Container(
                         key: const ValueKey('empty-bottom'),
                         height: safeAreaBottom + 8,
-                        color: Colors.white,
+                        color: AppColors.white,
                       ),
             ),
           ],
@@ -537,7 +533,7 @@ class _SectionLabel extends StatelessWidget {
         fontSize: 14,
         height: 20 / 14,
         fontWeight: FontWeight.w500,
-        color: Color(0xFF64748B),
+        color: AppColors.textSecondary,
       ),
     );
   }

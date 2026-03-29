@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:money_mate/ui/ledger/widgets/ledger_category_options.dart';
 
 class LedgerCategoryGrid extends StatelessWidget {
@@ -64,7 +65,7 @@ class _LedgerCategoryGridItem extends StatelessWidget {
             shape: BoxShape.circle,
             border:
                 selected
-                    ? Border.all(color: const Color(0xFF137FEC), width: 2)
+                    ? Border.all(color: AppColors.primary, width: 2)
                     : null,
           ),
           alignment: Alignment.center,
@@ -80,7 +81,7 @@ class _LedgerCategoryGridItem extends StatelessWidget {
             fontSize: 12,
             height: 16 / 12,
             fontWeight: FontWeight.w500,
-            color: selected ? const Color(0xFF137FEC) : const Color(0xFF475569),
+            color: selected ? AppColors.primary : AppColors.hexFF475569,
           ),
         ),
       ],

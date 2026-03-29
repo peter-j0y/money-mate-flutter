@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:money_mate/data/model/entities/ledger_record.dart';
 import 'package:money_mate/ui/ledger/extensions/expense_payment_method_localization.dart';
 
@@ -47,7 +48,7 @@ class SelectedDateLedgerSection extends StatelessWidget {
                   fontSize: 16,
                   height: 24 / 16,
                   fontWeight: FontWeight.w500,
-                  color: Color(0xFF1E293B),
+                  color: AppColors.hexFF1E293B,
                 ),
               ),
               Text(
@@ -56,7 +57,7 @@ class SelectedDateLedgerSection extends StatelessWidget {
                   fontSize: 12,
                   height: 16 / 12,
                   fontWeight: FontWeight.w400,
-                  color: Color(0xFF64748B),
+                  color: AppColors.textSecondary,
                 ),
               ),
             ],
@@ -73,7 +74,7 @@ class SelectedDateLedgerSection extends StatelessWidget {
                   fontSize: 14,
                   height: 20 / 14,
                   fontWeight: FontWeight.w500,
-                  color: Color(0xFFEF4444),
+                  color: AppColors.hexFFEF4444,
                 ),
               ),
             )
@@ -86,7 +87,7 @@ class SelectedDateLedgerSection extends StatelessWidget {
                   fontSize: 14,
                   height: 20 / 14,
                   fontWeight: FontWeight.w500,
-                  color: Color(0xFF94A3B8),
+                  color: AppColors.textTertiary,
                 ),
               ),
             )
@@ -129,7 +130,7 @@ class _StateCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
       ),
       child: child,
@@ -147,7 +148,7 @@ class _DailyLedgerListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final isIncome = item.type == LedgerRecordType.income;
     final amountColor =
-        isIncome ? const Color(0xFF137FEC) : const Color(0xFFF43F5E);
+        isIncome ? AppColors.primary : AppColors.danger;
     final amountPrefix = isIncome ? '+' : '-';
     final style = _LedgerCategoryStyle.from(item);
     final subtitle = _truncateSubtitle(item.memo?.trim());
@@ -157,7 +158,7 @@ class _DailyLedgerListTile extends StatelessWidget {
         rightBottomText != null && rightBottomText.isNotEmpty;
 
     return Material(
-      color: Colors.white,
+      color: AppColors.white,
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
@@ -186,7 +187,7 @@ class _DailyLedgerListTile extends StatelessWidget {
                         fontSize: 14,
                         height: 20 / 14,
                         fontWeight: FontWeight.w500,
-                        color: Color(0xFF0F172A),
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     if (hasSubtitle) ...[
@@ -199,7 +200,7 @@ class _DailyLedgerListTile extends StatelessWidget {
                           fontSize: 12,
                           height: 16 / 12,
                           fontWeight: FontWeight.w400,
-                          color: Color(0xFF94A3B8),
+                          color: AppColors.textTertiary,
                         ),
                       ),
                     ],
@@ -229,7 +230,7 @@ class _DailyLedgerListTile extends StatelessWidget {
                         fontSize: 10,
                         height: 15 / 10,
                         fontWeight: FontWeight.w500,
-                        color: Color(0xFF94A3B8),
+                        color: AppColors.textTertiary,
                       ),
                     ),
                   ],
@@ -285,50 +286,50 @@ class _LedgerCategoryStyle {
       case '이자/배당':
         return const _LedgerCategoryStyle(
           icon: Icons.payments_outlined,
-          iconBackgroundColor: Color(0xFFDDEAF6),
-          iconColor: Color(0xFF137FEC),
+          iconBackgroundColor: AppColors.hexFFDDEAF6,
+          iconColor: AppColors.primary,
         );
       case '식비':
         return const _LedgerCategoryStyle(
           icon: Icons.restaurant_rounded,
-          iconBackgroundColor: Color(0xFFFFE4E6),
-          iconColor: Color(0xFFF43F5E),
+          iconBackgroundColor: AppColors.hexFFFFE4E6,
+          iconColor: AppColors.danger,
         );
       case '쇼핑':
         return const _LedgerCategoryStyle(
           icon: Icons.shopping_cart_outlined,
-          iconBackgroundColor: Color(0xFFFEF3C7),
-          iconColor: Color(0xFFD97706),
+          iconBackgroundColor: AppColors.hexFFFEF3C7,
+          iconColor: AppColors.hexFFD97706,
         );
       case '교통':
         return const _LedgerCategoryStyle(
           icon: Icons.directions_bus_filled_rounded,
-          iconBackgroundColor: Color(0xFFDBEAFE),
-          iconColor: Color(0xFF137FEC),
+          iconBackgroundColor: AppColors.hexFFDBEAFE,
+          iconColor: AppColors.primary,
         );
       case '문화/취미':
         return const _LedgerCategoryStyle(
           icon: Icons.theaters_outlined,
-          iconBackgroundColor: Color(0xFFF3E8FF),
-          iconColor: Color(0xFFA855F7),
+          iconBackgroundColor: AppColors.hexFFF3E8FF,
+          iconColor: AppColors.hexFFA855F7,
         );
       case '주거/통신':
         return const _LedgerCategoryStyle(
           icon: Icons.home_outlined,
-          iconBackgroundColor: Color(0xFFDCFCE7),
-          iconColor: Color(0xFF22C55E),
+          iconBackgroundColor: AppColors.hexFFDCFCE7,
+          iconColor: AppColors.hexFF22C55E,
         );
       case '의료/건강':
         return const _LedgerCategoryStyle(
           icon: Icons.medical_services_outlined,
-          iconBackgroundColor: Color(0xFFCCFBF1),
-          iconColor: Color(0xFF14B8A6),
+          iconBackgroundColor: AppColors.hexFFCCFBF1,
+          iconColor: AppColors.hexFF14B8A6,
         );
       case '교육':
         return const _LedgerCategoryStyle(
           icon: Icons.school_outlined,
-          iconBackgroundColor: Color(0xFFFEF9C3),
-          iconColor: Color(0xFFD97706),
+          iconBackgroundColor: AppColors.hexFFFEF9C3,
+          iconColor: AppColors.hexFFD97706,
         );
       default:
         final isIncome = entry.type == LedgerRecordType.income;
@@ -336,9 +337,8 @@ class _LedgerCategoryStyle {
           icon:
               isIncome ? Icons.payments_outlined : Icons.receipt_long_outlined,
           iconBackgroundColor:
-              isIncome ? const Color(0xFFDDEAF6) : const Color(0xFFF1F5F9),
-          iconColor:
-              isIncome ? const Color(0xFF137FEC) : const Color(0xFF94A3B8),
+              isIncome ? AppColors.hexFFDDEAF6 : AppColors.surfaceMuted,
+          iconColor: isIncome ? AppColors.primary : AppColors.textTertiary,
         );
     }
   }

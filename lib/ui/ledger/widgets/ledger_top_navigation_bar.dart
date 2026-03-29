@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:money_mate/ui/ledger/widgets/ledger_view_toggle.dart';
 
 class LedgerTopNavigationBar extends StatelessWidget {
@@ -15,9 +16,7 @@ class LedgerTopNavigationBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 46,
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-      ),
+      decoration: BoxDecoration(color: AppColors.background),
       child: Row(
         children: [
           _TopNavItem(
@@ -51,7 +50,7 @@ class _TopNavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.transparent,
+      color: AppColors.overlay,
       child: InkWell(
         onTap: onTap,
         child: Padding(
@@ -64,9 +63,7 @@ class _TopNavItem extends StatelessWidget {
                 height: 28 / 18,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 color:
-                    isSelected
-                        ? const Color(0xFF0F172A)
-                        : const Color(0xFF98A0B4),
+                    isSelected ? AppColors.textPrimary : AppColors.hexFF98A0B4,
               ),
             ),
           ),

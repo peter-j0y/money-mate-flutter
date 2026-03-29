@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:money_mate/data/model/entities/ledger_record.dart';
 import 'package:money_mate/ui/ledger/view_models/ledger_tab_view_model.dart';
 import 'package:money_mate/ui/ledger/widgets/ledger_calendar.dart';
@@ -128,7 +129,7 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Container(
-        color: const Color(0xFFF8FAFC),
+        color: AppColors.background,
         child: Column(
           children: [
             Padding(

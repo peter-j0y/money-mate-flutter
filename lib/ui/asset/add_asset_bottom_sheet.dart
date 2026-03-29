@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/ui/core/design_system/design_system.dart';
 
 void showAddAssetBottomSheet(BuildContext context) {
   showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
+    backgroundColor: AppColors.transparent,
     builder: (context) => const _AddAssetBottomSheet(),
   );
 }
@@ -27,26 +28,26 @@ class _AddAssetBottomSheetState extends State<_AddAssetBottomSheet> {
     _AddAssetTypeOption(
       label: '주식',
       icon: Icons.stacked_line_chart_rounded,
-      color: Color(0xFFFEF2F2),
-      iconColor: Color(0xFFEF4444),
+      color: AppColors.hexFFFEF2F2,
+      iconColor: AppColors.hexFFEF4444,
     ),
     _AddAssetTypeOption(
       label: '예적금',
       icon: Icons.savings_rounded,
-      color: Color(0xFFEEF2FF),
-      iconColor: Color(0xFF6366F1),
+      color: AppColors.hexFFEEF2FF,
+      iconColor: AppColors.hexFF6366F1,
     ),
     _AddAssetTypeOption(
       label: '부동산',
       icon: Icons.apartment_rounded,
-      color: Color(0xFFFFFBEB),
-      iconColor: Color(0xFFF59E0B),
+      color: AppColors.hexFFFFFBEB,
+      iconColor: AppColors.hexFFF59E0B,
     ),
     _AddAssetTypeOption(
       label: '가상화폐',
       icon: Icons.currency_bitcoin_rounded,
-      color: Color(0xFFF3E8FF),
-      iconColor: Color(0xFF7C3AED),
+      color: AppColors.hexFFF3E8FF,
+      iconColor: AppColors.hexFF7C3AED,
     ),
   ];
 
@@ -68,7 +69,7 @@ class _AddAssetBottomSheetState extends State<_AddAssetBottomSheet> {
       child: Container(
         height: maxHeight,
         decoration: const BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
         ),
         child: Column(
@@ -78,7 +79,7 @@ class _AddAssetBottomSheetState extends State<_AddAssetBottomSheet> {
               width: 48,
               height: 6,
               decoration: BoxDecoration(
-                color: const Color(0xFFE5E7EB),
+                color: AppColors.hexFFE5E7EB,
                 borderRadius: BorderRadius.circular(3),
               ),
             ),
@@ -100,7 +101,7 @@ class _AddAssetBottomSheetState extends State<_AddAssetBottomSheet> {
                             fontSize: 22,
                             height: 32 / 22,
                             fontWeight: FontWeight.w700,
-                            color: const Color(0xFF1E293B),
+                            color: AppColors.hexFF1E293B,
                           ),
                         ),
                         Text(
@@ -109,7 +110,7 @@ class _AddAssetBottomSheetState extends State<_AddAssetBottomSheet> {
                             context,
                           ).textTheme.bodySmall?.copyWith(
                             fontSize: 13,
-                            color: const Color(0xFF64748B),
+                            color: AppColors.hexFF64748B,
                           ),
                         ),
                       ],
@@ -119,7 +120,7 @@ class _AddAssetBottomSheetState extends State<_AddAssetBottomSheet> {
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF3F4F6),
+                      color: AppColors.hexFFF3F4F6,
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: IconButton(
@@ -128,14 +129,18 @@ class _AddAssetBottomSheetState extends State<_AddAssetBottomSheet> {
                       icon: const Icon(
                         Icons.close_rounded,
                         size: 18,
-                        color: Color(0xFF64748B),
+                        color: AppColors.hexFF64748B,
                       ),
                     ),
                   ),
                 ],
               ),
             ),
-            const Divider(height: 1, thickness: 1, color: Color(0xFFF9FAFB)),
+            const Divider(
+              height: 1,
+              thickness: 1,
+              color: AppColors.hexFFF9FAFB,
+            ),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
@@ -203,14 +208,14 @@ class _AddAssetBottomSheetState extends State<_AddAssetBottomSheet> {
                       width: double.infinity,
                       padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
                       decoration: BoxDecoration(
-                        color: const Color.fromRGBO(224, 242, 254, 0.3),
+                        color: AppColors.rgba_224_242_254_03,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: const Color(0xFFE0F2FE)),
+                        border: Border.all(color: AppColors.hexFFE0F2FE),
                       ),
                       child: Text(
                         '입력한 목표 비중을 기준으로 포트폴리오 균형을 계산합니다.',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: const Color(0xFF334155),
+                          color: AppColors.hexFF334155,
                           height: 1.5,
                         ),
                       ),
@@ -221,16 +226,16 @@ class _AddAssetBottomSheetState extends State<_AddAssetBottomSheet> {
                       height: 42,
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF9FAFB),
+                        color: AppColors.hexFFF9FAFB,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: const Color(0xFFF3F4F6)),
+                        border: Border.all(color: AppColors.hexFFF3F4F6),
                       ),
                       child: Row(
                         children: [
                           const Icon(
                             Icons.info_outline_rounded,
                             size: 18,
-                            color: Color(0xFF94A3B8),
+                            color: AppColors.hexFF94A3B8,
                           ),
                           const SizedBox(width: 8),
                           Expanded(
@@ -239,7 +244,7 @@ class _AddAssetBottomSheetState extends State<_AddAssetBottomSheet> {
                               style: Theme.of(
                                 context,
                               ).textTheme.bodySmall?.copyWith(
-                                color: const Color(0xFF64748B),
+                                color: AppColors.hexFF64748B,
                                 fontSize: 12,
                               ),
                             ),
@@ -259,8 +264,8 @@ class _AddAssetBottomSheetState extends State<_AddAssetBottomSheet> {
                 child: FilledButton.icon(
                   onPressed: () => Navigator.of(context).pop(),
                   style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFF34D399),
-                    foregroundColor: Colors.white,
+                    backgroundColor: AppColors.hexFF34D399,
+                    foregroundColor: AppColors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -304,13 +309,10 @@ class _AssetTypeCard extends StatelessWidget {
         width: 104,
         height: 90,
         decoration: BoxDecoration(
-          color:
-              selected
-                  ? const Color.fromRGBO(209, 250, 229, 0.3)
-                  : Colors.white,
+          color: selected ? AppColors.rgba_209_250_229_03 : AppColors.white,
           borderRadius: BorderRadius.circular(15),
           border: Border.all(
-            color: selected ? const Color(0xFF34D399) : const Color(0xFFF3F4F6),
+            color: selected ? AppColors.hexFF34D399 : AppColors.hexFFF3F4F6,
             width: selected ? 2 : 1.5,
           ),
         ),
@@ -332,7 +334,7 @@ class _AssetTypeCard extends StatelessWidget {
               option.label,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: const Color(0xFF334155),
+                color: AppColors.hexFF334155,
               ),
             ),
           ],
@@ -361,9 +363,9 @@ class _AssetTextField extends StatelessWidget {
       height: 48,
       padding: const EdgeInsets.symmetric(horizontal: 14),
       decoration: BoxDecoration(
-        color: const Color(0xFFF9FAFB),
+        color: AppColors.hexFFF9FAFB,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFF3F4F6)),
+        border: Border.all(color: AppColors.hexFFF3F4F6),
       ),
       child: TextField(
         controller: controller,
@@ -374,11 +376,11 @@ class _AssetTextField extends StatelessWidget {
           hintText: hintText,
           hintStyle: Theme.of(
             context,
-          ).textTheme.bodySmall?.copyWith(color: const Color(0xFF94A3B8)),
+          ).textTheme.bodySmall?.copyWith(color: AppColors.hexFF94A3B8),
           prefixIcon:
               prefixIcon == null
                   ? null
-                  : Icon(prefixIcon, color: const Color(0xFF94A3B8), size: 20),
+                  : Icon(prefixIcon, color: AppColors.hexFF94A3B8, size: 20),
           prefixIconConstraints:
               prefixIcon == null
                   ? null
