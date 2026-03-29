@@ -50,6 +50,11 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
   bool _hasTappedAnyItem = false;
   bool _isUpdating = false;
 
+  bool get _isMemoInitiallyEmpty {
+    final initialMemo = widget.entry.memo?.trim();
+    return initialMemo == null || initialMemo.isEmpty;
+  }
+
   List<LedgerCategoryOption> get _categoryOptions {
     return _selectedTypeIndex == 0
         ? ledgerIncomeCategoryOptions
@@ -315,6 +320,10 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
                     LedgerMemoSection.editable(
                       controller: _memoController,
                       onTap: _markTapped,
+                      placeholder:
+                          _isMemoInitiallyEmpty
+                              ? '기존 메모가 없어요. 내용을 추가해 주세요.'
+                              : null,
                     ),
                   ],
                 ),

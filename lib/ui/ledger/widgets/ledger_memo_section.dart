@@ -6,22 +6,29 @@ class LedgerMemoSection extends StatelessWidget {
     required this.controller,
     this.maxLines = 4,
     this.onTap,
+    this.placeholder,
   }) : text = null;
 
-  const LedgerMemoSection.readOnly({super.key, required this.text})
-    : controller = null,
-      maxLines = 1,
-      onTap = null;
+  const LedgerMemoSection.readOnly({
+    super.key,
+    required this.text,
+    this.placeholder,
+  }) : controller = null,
+       maxLines = 1,
+       onTap = null;
 
   final TextEditingController? controller;
   final String? text;
   final int maxLines;
   final VoidCallback? onTap;
+  final String? placeholder;
 
-  static const String _placeholder = '내용을 입력해주세요 (예: 퇴근길 버스비)';
+  static const String _defaultPlaceholder = '내용을 입력해주세요 (예: 퇴근길 버스비)';
 
   @override
   Widget build(BuildContext context) {
+    final placeholderText = placeholder ?? _defaultPlaceholder;
+
     if (controller != null) {
       return Container(
         decoration: BoxDecoration(
@@ -39,9 +46,9 @@ class LedgerMemoSection extends StatelessWidget {
             fontWeight: FontWeight.w500,
             color: Color(0xFF0F172A),
           ),
-          decoration: const InputDecoration(
-            hintText: _placeholder,
-            hintStyle: TextStyle(
+          decoration: InputDecoration(
+            hintText: placeholderText,
+            hintStyle: const TextStyle(
               fontSize: 16,
               height: 24 / 16,
               fontWeight: FontWeight.w500,
@@ -65,7 +72,7 @@ class LedgerMemoSection extends StatelessWidget {
       ),
       padding: const EdgeInsets.fromLTRB(17, 13, 17, 13),
       child: Text(
-        hasMemo ? memoText : _placeholder,
+        hasMemo ? memoText : placeholderText,
         style: TextStyle(
           fontSize: 16,
           height: 24 / 16,
