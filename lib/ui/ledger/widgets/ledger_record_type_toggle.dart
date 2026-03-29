@@ -62,22 +62,6 @@ class _RecordTypeButton extends StatelessWidget {
             color: isSelected ? const Color(0xFF137FEC) : const Color(0xFFF1F5F9),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(color: Colors.transparent, width: 2),
-            boxShadow: isSelected
-                ? const [
-                    BoxShadow(
-                      color: Color.fromRGBO(19, 127, 236, 0.2),
-                      offset: Offset(0, 10),
-                      blurRadius: 15,
-                      spreadRadius: -3,
-                    ),
-                    BoxShadow(
-                      color: Color.fromRGBO(19, 127, 236, 0.2),
-                      offset: Offset(0, 4),
-                      blurRadius: 6,
-                      spreadRadius: -4,
-                    ),
-                  ]
-                : null,
           ),
           child: Text(
             label,
