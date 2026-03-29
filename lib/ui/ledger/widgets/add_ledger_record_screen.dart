@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:money_mate/ui/ledger/widgets/ledger_category_grid.dart';
 import 'package:money_mate/ui/ledger/widgets/expense_payment_method_selector.dart';
+import 'package:money_mate/ui/ledger/widgets/ledger_category_options.dart';
+import 'package:money_mate/ui/ledger/widgets/ledger_date_amount_fields.dart';
+import 'package:money_mate/ui/ledger/widgets/ledger_memo_section.dart';
 import 'package:money_mate/ui/ledger/widgets/ledger_record_type_toggle.dart';
+import 'package:money_mate/ui/ledger/widgets/ledger_screen_header.dart';
 import 'package:money_mate/ui/ledger/view_models/add_ledger_record_view_model.dart';
 
 import '../../../data/model/entities/ledger_record.dart';
@@ -30,96 +35,6 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
 
   DateTime _selectedDate = DateTime.now();
 
-  static const List<_LedgerCategoryOption> _incomeCategoryOptions = [
-    _LedgerCategoryOption(
-      label: '월급',
-      icon: Icons.payments_outlined,
-      backgroundColor: Color(0xFFDCFCE7),
-      iconColor: Color(0xFF22C55E),
-    ),
-    _LedgerCategoryOption(
-      label: '부업',
-      icon: Icons.work_outline_rounded,
-      backgroundColor: Color(0xFFDBEAFE),
-      iconColor: Color(0xFF137FEC),
-    ),
-    _LedgerCategoryOption(
-      label: '보너스',
-      icon: Icons.card_giftcard_rounded,
-      backgroundColor: Color(0xFFFFEDD5),
-      iconColor: Color(0xFFF97316),
-    ),
-    _LedgerCategoryOption(
-      label: '용돈',
-      icon: Icons.savings_outlined,
-      backgroundColor: Color(0xFFFCE7F3),
-      iconColor: Color(0xFFEC4899),
-    ),
-    _LedgerCategoryOption(
-      label: '이자/배당',
-      icon: Icons.trending_up_rounded,
-      backgroundColor: Color(0xFFF3E8FF),
-      iconColor: Color(0xFFA855F7),
-    ),
-    _LedgerCategoryOption(
-      label: '기타',
-      icon: Icons.more_horiz_rounded,
-      backgroundColor: Color(0xFFF1F5F9),
-      iconColor: Color(0xFF94A3B8),
-    ),
-  ];
-
-  static const List<_LedgerCategoryOption> _expenseCategoryOptions = [
-    _LedgerCategoryOption(
-      label: '식비',
-      icon: Icons.restaurant_rounded,
-      backgroundColor: Color(0xFFFFEDD5),
-      iconColor: Color(0xFFF97316),
-    ),
-    _LedgerCategoryOption(
-      label: '교통',
-      icon: Icons.directions_bus_filled_rounded,
-      backgroundColor: Color(0xFFDBEAFE),
-      iconColor: Color(0xFF137FEC),
-    ),
-    _LedgerCategoryOption(
-      label: '쇼핑',
-      icon: Icons.shopping_bag_outlined,
-      backgroundColor: Color(0xFFFCE7F3),
-      iconColor: Color(0xFFEC4899),
-    ),
-    _LedgerCategoryOption(
-      label: '문화/취미',
-      icon: Icons.theaters_outlined,
-      backgroundColor: Color(0xFFF3E8FF),
-      iconColor: Color(0xFFA855F7),
-    ),
-    _LedgerCategoryOption(
-      label: '주거/통신',
-      icon: Icons.home_outlined,
-      backgroundColor: Color(0xFFDCFCE7),
-      iconColor: Color(0xFF22C55E),
-    ),
-    _LedgerCategoryOption(
-      label: '의료/건강',
-      icon: Icons.medical_services_outlined,
-      backgroundColor: Color(0xFFCCFBF1),
-      iconColor: Color(0xFF14B8A6),
-    ),
-    _LedgerCategoryOption(
-      label: '교육',
-      icon: Icons.school_outlined,
-      backgroundColor: Color(0xFFFEF9C3),
-      iconColor: Color(0xFFD97706),
-    ),
-    _LedgerCategoryOption(
-      label: '기타',
-      icon: Icons.more_horiz_rounded,
-      backgroundColor: Color(0xFFF1F5F9),
-      iconColor: Color(0xFF94A3B8),
-    ),
-  ];
-
   static const List<ExpensePaymentMethod> _expensePaymentMethods = [
     ExpensePaymentMethod.cash,
     ExpensePaymentMethod.creditCard,
@@ -129,10 +44,10 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
     ExpensePaymentMethod.other,
   ];
 
-  List<_LedgerCategoryOption> get _categoryOptions {
+  List<LedgerCategoryOption> get _categoryOptions {
     return _selectedTypeIndex == 0
-        ? _incomeCategoryOptions
-        : _expenseCategoryOptions;
+        ? ledgerIncomeCategoryOptions
+        : ledgerExpenseCategoryOptions;
   }
 
   int get _selectedCategoryIndex {
@@ -240,35 +155,12 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-              child: Row(
-                children: [
-                  SizedBox(
-                    width: 48,
-                    height: 48,
-                    child: IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(
-                        Icons.close_rounded,
-                        size: 24,
-                        color: Color(0xFF1E293B),
-                      ),
-                    ),
-                  ),
-                  const Expanded(
-                    child: Text(
-                      '내역 추가',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 18,
-                        height: 22.5 / 18,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF0F172A),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 48, height: 48),
-                ],
+              padding: EdgeInsets.zero,
+              child: LedgerScreenHeader(
+                title: '기록 추가',
+                onCloseTap: () => Navigator.pop(context),
+                closeButtonSize: 40,
+                padding: const EdgeInsets.fromLTRB(0, 16, 0, 8),
               ),
             ),
             Expanded(
@@ -279,75 +171,18 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
                   children: [
                     const _SectionLabel(text: '날짜'),
                     const SizedBox(height: 8),
-                    InkWell(
-                      borderRadius: BorderRadius.circular(24),
+                    LedgerDateCard(
+                      date: _selectedDate,
+                      dateTextBuilder: _koreanDateText,
                       onTap: _pickDate,
-                      child: Ink(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF8FAFC),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                _koreanDateText(_selectedDate),
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  height: 24 / 16,
-                                  fontWeight: FontWeight.w500,
-                                  color: Color(0xFF0F172A),
-                                ),
-                              ),
-                            ),
-                            const Icon(
-                              Icons.calendar_today_outlined,
-                              size: 20,
-                              color: Color(0xFF94A3B8),
-                            ),
-                          ],
-                        ),
-                      ),
                     ),
                     const SizedBox(height: 24),
                     const _SectionLabel(text: '금액'),
                     const SizedBox(height: 8),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: _amountController,
-                            focusNode: _amountFocusNode,
-                            keyboardType: TextInputType.number,
-                            inputFormatters: const [_AmountInputFormatter()],
-                            style: const TextStyle(
-                              fontSize: 36,
-                              height: 36 / 30,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF0F172A),
-                            ),
-                            decoration: const InputDecoration(
-                              isCollapsed: true,
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.only(bottom: 6),
-                            ),
-                          ),
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.only(bottom: 10),
-                          child: Text(
-                            '원',
-                            style: TextStyle(
-                              fontSize: 20,
-                              height: 28 / 20,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xFF1E293B),
-                            ),
-                          ),
-                        ),
-                      ],
+                    LedgerAmountField.editable(
+                      controller: _amountController,
+                      focusNode: _amountFocusNode,
+                      inputFormatters: const [_AmountInputFormatter()],
                     ),
                     const Divider(
                       height: 2,
@@ -365,26 +200,10 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
                     const SizedBox(height: 24),
                     const _SectionLabel(text: '카테고리'),
                     const SizedBox(height: 8),
-                    GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: _categoryOptions.length,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 4,
-                            mainAxisSpacing: 12,
-                            crossAxisSpacing: 12,
-                            mainAxisExtent: 92,
-                          ),
-                      itemBuilder: (context, index) {
-                        final option = _categoryOptions[index];
-                        final selected = _selectedCategoryIndex == index;
-                        return _CategoryItem(
-                          option: option,
-                          selected: selected,
-                          onTap: () => _onCategoryTap(index),
-                        );
-                      },
+                    LedgerCategoryGrid(
+                      options: _categoryOptions,
+                      selectedIndex: _selectedCategoryIndex,
+                      onCategoryTap: _onCategoryTap,
                     ),
                     if (_selectedTypeIndex == 1) ...[
                       const SizedBox(height: 24),
@@ -400,34 +219,7 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
                     const SizedBox(height: 24),
                     const _SectionLabel(text: '메모'),
                     const SizedBox(height: 8),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF8FAFC),
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                      padding: const EdgeInsets.all(5),
-                      child: TextField(
-                        controller: _memoController,
-                        maxLines: 4,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          height: 24 / 16,
-                          fontWeight: FontWeight.w500,
-                          color: Color(0xFF0F172A),
-                        ),
-                        decoration: const InputDecoration(
-                          hintText: '내용을 입력해주세요 (예: 퇴근길 버스비)',
-                          hintStyle: TextStyle(
-                            fontSize: 16,
-                            height: 24 / 16,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xFF94A3B8),
-                          ),
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.fromLTRB(12, 8, 12, 8),
-                        ),
-                      ),
-                    ),
+                    LedgerMemoSection.editable(controller: _memoController),
                   ],
                 ),
               ),
@@ -472,7 +264,7 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
                                 ),
                               )
                               : const Text(
-                                '저장하기',
+                                '추가하기',
                                 style: TextStyle(
                                   fontSize: 18,
                                   height: 28 / 18,
@@ -514,73 +306,6 @@ class _SectionLabel extends StatelessWidget {
       ),
     );
   }
-}
-
-class _CategoryItem extends StatelessWidget {
-  const _CategoryItem({
-    required this.option,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final _LedgerCategoryOption option;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(16),
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              color: option.backgroundColor,
-              shape: BoxShape.circle,
-              border:
-                  selected
-                      ? Border.all(color: const Color(0xFF137FEC), width: 2)
-                      : null,
-            ),
-            alignment: Alignment.center,
-            child: Icon(option.icon, size: 22, color: option.iconColor),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            option.label,
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 12,
-              height: 16 / 12,
-              fontWeight: FontWeight.w500,
-              color:
-                  selected ? const Color(0xFF137FEC) : const Color(0xFF475569),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _LedgerCategoryOption {
-  const _LedgerCategoryOption({
-    required this.label,
-    required this.icon,
-    required this.backgroundColor,
-    required this.iconColor,
-  });
-
-  final String label;
-  final IconData icon;
-  final Color backgroundColor;
-  final Color iconColor;
 }
 
 class _AmountInputFormatter extends TextInputFormatter {
