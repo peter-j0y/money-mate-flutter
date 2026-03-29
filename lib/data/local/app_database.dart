@@ -40,6 +40,15 @@ class AppDatabase extends _$AppDatabase {
     return into(ledgerRecords).insert(entry);
   }
 
+  Future<bool> replaceLedgerRecord(
+    int id,
+    LedgerRecordsCompanion updatedEntry,
+  ) async {
+    final affectedRows = await (update(ledgerRecords)
+      ..where((tbl) => tbl.id.equals(id))).write(updatedEntry);
+    return affectedRows > 0;
+  }
+
   Future<List<LedgerRecord>> fetchMonthlyRecords(DateTime month) {
     final query = _monthlyRecordsQuery(month);
     return query.get();

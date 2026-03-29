@@ -15,6 +15,11 @@ class LedgerRecordRepositoryImpl implements LedgerRecordRepository {
   }
 
   @override
+  Future<bool> replaceRecord(int id, LedgerEntryDraft draft) {
+    return _localDataSource.replaceRecord(id, draft);
+  }
+
+  @override
   Future<List<LedgerEntry>> fetchMonthlyRecords(DateTime month) {
     return _localDataSource.fetchMonthlyRecords(month);
   }

@@ -21,6 +21,20 @@ class LedgerRecordLocalDataSource {
     );
   }
 
+  Future<bool> replaceRecord(int id, LedgerEntryDraft draft) {
+    return _database.replaceLedgerRecord(
+      id,
+      LedgerRecordsCompanion(
+        type: Value(_typeToDto(draft.type)),
+        category: Value(draft.category),
+        amount: Value(draft.amount),
+        date: Value(draft.date),
+        paymentMethod: Value(_paymentMethodToDto(draft.paymentMethod)),
+        memo: Value(draft.memo),
+      ),
+    );
+  }
+
   Future<List<LedgerEntry>> fetchMonthlyRecords(DateTime month) async {
     final rows = await _database.fetchMonthlyRecords(month);
     return _mapToLedgerEntries(rows);
