@@ -35,6 +35,10 @@ class LedgerRecordLocalDataSource {
     );
   }
 
+  Future<bool> deleteRecord(int id) {
+    return _database.deleteLedgerRecord(id);
+  }
+
   Future<List<LedgerEntry>> fetchMonthlyRecords(DateTime month) async {
     final rows = await _database.fetchMonthlyRecords(month);
     return _mapToLedgerEntries(rows);

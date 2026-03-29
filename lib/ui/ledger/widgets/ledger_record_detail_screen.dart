@@ -49,6 +49,7 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
   late TextEditingController _memoController;
   bool _hasTappedAnyItem = false;
   bool _isUpdating = false;
+  bool _isDeleting = false;
 
   bool get _isMemoInitiallyEmpty {
     final initialMemo = widget.entry.memo?.trim();
@@ -227,6 +228,85 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
     }
   }
 
+  Future<void> _onDeleteTap() async {
+    if (_isDeleting || _isUpdating) {
+      return;
+    }
+
+    final shouldDelete = await _showDeleteConfirmDialog();
+    if (!mounted) {
+      return;
+    }
+    if (!shouldDelete) {
+      return;
+    }
+
+    final recordId = widget.entry.id;
+    if (recordId == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('삭제할 항목 ID가 없습니다.')));
+      return;
+    }
+
+    setState(() => _isDeleting = true);
+
+    try {
+      final deleted = await _repository.deleteRecord(recordId);
+      if (!mounted) {
+        return;
+      }
+
+      if (!deleted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('삭제할 항목을 찾지 못했어요.')));
+        setState(() => _isDeleting = false);
+        return;
+      }
+
+      Navigator.pop(context, true);
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('삭제 중 오류가 발생했습니다.')));
+      setState(() => _isDeleting = false);
+    }
+  }
+
+  Future<bool> _showDeleteConfirmDialog() async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          content: const Text('삭제하면 기록을 다시 복구할 수 없어요. 정말로 삭제할까요?'),
+          actions: [
+            TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: const Color(0xFF137FEC),
+              ),
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('취소'),
+            ),
+            TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: const Color(0xFF137FEC),
+              ),
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: const Text('삭제'),
+            ),
+          ],
+        );
+      },
+    );
+
+    return result ?? false;
+  }
+
   @override
   Widget build(BuildContext context) {
     final safeAreaBottom = MediaQuery.paddingOf(context).bottom;
@@ -244,13 +324,7 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
                 LedgerScreenHeaderAction(
                   label: '삭제',
                   color: const Color(0xFFF43F5E),
-                  onTap: () {
-                    if (widget.onDelete != null) {
-                      widget.onDelete!();
-                      return;
-                    }
-                    _showNotReadySnackBar(context, '삭제');
-                  },
+                  onTap: _onDeleteTap,
                 ),
               ],
             ),
@@ -369,7 +443,8 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
                                 0.25,
                               ),
                             ),
-                            onPressed: _isUpdating ? null : _onSaveTap,
+                            onPressed:
+                                _isUpdating || _isDeleting ? null : _onSaveTap,
                             child:
                                 _isUpdating
                                     ? const SizedBox(
@@ -402,12 +477,6 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
         ),
       ),
     );
-  }
-
-  void _showNotReadySnackBar(BuildContext context, String action) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('$action 기능은 준비 중이에요.')));
   }
 }
 

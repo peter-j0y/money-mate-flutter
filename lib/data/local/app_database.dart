@@ -49,6 +49,12 @@ class AppDatabase extends _$AppDatabase {
     return affectedRows > 0;
   }
 
+  Future<bool> deleteLedgerRecord(int id) async {
+    final affectedRows =
+        await (delete(ledgerRecords)..where((tbl) => tbl.id.equals(id))).go();
+    return affectedRows > 0;
+  }
+
   Future<List<LedgerRecord>> fetchMonthlyRecords(DateTime month) {
     final query = _monthlyRecordsQuery(month);
     return query.get();

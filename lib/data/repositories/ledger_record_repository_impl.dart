@@ -20,6 +20,11 @@ class LedgerRecordRepositoryImpl implements LedgerRecordRepository {
   }
 
   @override
+  Future<bool> deleteRecord(int id) {
+    return _localDataSource.deleteRecord(id);
+  }
+
+  @override
   Future<List<LedgerEntry>> fetchMonthlyRecords(DateTime month) {
     return _localDataSource.fetchMonthlyRecords(month);
   }
