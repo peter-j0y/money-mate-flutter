@@ -13,9 +13,14 @@ import 'package:money_mate/ui/ledger/view_models/add_ledger_record_view_model.da
 import '../../../data/model/entities/ledger_record.dart';
 
 class AddLedgerRecordScreen extends StatefulWidget {
-  const AddLedgerRecordScreen({super.key, this.initialDate});
+  const AddLedgerRecordScreen({
+    super.key,
+    this.initialDate,
+    this.initialType = LedgerRecordType.expense,
+  });
 
   final DateTime? initialDate;
+  final LedgerRecordType initialType;
 
   @override
   State<AddLedgerRecordScreen> createState() => _AddLedgerRecordScreenState();
@@ -69,6 +74,7 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
   @override
   void initState() {
     super.initState();
+    _selectedTypeIndex = widget.initialType == LedgerRecordType.income ? 0 : 1;
     _selectedDate = widget.initialDate ?? DateTime.now();
     _amountController.addListener(_onAmountChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {

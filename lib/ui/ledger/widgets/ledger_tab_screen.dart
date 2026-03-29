@@ -6,7 +6,9 @@ import 'package:money_mate/ui/ledger/widgets/ledger_calendar.dart';
 import 'package:money_mate/ui/ledger/widgets/ledger_view_toggle.dart';
 
 import 'ledger_income_summary_card.dart';
+import 'add_ledger_record_screen.dart';
 import 'ledger_month_selector.dart';
+import 'ledger_monthly_record_section.dart';
 import 'ledger_record_detail_screen.dart';
 import 'ledger_top_navigation_bar.dart';
 import 'selected_date_ledger_section.dart';
@@ -103,6 +105,24 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
     return _viewModel.recordsForDate(selectedDate);
   }
 
+  List<LedgerEntry> get _monthlyIncomeItems {
+    final items =
+        _viewModel.monthlyRecords
+            .where((record) => record.type == LedgerRecordType.income)
+            .toList();
+    items.sort((a, b) => b.date.compareTo(a.date));
+    return items;
+  }
+
+  List<LedgerEntry> get _monthlyExpenseItems {
+    final items =
+        _viewModel.monthlyRecords
+            .where((record) => record.type == LedgerRecordType.expense)
+            .toList();
+    items.sort((a, b) => b.date.compareTo(a.date));
+    return items;
+  }
+
   bool _isSameMonth(DateTime a, DateTime b) {
     return a.year == b.year && a.month == b.month;
   }
@@ -123,6 +143,22 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
       buffer.write(reversed[i]);
     }
     return '$sign${buffer.toString().split('').reversed.join()}원';
+  }
+
+  Future<void> _openAddLedgerRecordScreen(LedgerRecordType type) async {
+    final didSave = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder:
+            (context) => AddLedgerRecordScreen(
+              initialDate: _selectedDate ?? DateTime.now(),
+              initialType: type,
+            ),
+      ),
+    );
+
+    if (didSave == true) {
+      _viewModel.loadMonth(_currentMonth);
+    }
   }
 
   @override
@@ -204,6 +240,54 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
                           ),
                         );
                       },
+                    ),
+                    const SizedBox(height: 80),
+                  ] else ...[
+                    const SizedBox(height: 12),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: LedgerMonthlyRecordSection(
+                        title: '수입',
+                        emptyMessage: '이번 달 수입 내역이 없어요',
+                        totalLabel: '총 수입 합계',
+                        items: _monthlyIncomeItems,
+                        onItemTap: (item) {
+                          Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder:
+                                  (context) =>
+                                      LedgerRecordDetailScreen(entry: item),
+                            ),
+                          );
+                        },
+                        onAddTap:
+                            () => _openAddLedgerRecordScreen(
+                              LedgerRecordType.income,
+                            ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: LedgerMonthlyRecordSection(
+                        title: '지출',
+                        emptyMessage: '이번 달 지출 내역이 없어요',
+                        totalLabel: '총 지출 합계',
+                        items: _monthlyExpenseItems,
+                        onItemTap: (item) {
+                          Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder:
+                                  (context) =>
+                                      LedgerRecordDetailScreen(entry: item),
+                            ),
+                          );
+                        },
+                        onAddTap:
+                            () => _openAddLedgerRecordScreen(
+                              LedgerRecordType.expense,
+                            ),
+                      ),
                     ),
                     const SizedBox(height: 80),
                   ],
