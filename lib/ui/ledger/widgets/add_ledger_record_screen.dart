@@ -210,6 +210,7 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
   @override
   Widget build(BuildContext context) {
     final safeAreaBottom = MediaQuery.paddingOf(context).bottom;
+    final contentBottomPadding = safeAreaBottom + 120;
     final isSubmitEnabledUi = _isFormValid;
 
     return Scaffold(
@@ -231,7 +232,12 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
               child: Stack(
                 children: [
                   SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
+                    padding: EdgeInsets.fromLTRB(
+                      16,
+                      12,
+                      16,
+                      contentBottomPadding,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [

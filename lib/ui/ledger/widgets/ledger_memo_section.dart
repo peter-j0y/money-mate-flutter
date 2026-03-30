@@ -29,6 +29,8 @@ class LedgerMemoSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final placeholderText = placeholder ?? _defaultPlaceholder;
+    final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
+    final safeAreaBottom = MediaQuery.paddingOf(context).bottom;
 
     if (controller != null) {
       return Container(
@@ -41,6 +43,12 @@ class LedgerMemoSection extends StatelessWidget {
           controller: controller,
           onTap: onTap,
           maxLines: maxLines,
+          scrollPadding: EdgeInsets.fromLTRB(
+            20,
+            20,
+            20,
+            keyboardInset + safeAreaBottom + 120,
+          ),
           style: const TextStyle(
             fontSize: 16,
             height: 24 / 16,

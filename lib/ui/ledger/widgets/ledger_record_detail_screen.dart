@@ -308,6 +308,7 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final safeAreaBottom = MediaQuery.paddingOf(context).bottom;
+    final contentBottomPadding = safeAreaBottom + 120;
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -330,7 +331,12 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
               child: Stack(
                 children: [
                   SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
+                    padding: EdgeInsets.fromLTRB(
+                      16,
+                      12,
+                      16,
+                      contentBottomPadding,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
