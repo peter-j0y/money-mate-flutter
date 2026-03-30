@@ -43,6 +43,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   DateTime _selectedLedgerDate = DateTime.now();
+  late final List<int> _tabRefreshVersion;
 
   final List<BottomNavTabItem> _tabs = const [
     BottomNavTabItem(label: '가계부', icon: Icons.calendar_today_outlined),
@@ -51,14 +52,34 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _tabRefreshVersion = List<int>.filled(_tabs.length, 0);
+  }
+
+  void _onBottomTabTap(int index) {
+    setState(() {
+      if (_currentIndex == index) {
+        _tabRefreshVersion[index] += 1;
+        return;
+      }
+      _currentIndex = index;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final pages = [
       LedgerTabScreen(
+        key: ValueKey('ledger-tab-${_tabRefreshVersion[0]}'),
         selectedDate: _selectedLedgerDate,
         onSelectedDateChanged: (date) => _selectedLedgerDate = date,
       ),
-      const AssetsTabScreen(),
-      const _TabPage(title: '설정', subtitle: '설정 및 계정 관리'),
+      AssetsTabScreen(key: ValueKey('assets-tab-${_tabRefreshVersion[1]}')),
+      KeyedSubtree(
+        key: ValueKey('more-tab-${_tabRefreshVersion[2]}'),
+        child: const _TabPage(title: '설정', subtitle: '설정 및 계정 관리'),
+      ),
     ];
 
     return Scaffold(
@@ -66,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: MoneyMateBottomNavigationBar(
         tabs: _tabs,
         currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
+        onTap: _onBottomTabTap,
       ),
       floatingActionButton:
           _currentIndex == 0
