@@ -29,6 +29,12 @@ class LedgerTabScreen extends StatefulWidget {
 
 class _LedgerTabScreenState extends State<LedgerTabScreen> {
   final LedgerTabViewModel _viewModel = LedgerTabViewModel();
+  final PageStorageKey<String> _calendarScrollKey = const PageStorageKey(
+    'ledger-calendar-scroll',
+  );
+  final PageStorageKey<String> _listScrollKey = const PageStorageKey(
+    'ledger-list-scroll',
+  );
 
   DateTime _currentMonth = DateTime.now();
   DateTime? _selectedDate;
@@ -161,6 +167,123 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
     }
   }
 
+  List<Widget> _buildCommonSection() {
+    return [
+      LedgerMonthSelector(
+        monthLabel: _monthLabel,
+        onPreviousTap: () => _changeMonth(-1),
+        onNextTap: () => _changeMonth(1),
+      ),
+      const SizedBox(height: 8),
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: LedgerIncomeSummaryCard(
+          incomeText: _currencyText(_viewModel.monthlyIncomeTotal),
+          expenseText: _currencyText(_viewModel.monthlyExpenseTotal),
+          savableText: _currencyText(_viewModel.monthlySavableTotal),
+        ),
+      ),
+    ];
+  }
+
+  Widget _buildCalendarTab() {
+    return ListView(
+      key: _calendarScrollKey,
+      padding: EdgeInsets.zero,
+      children: [
+        ..._buildCommonSection(),
+        const SizedBox(height: 12),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: LedgerCalendar(
+            displayedMonth: _currentMonth,
+            selectedDate: _selectedDate,
+            dailyIncomeTotalsByDate: _viewModel.dailyIncomeTotalsByDate,
+            dailyExpenseTotalsByDate: _viewModel.dailyExpenseTotalsByDate,
+            onDateTap: (date) {
+              setState(() {
+                _selectedDate = date;
+              });
+
+              final selectedMonth = DateTime(date.year, date.month);
+              if (!_isSameMonth(_currentMonth, selectedMonth)) {
+                setState(() {
+                  _currentMonth = selectedMonth;
+                });
+                _viewModel.loadMonth(_currentMonth);
+              }
+
+              widget.onSelectedDateChanged?.call(date);
+            },
+          ),
+        ),
+        SelectedDateLedgerSection(
+          selectedDate: _selectedDate,
+          items: _selectedDateItems,
+          isLoading: _viewModel.isLoading,
+          errorMessage: _viewModel.errorMessage,
+          selectedDateLabelBuilder: _selectedDateLabel,
+          onItemTap: (item) {
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (context) => LedgerRecordDetailScreen(entry: item),
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: 80),
+      ],
+    );
+  }
+
+  Widget _buildListTab() {
+    return ListView(
+      key: _listScrollKey,
+      padding: EdgeInsets.zero,
+      children: [
+        ..._buildCommonSection(),
+        const SizedBox(height: 12),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: LedgerMonthlyRecordSection(
+            title: '수입',
+            emptyMessage: '이번 달 수입 내역이 없어요',
+            totalLabel: '총 수입 합계',
+            items: _monthlyIncomeItems,
+            onItemTap: (item) {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (context) => LedgerRecordDetailScreen(entry: item),
+                ),
+              );
+            },
+            onAddTap: () => _openAddLedgerRecordScreen(LedgerRecordType.income),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: LedgerMonthlyRecordSection(
+            title: '지출',
+            emptyMessage: '이번 달 지출 내역이 없어요',
+            totalLabel: '총 지출 합계',
+            items: _monthlyExpenseItems,
+            onItemTap: (item) {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (context) => LedgerRecordDetailScreen(entry: item),
+                ),
+              );
+            },
+            onAddTap:
+                () => _openAddLedgerRecordScreen(LedgerRecordType.expense),
+          ),
+        ),
+        const SizedBox(height: 80),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -176,122 +299,9 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
               ),
             ),
             Expanded(
-              child: ListView(
-                padding: EdgeInsets.zero,
-                children: [
-                  LedgerMonthSelector(
-                    monthLabel: _monthLabel,
-                    onPreviousTap: () => _changeMonth(-1),
-                    onNextTap: () => _changeMonth(1),
-                  ),
-                  const SizedBox(height: 8),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: LedgerIncomeSummaryCard(
-                      incomeText: _currencyText(_viewModel.monthlyIncomeTotal),
-                      expenseText: _currencyText(
-                        _viewModel.monthlyExpenseTotal,
-                      ),
-                      savableText: _currencyText(
-                        _viewModel.monthlySavableTotal,
-                      ),
-                    ),
-                  ),
-                  if (_selectedView == LedgerViewType.calendar) ...[
-                    const SizedBox(height: 12),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: LedgerCalendar(
-                        displayedMonth: _currentMonth,
-                        selectedDate: _selectedDate,
-                        dailyIncomeTotalsByDate:
-                            _viewModel.dailyIncomeTotalsByDate,
-                        dailyExpenseTotalsByDate:
-                            _viewModel.dailyExpenseTotalsByDate,
-                        onDateTap: (date) {
-                          setState(() {
-                            _selectedDate = date;
-                          });
-
-                          final selectedMonth = DateTime(date.year, date.month);
-                          if (!_isSameMonth(_currentMonth, selectedMonth)) {
-                            setState(() {
-                              _currentMonth = selectedMonth;
-                            });
-                            _viewModel.loadMonth(_currentMonth);
-                          }
-
-                          widget.onSelectedDateChanged?.call(date);
-                        },
-                      ),
-                    ),
-                    SelectedDateLedgerSection(
-                      selectedDate: _selectedDate,
-                      items: _selectedDateItems,
-                      isLoading: _viewModel.isLoading,
-                      errorMessage: _viewModel.errorMessage,
-                      selectedDateLabelBuilder: _selectedDateLabel,
-                      onItemTap: (item) {
-                        Navigator.of(context).push(
-                          MaterialPageRoute<void>(
-                            builder:
-                                (context) =>
-                                    LedgerRecordDetailScreen(entry: item),
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 80),
-                  ] else ...[
-                    const SizedBox(height: 12),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: LedgerMonthlyRecordSection(
-                        title: '수입',
-                        emptyMessage: '이번 달 수입 내역이 없어요',
-                        totalLabel: '총 수입 합계',
-                        items: _monthlyIncomeItems,
-                        onItemTap: (item) {
-                          Navigator.of(context).push(
-                            MaterialPageRoute<void>(
-                              builder:
-                                  (context) =>
-                                      LedgerRecordDetailScreen(entry: item),
-                            ),
-                          );
-                        },
-                        onAddTap:
-                            () => _openAddLedgerRecordScreen(
-                              LedgerRecordType.income,
-                            ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: LedgerMonthlyRecordSection(
-                        title: '지출',
-                        emptyMessage: '이번 달 지출 내역이 없어요',
-                        totalLabel: '총 지출 합계',
-                        items: _monthlyExpenseItems,
-                        onItemTap: (item) {
-                          Navigator.of(context).push(
-                            MaterialPageRoute<void>(
-                              builder:
-                                  (context) =>
-                                      LedgerRecordDetailScreen(entry: item),
-                            ),
-                          );
-                        },
-                        onAddTap:
-                            () => _openAddLedgerRecordScreen(
-                              LedgerRecordType.expense,
-                            ),
-                      ),
-                    ),
-                    const SizedBox(height: 80),
-                  ],
-                ],
+              child: IndexedStack(
+                index: _selectedView == LedgerViewType.calendar ? 0 : 1,
+                children: [_buildCalendarTab(), _buildListTab()],
               ),
             ),
           ],
