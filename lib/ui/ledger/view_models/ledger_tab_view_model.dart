@@ -11,20 +11,25 @@ class LedgerTabViewModel extends ChangeNotifier {
     : _repository = repository ?? LedgerRecordRepositoryImpl();
 
   final LedgerRecordRepository _repository;
+  static const int _watchWindowRadius = 1;
+  static const int _cacheWindowRadius = 2;
 
   bool _isLoading = false;
   String? _errorMessage;
   DateTime _currentMonth = DateTime.now();
-  StreamSubscription<List<LedgerEntry>>? _monthlyRecordsSubscription;
-  List<LedgerEntry> _monthlyRecords = const [];
-  Map<DateTime, List<LedgerEntry>> _recordsByDate = const {};
-  Map<DateTime, int> _dailyIncomeTotalsByDate = const {};
-  Map<DateTime, int> _dailyExpenseTotalsByDate = const {};
+  final Map<DateTime, StreamSubscription<List<LedgerEntry>>>
+  _monthlySubscriptions = {};
+  final Map<DateTime, List<LedgerEntry>> _monthlyRecordsByMonth = {};
+  final Map<DateTime, Map<DateTime, List<LedgerEntry>>> _recordsByDateByMonth =
+      {};
+  final Map<DateTime, Map<DateTime, int>> _dailyIncomeTotalsByMonth = {};
+  final Map<DateTime, Map<DateTime, int>> _dailyExpenseTotalsByMonth = {};
 
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   DateTime get currentMonth => _currentMonth;
-  List<LedgerEntry> get monthlyRecords => _monthlyRecords;
+  List<LedgerEntry> get monthlyRecords =>
+      _monthlyRecordsByMonth[_currentMonth] ?? const [];
 
   int get monthlyIncomeTotal => _monthlyRecords
       .where((record) => record.type == LedgerRecordType.income)
@@ -34,58 +39,136 @@ class LedgerTabViewModel extends ChangeNotifier {
       .fold(0, (sum, record) => sum + record.amount);
   int get monthlySavableTotal => monthlyIncomeTotal - monthlyExpenseTotal;
 
-  Map<DateTime, int> get dailyIncomeTotalsByDate => _dailyIncomeTotalsByDate;
-  Map<DateTime, int> get dailyExpenseTotalsByDate => _dailyExpenseTotalsByDate;
+  Map<DateTime, int> get dailyIncomeTotalsByDate =>
+      _dailyIncomeTotalsByMonth[_currentMonth] ?? const {};
+  Map<DateTime, int> get dailyExpenseTotalsByDate =>
+      _dailyExpenseTotalsByMonth[_currentMonth] ?? const {};
+
+  List<LedgerEntry> get _monthlyRecords =>
+      _monthlyRecordsByMonth[_currentMonth] ?? const [];
 
   Future<void> loadMonth(DateTime month) async {
     final normalizedMonth = DateTime(month.year, month.month);
     _currentMonth = normalizedMonth;
-    _isLoading = true;
     _errorMessage = null;
+    _isLoading = !_monthlyRecordsByMonth.containsKey(normalizedMonth);
     notifyListeners();
 
-    await _monthlyRecordsSubscription?.cancel();
-    _monthlyRecordsSubscription = _repository
-        .watchMonthlyRecords(normalizedMonth)
-        .listen(
-          (records) {
-            _monthlyRecords = records;
-            _rebuildDailyCaches();
-            _errorMessage = null;
-            _isLoading = false;
-            notifyListeners();
-          },
-          onError: (_) {
-            _monthlyRecords = const [];
-            _clearDailyCaches();
-            _errorMessage = '가계부 내역을 불러오는 중 오류가 발생했습니다.';
-            _isLoading = false;
-            notifyListeners();
-          },
-        );
+    _ensureWindowSubscriptions(centerMonth: normalizedMonth);
   }
 
   @override
   void dispose() {
-    _monthlyRecordsSubscription?.cancel();
-    _monthlyRecordsSubscription = null;
+    for (final subscription in _monthlySubscriptions.values) {
+      subscription.cancel();
+    }
+    _monthlySubscriptions.clear();
     super.dispose();
   }
 
   List<LedgerEntry> recordsForDate(DateTime date) {
-    return _recordsByDate[_normalizeDate(date)] ?? const [];
+    final month = _normalizeMonth(date);
+    return _recordsByDateByMonth[month]?[_normalizeDate(date)] ?? const [];
+  }
+
+  int incomeTotalForDate(DateTime date) {
+    final normalizedDate = _normalizeDate(date);
+    final month = _normalizeMonth(date);
+    return _dailyIncomeTotalsByMonth[month]?[normalizedDate] ?? 0;
+  }
+
+  int expenseTotalForDate(DateTime date) {
+    final normalizedDate = _normalizeDate(date);
+    final month = _normalizeMonth(date);
+    return _dailyExpenseTotalsByMonth[month]?[normalizedDate] ?? 0;
   }
 
   DateTime _normalizeDate(DateTime date) {
     return DateTime(date.year, date.month, date.day);
   }
 
-  void _rebuildDailyCaches() {
+  DateTime _normalizeMonth(DateTime date) {
+    return DateTime(date.year, date.month);
+  }
+
+  Set<DateTime> _buildMonthWindow({
+    required DateTime centerMonth,
+    required int radius,
+  }) {
+    final months = <DateTime>{};
+    for (var delta = -radius; delta <= radius; delta++) {
+      months.add(DateTime(centerMonth.year, centerMonth.month + delta));
+    }
+    return months;
+  }
+
+  void _ensureWindowSubscriptions({required DateTime centerMonth}) {
+    final watchMonths = _buildMonthWindow(
+      centerMonth: centerMonth,
+      radius: _watchWindowRadius,
+    );
+
+    for (final month in watchMonths) {
+      if (_monthlySubscriptions.containsKey(month)) {
+        continue;
+      }
+      _monthlySubscriptions[month] = _repository
+          .watchMonthlyRecords(month)
+          .listen(
+            (records) {
+              _updateMonthCaches(month: month, records: records);
+              if (_isSameMonth(month, _currentMonth)) {
+                _isLoading = false;
+                _errorMessage = null;
+              }
+              notifyListeners();
+            },
+            onError: (_) {
+              _updateMonthCaches(month: month, records: const []);
+              if (_isSameMonth(month, _currentMonth)) {
+                _isLoading = false;
+                _errorMessage = '가계부 내역을 불러오는 중 오류가 발생했습니다.';
+              }
+              notifyListeners();
+            },
+          );
+    }
+
+    final monthsToUnsubscribe =
+        _monthlySubscriptions.keys
+            .where((month) => !watchMonths.contains(month))
+            .toList();
+    for (final month in monthsToUnsubscribe) {
+      _monthlySubscriptions.remove(month)?.cancel();
+    }
+
+    final cacheMonths = _buildMonthWindow(
+      centerMonth: centerMonth,
+      radius: _cacheWindowRadius,
+    );
+    final monthsToRemove =
+        _monthlyRecordsByMonth.keys
+            .where((month) => !cacheMonths.contains(month))
+            .toList();
+    for (final month in monthsToRemove) {
+      _monthlyRecordsByMonth.remove(month);
+      _recordsByDateByMonth.remove(month);
+      _dailyIncomeTotalsByMonth.remove(month);
+      _dailyExpenseTotalsByMonth.remove(month);
+    }
+  }
+
+  void _updateMonthCaches({
+    required DateTime month,
+    required List<LedgerEntry> records,
+  }) {
+    _monthlyRecordsByMonth[month] = List<LedgerEntry>.unmodifiable(records);
+
     final recordsByDate = <DateTime, List<LedgerEntry>>{};
     final incomeTotals = <DateTime, int>{};
     final expenseTotals = <DateTime, int>{};
 
-    for (final record in _monthlyRecords) {
+    for (final record in records) {
       final key = _normalizeDate(record.date);
       recordsByDate.putIfAbsent(key, () => <LedgerEntry>[]).add(record);
 
@@ -96,16 +179,14 @@ class LedgerTabViewModel extends ChangeNotifier {
       }
     }
 
-    _recordsByDate = recordsByDate.map(
+    _recordsByDateByMonth[month] = recordsByDate.map(
       (key, value) => MapEntry(key, List<LedgerEntry>.unmodifiable(value)),
     );
-    _dailyIncomeTotalsByDate = Map.unmodifiable(incomeTotals);
-    _dailyExpenseTotalsByDate = Map.unmodifiable(expenseTotals);
+    _dailyIncomeTotalsByMonth[month] = Map.unmodifiable(incomeTotals);
+    _dailyExpenseTotalsByMonth[month] = Map.unmodifiable(expenseTotals);
   }
 
-  void _clearDailyCaches() {
-    _recordsByDate = const {};
-    _dailyIncomeTotalsByDate = const {};
-    _dailyExpenseTotalsByDate = const {};
+  bool _isSameMonth(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month;
   }
 }

@@ -28,6 +28,8 @@ class LedgerTabScreen extends StatefulWidget {
 }
 
 class _LedgerTabScreenState extends State<LedgerTabScreen> {
+  static const double _calendarSwipeVelocityThreshold = 200;
+
   final LedgerTabViewModel _viewModel = LedgerTabViewModel();
   final PageStorageKey<String> _calendarScrollKey = const PageStorageKey(
     'ledger-calendar-scroll',
@@ -39,6 +41,7 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
   DateTime _currentMonth = DateTime.now();
   DateTime? _selectedDate;
   LedgerViewType _selectedView = LedgerViewType.calendar;
+  bool _isCalendarCollapsed = false;
 
   @override
   void initState() {
@@ -187,51 +190,82 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
   }
 
   Widget _buildCalendarTab() {
-    return ListView(
-      key: _calendarScrollKey,
-      padding: EdgeInsets.zero,
+    return Column(
       children: [
         ..._buildCommonSection(),
         const SizedBox(height: 12),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: LedgerCalendar(
-            displayedMonth: _currentMonth,
+        GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onVerticalDragEnd: (details) {
+            final velocity = details.primaryVelocity ?? 0;
+            if (velocity.abs() < _calendarSwipeVelocityThreshold) {
+              return;
+            }
+            setState(() {
+              _isCalendarCollapsed = velocity < 0;
+            });
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: TweenAnimationBuilder<double>(
+              tween: Tween<double>(end: _isCalendarCollapsed ? 1 : 0),
+              duration: const Duration(milliseconds: 220),
+              curve: Curves.easeOutCubic,
+              builder: (context, collapseProgress, _) {
+                return LedgerCalendar(
+                  displayedMonth: _currentMonth,
+                  selectedDate: _selectedDate,
+                  collapseProgress: collapseProgress,
+                  incomeTotalForDate: _viewModel.incomeTotalForDate,
+                  expenseTotalForDate: _viewModel.expenseTotalForDate,
+                  onMonthChanged: (month) {
+                    if (_isSameMonth(_currentMonth, month)) {
+                      return;
+                    }
+                    setState(() {
+                      _currentMonth = month;
+                      _selectedDate = DateTime(month.year, month.month, 1);
+                    });
+                    widget.onSelectedDateChanged?.call(_selectedDate!);
+                    _viewModel.loadMonth(_currentMonth);
+                  },
+                  onDateTap: (date) {
+                    setState(() {
+                      _selectedDate = date;
+                    });
+
+                    final selectedMonth = DateTime(date.year, date.month);
+                    if (!_isSameMonth(_currentMonth, selectedMonth)) {
+                      setState(() {
+                        _currentMonth = selectedMonth;
+                      });
+                      _viewModel.loadMonth(_currentMonth);
+                    }
+
+                    widget.onSelectedDateChanged?.call(date);
+                  },
+                );
+              },
+            ),
+          ),
+        ),
+        Expanded(
+          child: SelectedDateLedgerSection(
+            key: _calendarScrollKey,
             selectedDate: _selectedDate,
-            dailyIncomeTotalsByDate: _viewModel.dailyIncomeTotalsByDate,
-            dailyExpenseTotalsByDate: _viewModel.dailyExpenseTotalsByDate,
-            onDateTap: (date) {
-              setState(() {
-                _selectedDate = date;
-              });
-
-              final selectedMonth = DateTime(date.year, date.month);
-              if (!_isSameMonth(_currentMonth, selectedMonth)) {
-                setState(() {
-                  _currentMonth = selectedMonth;
-                });
-                _viewModel.loadMonth(_currentMonth);
-              }
-
-              widget.onSelectedDateChanged?.call(date);
+            items: _selectedDateItems,
+            isLoading: _viewModel.isLoading,
+            errorMessage: _viewModel.errorMessage,
+            selectedDateLabelBuilder: _selectedDateLabel,
+            onItemTap: (item) {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (context) => LedgerRecordDetailScreen(entry: item),
+                ),
+              );
             },
           ),
         ),
-        SelectedDateLedgerSection(
-          selectedDate: _selectedDate,
-          items: _selectedDateItems,
-          isLoading: _viewModel.isLoading,
-          errorMessage: _viewModel.errorMessage,
-          selectedDateLabelBuilder: _selectedDateLabel,
-          onItemTap: (item) {
-            Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (context) => LedgerRecordDetailScreen(entry: item),
-              ),
-            );
-          },
-        ),
-        const SizedBox(height: 80),
       ],
     );
   }
