@@ -13,6 +13,7 @@ class SelectedDateLedgerSection extends StatelessWidget {
     required this.errorMessage,
     required this.selectedDateLabelBuilder,
     required this.onItemTap,
+    this.controller,
   });
 
   final DateTime? selectedDate;
@@ -21,6 +22,8 @@ class SelectedDateLedgerSection extends StatelessWidget {
   final String? errorMessage;
   final String Function(DateTime) selectedDateLabelBuilder;
   final ValueChanged<LedgerEntry> onItemTap;
+  final ScrollController? controller;
+  static const double _emptyStateHeight = 80;
 
   @override
   Widget build(BuildContext context) {
@@ -35,8 +38,8 @@ class SelectedDateLedgerSection extends StatelessWidget {
           (item.type == LedgerRecordType.income ? item.amount : -item.amount),
     );
 
-    return Container(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -64,42 +67,58 @@ class SelectedDateLedgerSection extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 8),
-          if (isLoading)
-            const LedgerStateCard(
-              child: Center(child: CircularProgressIndicator()),
-            )
-          else if (errorMessage != null)
-            LedgerStateCard(
-              child: Text(
-                errorMessage!,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 14,
-                  height: 20 / 14,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.hexFFEF4444,
-                ),
-              ),
-            )
-          else if (items.isEmpty)
-            const LedgerStateCard(
-              child: Text(
-                '해당 날짜에 등록된 내역이 없어요',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  height: 20 / 14,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textTertiary,
+          if (items.isEmpty && !isLoading && errorMessage == null)
+            const SizedBox(
+              height: _emptyStateHeight,
+              child: LedgerStateCard(
+                child: Center(
+                  child: Text(
+                    '해당 날짜에 등록된 내역이 없어요',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14,
+                      height: 20 / 14,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textTertiary,
+                    ),
+                  ),
                 ),
               ),
             )
           else
-            ...items.map(
-              (item) => Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: _DailyLedgerListTile(item: item, onTap: onItemTap),
-              ),
+            Expanded(
+              child:
+                  isLoading
+                      ? const LedgerStateCard(
+                        child: Center(child: CircularProgressIndicator()),
+                      )
+                      : errorMessage != null
+                      ? LedgerStateCard(
+                        child: Text(
+                          errorMessage!,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            height: 20 / 14,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.hexFFEF4444,
+                          ),
+                        ),
+                      )
+                      : ListView.separated(
+                        controller: controller,
+                        padding: const EdgeInsets.only(bottom: 100),
+                        itemCount: items.length,
+                        separatorBuilder:
+                            (context, index) => const SizedBox(height: 8),
+                        itemBuilder: (context, index) {
+                          final item = items[index];
+                          return _DailyLedgerListTile(
+                            item: item,
+                            onTap: onItemTap,
+                          );
+                        },
+                      ),
             ),
         ],
       ),
