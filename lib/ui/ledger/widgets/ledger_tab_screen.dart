@@ -209,8 +209,8 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: TweenAnimationBuilder<double>(
               tween: Tween<double>(end: _isCalendarCollapsed ? 1 : 0),
-              duration: const Duration(milliseconds: 220),
-              curve: Curves.easeOutCubic,
+              duration: const Duration(milliseconds: 280),
+              curve: Curves.easeInOutCubic,
               builder: (context, collapseProgress, _) {
                 return LedgerCalendar(
                   displayedMonth: _currentMonth,

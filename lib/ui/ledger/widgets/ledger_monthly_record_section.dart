@@ -101,9 +101,13 @@ class LedgerMonthlyRecordSection extends StatelessWidget {
               Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: Color.fromRGBO(248, 250, 252, 0.5),
+                  color: context.appColors.surfaceMuted,
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(24),
+                    bottomRight: Radius.circular(24),
+                  ),
                   border: Border(
-                    top: BorderSide(color: context.appColors.background, width: 1),
+                    top: BorderSide(color: context.appColors.border, width: 1),
                   ),
                 ),
                 padding: const EdgeInsets.fromLTRB(16, 13, 16, 12),

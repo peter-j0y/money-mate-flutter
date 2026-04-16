@@ -48,6 +48,7 @@ class LedgerCalendar extends StatefulWidget {
 
 class _LedgerCalendarState extends State<LedgerCalendar> {
   static const int _centerPage = 10000;
+  static const double _amountRenderThreshold = 0.04;
   late final PageController _pageController;
   int _pendingMonthOffset = 0;
 
@@ -81,7 +82,8 @@ class _LedgerCalendarState extends State<LedgerCalendar> {
           LedgerCalendar.collapsedRowHeight,
           collapsedProgress,
         )!;
-    final amountOpacity = (1 - collapsedProgress * 1.4).clamp(0.0, 1.0);
+    final amountOpacity = (1 - collapsedProgress * 1.6).clamp(0.0, 1.0);
+    final shouldRenderAmounts = collapsedProgress <= _amountRenderThreshold;
 
     return Container(
       padding: const EdgeInsets.fromLTRB(
@@ -110,43 +112,46 @@ class _LedgerCalendarState extends State<LedgerCalendar> {
           const SizedBox(height: 8),
           SizedBox(
             height: rowHeight * LedgerCalendar.weekCount,
-            child: NotificationListener<ScrollEndNotification>(
-              onNotification: (_) {
-                if (_pendingMonthOffset == 0) {
-                  return false;
-                }
-                final nextMonth = DateTime(
-                  widget.displayedMonth.year,
-                  widget.displayedMonth.month + _pendingMonthOffset,
-                );
-                _pendingMonthOffset = 0;
-                widget.onMonthChanged?.call(
-                  DateTime(nextMonth.year, nextMonth.month),
-                );
-                return false;
-              },
-              child: PageView.builder(
-                controller: _pageController,
-                onPageChanged: (index) {
-                  _pendingMonthOffset = index - _centerPage;
-                },
-                itemBuilder: (context, index) {
-                  final monthOffset = index - _centerPage;
-                  final month = DateTime(
+            child: RepaintBoundary(
+              child: NotificationListener<ScrollEndNotification>(
+                onNotification: (_) {
+                  if (_pendingMonthOffset == 0) {
+                    return false;
+                  }
+                  final nextMonth = DateTime(
                     widget.displayedMonth.year,
-                    widget.displayedMonth.month + monthOffset,
-                    1,
+                    widget.displayedMonth.month + _pendingMonthOffset,
                   );
-                  return _CalendarMonthGrid(
-                    displayedMonth: month,
-                    selectedDate: widget.selectedDate,
-                    incomeTotalForDate: widget.incomeTotalForDate,
-                    expenseTotalForDate: widget.expenseTotalForDate,
-                    rowHeight: rowHeight,
-                    amountOpacity: amountOpacity,
-                    onDateTap: widget.onDateTap,
+                  _pendingMonthOffset = 0;
+                  widget.onMonthChanged?.call(
+                    DateTime(nextMonth.year, nextMonth.month),
                   );
+                  return false;
                 },
+                child: PageView.builder(
+                  controller: _pageController,
+                  onPageChanged: (index) {
+                    _pendingMonthOffset = index - _centerPage;
+                  },
+                  itemBuilder: (context, index) {
+                    final monthOffset = index - _centerPage;
+                    final month = DateTime(
+                      widget.displayedMonth.year,
+                      widget.displayedMonth.month + monthOffset,
+                      1,
+                    );
+                    return _CalendarMonthGrid(
+                      displayedMonth: month,
+                      selectedDate: widget.selectedDate,
+                      incomeTotalForDate: widget.incomeTotalForDate,
+                      expenseTotalForDate: widget.expenseTotalForDate,
+                      rowHeight: rowHeight,
+                      amountOpacity: amountOpacity,
+                      shouldRenderAmounts: shouldRenderAmounts,
+                      onDateTap: widget.onDateTap,
+                    );
+                  },
+                ),
               ),
             ),
           ),
@@ -168,6 +173,7 @@ class _CalendarMonthGrid extends StatelessWidget {
     required this.expenseTotalForDate,
     required this.rowHeight,
     required this.amountOpacity,
+    required this.shouldRenderAmounts,
     required this.onDateTap,
   });
 
@@ -177,6 +183,7 @@ class _CalendarMonthGrid extends StatelessWidget {
   final int Function(DateTime date)? expenseTotalForDate;
   final double rowHeight;
   final double amountOpacity;
+  final bool shouldRenderAmounts;
   final ValueChanged<DateTime>? onDateTap;
 
   @override
@@ -222,21 +229,8 @@ class _CalendarMonthGrid extends StatelessWidget {
                       incomeTotalForDate?.call(normalizedDay) ?? 0;
                   final expenseTotal =
                       expenseTotalForDate?.call(normalizedDay) ?? 0;
-                  final amountLineCount =
-                      (isCurrentMonth && incomeTotal > 0 ? 1 : 0) +
-                      (isCurrentMonth && expenseTotal > 0 ? 1 : 0);
-                  const double dayNumberBlockHeight = 24;
-                  const double amountTopSpacing = 2;
-                  const double amountLineHeight = 14;
-                  final requiredHeightForAmounts =
-                      dayNumberBlockHeight +
-                      (amountLineCount > 0
-                          ? amountTopSpacing +
-                              (amountLineHeight * amountLineCount)
-                          : 0);
                   final canShowAmounts =
-                      amountOpacity > 0 &&
-                      rowHeight >= requiredHeightForAmounts;
+                      shouldRenderAmounts && amountOpacity > 0;
 
                   return Expanded(
                     child: InkWell(
