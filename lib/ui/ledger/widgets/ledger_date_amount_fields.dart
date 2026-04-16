@@ -19,26 +19,27 @@ class LedgerDateCard extends StatelessWidget {
     final content = Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.background,
+        color: context.appColors.surfaceMuted,
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: context.appColors.border),
       ),
       child: Row(
         children: [
           Expanded(
             child: Text(
               dateTextBuilder(date),
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
                 height: 24 / 16,
                 fontWeight: FontWeight.w500,
-                color: AppColors.textPrimary,
+                color: context.appColors.textPrimary,
               ),
             ),
           ),
-          const Icon(
+          Icon(
             Icons.calendar_today_outlined,
             size: 20,
-            color: AppColors.textTertiary,
+            color: context.appColors.textTertiary,
           ),
         ],
       ),
@@ -87,11 +88,11 @@ class LedgerAmountField extends StatelessWidget {
               onTap: onTap,
               keyboardType: TextInputType.number,
               inputFormatters: inputFormatters,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 36,
                 height: 36 / 30,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: context.appColors.textPrimary,
               ),
               decoration: const InputDecoration(
                 isCollapsed: true,
@@ -103,11 +104,11 @@ class LedgerAmountField extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 6),
               child: Text(
                 readOnlyText ?? '0',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 36,
                   height: 36 / 30,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
+                  color: context.appColors.textPrimary,
                 ),
               ),
             );
@@ -116,7 +117,7 @@ class LedgerAmountField extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Expanded(child: amountWidget),
-        const Padding(
+        Padding(
           padding: EdgeInsets.only(bottom: 10),
           child: Text(
             '원',
@@ -124,7 +125,7 @@ class LedgerAmountField extends StatelessWidget {
               fontSize: 20,
               height: 28 / 20,
               fontWeight: FontWeight.w500,
-              color: AppColors.hexFF1E293B,
+              color: context.appColors.textSecondary,
             ),
           ),
         ),

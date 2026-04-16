@@ -284,16 +284,16 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          backgroundColor: AppColors.white,
+          backgroundColor: context.appColors.surface,
           content: const Text('삭제하면 기록을 다시 복구할 수 없어요. 정말로 삭제할까요?'),
           actions: [
             TextButton(
-              style: TextButton.styleFrom(foregroundColor: AppColors.primary),
+              style: TextButton.styleFrom(foregroundColor: context.appColors.primary),
               onPressed: () => Navigator.of(dialogContext).pop(false),
               child: const Text('취소'),
             ),
             TextButton(
-              style: TextButton.styleFrom(foregroundColor: AppColors.primary),
+              style: TextButton.styleFrom(foregroundColor: context.appColors.primary),
               onPressed: () => Navigator.of(dialogContext).pop(true),
               child: const Text('삭제'),
             ),
@@ -311,7 +311,7 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
     final contentBottomPadding = safeAreaBottom + 120;
 
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: context.appColors.background,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -322,7 +322,7 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
               actions: [
                 LedgerScreenHeaderAction(
                   label: '삭제',
-                  color: AppColors.danger,
+                  color: context.appColors.danger,
                   onTap: _onDeleteTap,
                 ),
               ],
@@ -356,10 +356,10 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
                           inputFormatters: const [_AmountInputFormatter()],
                           onTap: _markTapped,
                         ),
-                        const Divider(
+                        Divider(
                           height: 2,
                           thickness: 2,
-                          color: AppColors.surfaceMuted,
+                          color: context.appColors.surfaceMuted,
                         ),
                         const SizedBox(height: 24),
                         const _SectionLabel(text: '유형'),
@@ -420,7 +420,7 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    const SizedBox(
+                                    SizedBox(
                                       width: double.infinity,
                                       height: 28,
                                       child: DecoratedBox(
@@ -429,9 +429,9 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
                                             begin: Alignment.topCenter,
                                             end: Alignment.bottomCenter,
                                             colors: [
-                                              AppColors.rgba_255_255_255_0,
-                                              AppColors.rgba_255_255_255_05,
-                                              AppColors.white,
+                                              context.appColors.background.withValues(alpha: 0),
+                                              context.appColors.background.withValues(alpha: 0.65),
+                                              context.appColors.background,
                                             ],
                                             stops: [0, 0.6, 1],
                                           ),
@@ -439,7 +439,7 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
                                       ),
                                     ),
                                     Container(
-                                      color: AppColors.white,
+                                      color: context.appColors.background,
                                       padding: EdgeInsets.fromLTRB(
                                         16,
                                         0,
@@ -451,7 +451,7 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
                                         height: 60,
                                         child: FilledButton(
                                           style: FilledButton.styleFrom(
-                                            backgroundColor: AppColors.primary,
+                                            backgroundColor: context.appColors.primary,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
                                                   BorderRadius.circular(24),
@@ -558,11 +558,11 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 14,
         height: 20 / 14,
         fontWeight: FontWeight.w500,
-        color: AppColors.textSecondary,
+        color: context.appColors.textSecondary,
       ),
     );
   }

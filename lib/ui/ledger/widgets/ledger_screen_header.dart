@@ -45,10 +45,10 @@ class LedgerScreenHeader extends StatelessWidget {
                 height: closeButtonSize,
                 child: IconButton(
                   onPressed: onCloseTap,
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.close_rounded,
                     size: 24,
-                    color: AppColors.hexFF1E293B,
+                    color: context.appColors.textPrimary,
                   ),
                 ),
               ),
@@ -56,11 +56,11 @@ class LedgerScreenHeader extends StatelessWidget {
             Text(
               title,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 18,
                 height: 22.5 / 18,
                 fontWeight: FontWeight.w500,
-                color: AppColors.textPrimary,
+                color: context.appColors.textPrimary,
               ),
             ),
             if (actions.isNotEmpty)

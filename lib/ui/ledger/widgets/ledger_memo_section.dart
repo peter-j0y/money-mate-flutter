@@ -35,8 +35,9 @@ class LedgerMemoSection extends StatelessWidget {
     if (controller != null) {
       return Container(
         decoration: BoxDecoration(
-          color: AppColors.background,
+          color: context.appColors.surfaceMuted,
           borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: context.appColors.border),
         ),
         padding: const EdgeInsets.all(5),
         child: TextField(
@@ -49,19 +50,19 @@ class LedgerMemoSection extends StatelessWidget {
             20,
             keyboardInset + safeAreaBottom + 120,
           ),
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16,
             height: 24 / 16,
             fontWeight: FontWeight.w500,
-            color: AppColors.textPrimary,
+            color: context.appColors.textPrimary,
           ),
           decoration: InputDecoration(
             hintText: placeholderText,
-            hintStyle: const TextStyle(
+            hintStyle: TextStyle(
               fontSize: 16,
               height: 24 / 16,
               fontWeight: FontWeight.w500,
-              color: AppColors.textTertiary,
+              color: context.appColors.textTertiary,
             ),
             border: InputBorder.none,
             contentPadding: EdgeInsets.fromLTRB(12, 8, 12, 8),
@@ -76,8 +77,9 @@ class LedgerMemoSection extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: AppColors.background,
+        color: context.appColors.surfaceMuted,
         borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: context.appColors.border),
       ),
       padding: const EdgeInsets.fromLTRB(17, 13, 17, 13),
       child: Text(
@@ -86,7 +88,7 @@ class LedgerMemoSection extends StatelessWidget {
           fontSize: 16,
           height: 24 / 16,
           fontWeight: FontWeight.w500,
-          color: hasMemo ? AppColors.textPrimary : AppColors.textTertiary,
+          color: hasMemo ? context.appColors.textPrimary : context.appColors.textTertiary,
         ),
       ),
     );

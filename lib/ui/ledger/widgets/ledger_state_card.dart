@@ -7,14 +7,14 @@ class LedgerStateCard extends StatelessWidget {
     required this.child,
     this.padding = const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
     this.borderRadius = 16,
-    this.backgroundColor = AppColors.white,
+    this.backgroundColor,
     this.borderColor,
   });
 
   final Widget child;
   final EdgeInsetsGeometry padding;
   final double borderRadius;
-  final Color backgroundColor;
+  final Color? backgroundColor;
   final Color? borderColor;
 
   @override
@@ -23,7 +23,7 @@ class LedgerStateCard extends StatelessWidget {
       width: double.infinity,
       padding: padding,
       decoration: BoxDecoration(
-        color: backgroundColor,
+        color: backgroundColor ?? context.appColors.surface,
         borderRadius: BorderRadius.circular(borderRadius),
         border: borderColor == null ? null : Border.all(color: borderColor!),
       ),

@@ -48,27 +48,27 @@ class SelectedDateLedgerSection extends StatelessWidget {
             children: [
               Text(
                 selectedDateLabelBuilder(selectedDate!),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   height: 24 / 16,
                   fontWeight: FontWeight.w500,
-                  color: AppColors.hexFF1E293B,
+                  color: context.appColors.textPrimary,
                 ),
               ),
               Text(
                 '합계 ${_wonText(totalAmount)}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   height: 16 / 12,
                   fontWeight: FontWeight.w400,
-                  color: AppColors.textSecondary,
+                  color: context.appColors.textSecondary,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 8),
           if (items.isEmpty && !isLoading && errorMessage == null)
-            const SizedBox(
+            SizedBox(
               height: _emptyStateHeight,
               child: LedgerStateCard(
                 child: Center(
@@ -79,7 +79,7 @@ class SelectedDateLedgerSection extends StatelessWidget {
                       fontSize: 14,
                       height: 20 / 14,
                       fontWeight: FontWeight.w500,
-                      color: AppColors.textTertiary,
+                      color: context.appColors.textTertiary,
                     ),
                   ),
                 ),
@@ -97,11 +97,11 @@ class SelectedDateLedgerSection extends StatelessWidget {
                         child: Text(
                           errorMessage!,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
                             height: 20 / 14,
                             fontWeight: FontWeight.w500,
-                            color: AppColors.hexFFEF4444,
+                            color: context.appColors.danger,
                           ),
                         ),
                       )
@@ -150,7 +150,7 @@ class _DailyLedgerListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.white,
+      color: context.appColors.surface,
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),

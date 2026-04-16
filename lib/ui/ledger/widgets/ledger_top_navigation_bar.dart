@@ -16,7 +16,7 @@ class LedgerTopNavigationBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 46,
-      decoration: BoxDecoration(color: AppColors.background),
+      decoration: BoxDecoration(color: context.appColors.background),
       child: Row(
         children: [
           _TopNavItem(
@@ -50,7 +50,7 @@ class _TopNavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.overlay,
+      color: context.appColors.overlay,
       child: InkWell(
         onTap: onTap,
         child: Padding(
@@ -63,7 +63,7 @@ class _TopNavItem extends StatelessWidget {
                 height: 28 / 18,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 color:
-                    isSelected ? AppColors.textPrimary : AppColors.hexFF98A0B4,
+                    isSelected ? context.appColors.textPrimary : context.appColors.textTertiary,
               ),
             ),
           ),

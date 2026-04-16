@@ -19,7 +19,7 @@ class LedgerCalendar extends StatefulWidget {
   static const double containerVerticalPadding = 12;
   static const double weekdayLabelHeight = 16;
   static const double weekdayToGridSpacing = 8;
-  static const double expandedRowHeight = 60;
+  static const double expandedRowHeight = 64;
   static const double collapsedRowHeight = 38;
 
   static double get expandedHeight =>
@@ -91,7 +91,7 @@ class _LedgerCalendarState extends State<LedgerCalendar> {
         LedgerCalendar.containerVerticalPadding,
       ),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: context.appColors.surface,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -247,13 +247,13 @@ class _CalendarMonthGrid extends StatelessWidget {
                           color:
                               isSelected
                                   ? AppColors.rgba_19_127_236_005
-                                  : AppColors.overlay,
+                                  : context.appColors.overlay,
                           border: Border(
                             top: BorderSide(
                               color:
                                   isSelected
-                                      ? AppColors.primary
-                                      : AppColors.white,
+                                      ? context.appColors.primary
+                                      : context.appColors.surface,
                               width: 1,
                             ),
                           ),
@@ -276,8 +276,9 @@ class _CalendarMonthGrid extends StatelessWidget {
                                             : FontWeight.w500,
                                     color:
                                         isSelected
-                                            ? AppColors.primary
+                                            ? context.appColors.primary
                                             : _dayTextColor(
+                                              context: context,
                                               day: day,
                                               isCurrentMonth: isCurrentMonth,
                                             ),
@@ -303,7 +304,7 @@ class _CalendarMonthGrid extends StatelessWidget {
                                   opacity: amountOpacity,
                                   child: _AdaptiveCalendarAmountText(
                                     text: '+${_wonText(incomeTotal)}',
-                                    color: AppColors.primary,
+                                    color: context.appColors.primary,
                                   ),
                                 ),
                               if (isCurrentMonth && expenseTotal > 0)
@@ -311,7 +312,7 @@ class _CalendarMonthGrid extends StatelessWidget {
                                   opacity: amountOpacity,
                                   child: _AdaptiveCalendarAmountText(
                                     text: '-${_wonText(expenseTotal)}',
-                                    color: AppColors.danger,
+                                    color: context.appColors.danger,
                                   ),
                                 ),
                             ],
@@ -335,14 +336,18 @@ class _CalendarMonthGrid extends StatelessWidget {
     return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 
-  Color _dayTextColor({required DateTime day, required bool isCurrentMonth}) {
+  Color _dayTextColor({
+    required BuildContext context,
+    required DateTime day,
+    required bool isCurrentMonth,
+  }) {
     if (isCurrentMonth && day.weekday == DateTime.sunday) {
       return AppColors.hexFFEF4444;
     }
     if (isCurrentMonth && day.weekday == DateTime.saturday) {
       return AppColors.hexFF3B82F6;
     }
-    return isCurrentMonth ? AppColors.textPrimary : AppColors.textTertiary;
+    return isCurrentMonth ? context.appColors.textPrimary : context.appColors.textTertiary;
   }
 
   String _wonText(int amount) {

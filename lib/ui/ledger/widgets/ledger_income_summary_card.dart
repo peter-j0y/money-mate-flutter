@@ -18,7 +18,7 @@ class LedgerIncomeSummaryCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(4, 8, 4, 8),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: context.appColors.surface,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -27,7 +27,7 @@ class LedgerIncomeSummaryCard extends StatelessWidget {
             child: _SummaryValueColumn(
               title: '수입',
               value: incomeText,
-              valueColor: AppColors.primary,
+              valueColor: context.appColors.primary,
               showRightBorder: true,
             ),
           ),
@@ -35,7 +35,7 @@ class LedgerIncomeSummaryCard extends StatelessWidget {
             child: _SummaryValueColumn(
               title: '지출',
               value: expenseText,
-              valueColor: AppColors.danger,
+              valueColor: context.appColors.danger,
               showRightBorder: true,
             ),
           ),
@@ -43,7 +43,7 @@ class LedgerIncomeSummaryCard extends StatelessWidget {
             child: _SummaryValueColumn(
               title: '저축 가능',
               value: savableText,
-              valueColor: AppColors.success,
+              valueColor: context.appColors.success,
             ),
           ),
         ],
@@ -72,8 +72,8 @@ class _SummaryValueColumn extends StatelessWidget {
       decoration: BoxDecoration(
         border:
             showRightBorder
-                ? const Border(
-                  right: BorderSide(color: AppColors.border, width: 1),
+                ? Border(
+                  right: BorderSide(color: context.appColors.border, width: 1),
                 )
                 : null,
       ),
@@ -82,11 +82,11 @@ class _SummaryValueColumn extends StatelessWidget {
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               height: 1.5,
               fontWeight: FontWeight.w600,
-              color: AppColors.hexFF4D545E,
+              color: context.appColors.textSecondary,
             ),
           ),
           const SizedBox(height: 4),

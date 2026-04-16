@@ -46,7 +46,7 @@ class SegmentedToggle extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
-          color: AppColors.surfaceMuted,
+          color: context.appColors.surfaceMuted,
           borderRadius: BorderRadius.circular(24),
         ),
         child: Row(
@@ -79,20 +79,20 @@ class _ToggleButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.overlay,
+      color: context.appColors.overlay,
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 6),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.white : AppColors.overlay,
+            color: isSelected ? context.appColors.surface : context.appColors.overlay,
             borderRadius: BorderRadius.circular(16),
             boxShadow:
                 isSelected
-                    ? const [
+                    ? [
                       BoxShadow(
-                        color: AppColors.rgba_0_0_0_005,
+                        color: Colors.black.withValues(alpha: 0.12),
                         blurRadius: 2,
                         offset: Offset(0, 1),
                       ),
@@ -106,7 +106,7 @@ class _ToggleButton extends StatelessWidget {
               fontSize: 16,
               height: 20 / 14,
               fontWeight: FontWeight.w500,
-              color: isSelected ? AppColors.primary : AppColors.textSecondary,
+              color: isSelected ? context.appColors.primary : context.appColors.textSecondary,
             ),
           ),
         ),

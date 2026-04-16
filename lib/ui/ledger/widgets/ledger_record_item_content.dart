@@ -23,7 +23,7 @@ class LedgerRecordItemContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final categoryOption = _categoryOptionOf(item);
     final isIncome = item.type == LedgerRecordType.income;
-    final amountColor = isIncome ? AppColors.primary : AppColors.danger;
+    final amountColor = isIncome ? context.appColors.primary : context.appColors.danger;
     final amountPrefix =
         amountStyle == LedgerAmountStyle.signed ? (isIncome ? '+' : '-') : '';
     final memo = _truncateMemo(item.memo?.trim());
@@ -59,11 +59,11 @@ class LedgerRecordItemContent extends StatelessWidget {
                 item.category,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   height: 20 / 14,
                   fontWeight: FontWeight.w500,
-                  color: AppColors.textPrimary,
+                  color: context.appColors.textPrimary,
                 ),
               ),
               if (hasMemo) ...[
@@ -72,11 +72,11 @@ class LedgerRecordItemContent extends StatelessWidget {
                   memo,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     height: 16 / 12,
                     fontWeight: FontWeight.w400,
-                    color: AppColors.textTertiary,
+                    color: context.appColors.textTertiary,
                   ),
                 ),
               ],
@@ -105,11 +105,11 @@ class LedgerRecordItemContent extends StatelessWidget {
                     rightBottomText,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 10,
                       height: 15 / 10,
                       fontWeight: FontWeight.w500,
-                      color: AppColors.textTertiary,
+                      color: context.appColors.textTertiary,
                     ),
                   ),
                 ],

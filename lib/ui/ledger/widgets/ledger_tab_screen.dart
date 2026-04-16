@@ -322,7 +322,7 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Container(
-        color: AppColors.background,
+        color: context.appColors.background,
         child: Column(
           children: [
             Padding(

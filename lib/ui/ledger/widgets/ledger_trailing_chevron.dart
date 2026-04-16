@@ -11,7 +11,7 @@ class LedgerTrailingChevron extends StatelessWidget {
     return Icon(
       Icons.chevron_right_rounded,
       size: size,
-      color: AppColors.textTertiary,
+      color: context.appColors.textTertiary,
     );
   }
 }

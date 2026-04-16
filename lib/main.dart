@@ -20,7 +20,7 @@ class MoneyMateApp extends StatelessWidget {
       title: 'Money Mate',
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
-      themeMode: ThemeMode.light,
+      themeMode: ThemeMode.system,
       locale: const Locale('ko', 'KR'),
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
@@ -102,9 +102,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   );
                 },
-                backgroundColor: AppColors.primary,
+                backgroundColor: context.appColors.primary,
                 shape: const CircleBorder(),
-                child: Icon(Icons.add, color: AppColors.inverseText, size: 28),
+                child: Icon(Icons.add, color: context.appColors.inverseText, size: 28),
               )
               : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
@@ -130,7 +130,7 @@ class _TabPage extends StatelessWidget {
               title,
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                 fontWeight: FontWeight.w800,
-                color: AppColors.textPrimary,
+                color: context.appColors.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
@@ -138,16 +138,16 @@ class _TabPage extends StatelessWidget {
               subtitle,
               style: Theme.of(
                 context,
-              ).textTheme.bodyLarge?.copyWith(color: AppColors.textSecondary),
+              ).textTheme.bodyLarge?.copyWith(color: context.appColors.textSecondary),
             ),
             const Spacer(),
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: AppColors.surface,
+                color: context.appColors.surface,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AppColors.border),
+                border: Border.all(color: context.appColors.border),
               ),
               child: const Text(
                 'Figma 디자인 값을 연결해 픽셀 단위로 맞출 준비가 되어 있습니다.',

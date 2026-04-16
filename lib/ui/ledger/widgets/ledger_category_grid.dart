@@ -65,7 +65,7 @@ class _LedgerCategoryGridItem extends StatelessWidget {
             shape: BoxShape.circle,
             border:
                 selected
-                    ? Border.all(color: AppColors.primary, width: 2)
+                    ? Border.all(color: context.appColors.primary, width: 2)
                     : null,
           ),
           alignment: Alignment.center,
@@ -81,7 +81,7 @@ class _LedgerCategoryGridItem extends StatelessWidget {
             fontSize: 12,
             height: 16 / 12,
             fontWeight: FontWeight.w500,
-            color: selected ? AppColors.primary : AppColors.hexFF475569,
+            color: selected ? context.appColors.primary : context.appColors.textSecondary,
           ),
         ),
       ],

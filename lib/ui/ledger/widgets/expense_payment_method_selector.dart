@@ -20,13 +20,13 @@ class ExpensePaymentMethodSelector extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           '지출 수단',
           style: TextStyle(
             fontSize: 14,
             height: 20 / 14,
             fontWeight: FontWeight.w500,
-            color: AppColors.textSecondary,
+            color: context.appColors.textSecondary,
           ),
         ),
         const SizedBox(height: 8),
@@ -66,10 +66,10 @@ class _PaymentMethodChip extends StatelessWidget {
       child: Ink(
         padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 9),
         decoration: BoxDecoration(
-          color: selected ? AppColors.primary : AppColors.white,
+          color: selected ? context.appColors.primary : context.appColors.surface,
           borderRadius: BorderRadius.circular(9999),
           border: Border.all(
-            color: selected ? AppColors.primary : AppColors.border,
+            color: selected ? context.appColors.primary : context.appColors.border,
           ),
         ),
         child: Text(
@@ -78,7 +78,7 @@ class _PaymentMethodChip extends StatelessWidget {
             fontSize: 14,
             height: 20 / 14,
             fontWeight: FontWeight.w500,
-            color: selected ? AppColors.white : AppColors.hexFF475569,
+            color: selected ? AppColors.white : context.appColors.textSecondary,
           ),
         ),
       ),

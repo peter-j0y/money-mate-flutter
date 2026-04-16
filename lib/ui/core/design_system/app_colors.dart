@@ -18,19 +18,21 @@ class AppColors {
   static const Color surface = Color(0xFFFFFFFF);
   static const Color surfaceMuted = Color(0xFFF1F5F9);
   static const Color textPrimary = Color(0xFF0F172A);
-  static const Color textSecondary = Color(0xFF64748B);
-  static const Color textTertiary = Color(0xFF94A3B8);
+  static const Color textSecondary = Color(0xFF475569);
+  static const Color textTertiary = Color(0xFF64748B);
   static const Color border = Color(0xFFE2E8F0);
   static const Color overlay = Colors.transparent;
   static const Color inverseText = Colors.white;
 
   // Hex Tokens
+  static const Color hexFF020617 = Color(0xFF020617);
+  static const Color hexFF111827 = Color(0xFF111827);
   static const Color hexFFFFFFFF = Color(0xFFFFFFFF);
   static const Color hexFF0F172A = Color(0xFF0F172A);
   static const Color hexFF10B981 = Color(0xFF10B981);
   static const Color hexFF137FEC = Color(0xFF137FEC);
   static const Color hexFF14B8A6 = Color(0xFF14B8A6);
-  static const Color hexFF1E293B = Color(0xFF1E293B);
+  static const Color hexFF1E293B = Color(0xFF0F172A);
   static const Color hexFF22C55E = Color(0xFF22C55E);
   static const Color hexFF2D6A4F = Color(0xFF2D6A4F);
   static const Color hexFF334155 = Color(0xFF334155);
@@ -38,48 +40,48 @@ class AppColors {
   static const Color hexFF38BDF8 = Color(0xFF38BDF8);
   static const Color hexFF3B82F6 = Color(0xFF3B82F6);
   static const Color hexFF475569 = Color(0xFF475569);
-  static const Color hexFF4A4A4A = Color(0xFF4A4A4A);
-  static const Color hexFF4D545E = Color(0xFF4D545E);
+  static const Color hexFF4A4A4A = Color(0xFF475569);
+  static const Color hexFF4D545E = Color(0xFF475569);
   static const Color hexFF6366F1 = Color(0xFF6366F1);
   static const Color hexFF64748B = Color(0xFF64748B);
-  static const Color hexFF7C3AED = Color(0xFF7C3AED);
-  static const Color hexFF8C8C8C = Color(0xFF8C8C8C);
+  static const Color hexFF7C3AED = Color(0xFF3B82F6);
+  static const Color hexFF8C8C8C = Color(0xFF94A3B8);
   static const Color hexFF94A3B8 = Color(0xFF94A3B8);
-  static const Color hexFF98A0B4 = Color(0xFF98A0B4);
-  static const Color hexFF9CA3AF = Color(0xFF9CA3AF);
-  static const Color hexFFA78BFA = Color(0xFFA78BFA);
-  static const Color hexFFA855F7 = Color(0xFFA855F7);
-  static const Color hexFFB8F2E6 = Color(0xFFB8F2E6);
+  static const Color hexFF98A0B4 = Color(0xFF94A3B8);
+  static const Color hexFF9CA3AF = Color(0xFF94A3B8);
+  static const Color hexFFA78BFA = Color(0xFF60A5FA);
+  static const Color hexFFA855F7 = Color(0xFF3B82F6);
+  static const Color hexFFB8F2E6 = Color(0xFFECFDF5);
   static const Color hexFFCBD5E1 = Color(0xFFCBD5E1);
-  static const Color hexFFCCFBF1 = Color(0xFFCCFBF1);
+  static const Color hexFFCCFBF1 = Color(0xFFECFDF5);
   static const Color hexFFD97706 = Color(0xFFD97706);
-  static const Color hexFFDBEAFE = Color(0xFFDBEAFE);
-  static const Color hexFFDCFCE7 = Color(0xFFDCFCE7);
-  static const Color hexFFDDEAF6 = Color(0xFFDDEAF6);
+  static const Color hexFFDBEAFE = Color(0xFFE0F2FE);
+  static const Color hexFFDCFCE7 = Color(0xFFECFDF5);
+  static const Color hexFFDDEAF6 = Color(0xFFE0F2FE);
   static const Color hexFFE0F2FE = Color(0xFFE0F2FE);
   static const Color hexFFE2E8F0 = Color(0xFFE2E8F0);
-  static const Color hexFFE5E7EB = Color(0xFFE5E7EB);
-  static const Color hexFFEC4899 = Color(0xFFEC4899);
+  static const Color hexFFE5E7EB = Color(0xFFE2E8F0);
+  static const Color hexFFEC4899 = Color(0xFFF43F5E);
   static const Color hexFFECFDF5 = Color(0xFFECFDF5);
-  static const Color hexFFEEF2FF = Color(0xFFEEF2FF);
-  static const Color hexFFEF4444 = Color(0xFFEF4444);
+  static const Color hexFFEEF2FF = Color(0xFFE0F2FE);
+  static const Color hexFFEF4444 = Color(0xFFF43F5E);
   static const Color hexFFF1F5F9 = Color(0xFFF1F5F9);
-  static const Color hexFFF3E8FF = Color(0xFFF3E8FF);
-  static const Color hexFFF3F4F6 = Color(0xFFF3F4F6);
+  static const Color hexFFF3E8FF = Color(0xFFE0F2FE);
+  static const Color hexFFF3F4F6 = Color(0xFFF1F5F9);
   static const Color hexFFF43F5E = Color(0xFFF43F5E);
   static const Color hexFFF59E0B = Color(0xFFF59E0B);
   static const Color hexFFF8FAFC = Color(0xFFF8FAFC);
-  static const Color hexFFF97316 = Color(0xFFF97316);
-  static const Color hexFFF9FAFB = Color(0xFFF9FAFB);
-  static const Color hexFFFACC15 = Color(0xFFFACC15);
+  static const Color hexFFF97316 = Color(0xFFFB923C);
+  static const Color hexFFF9FAFB = Color(0xFFF8FAFC);
+  static const Color hexFFFACC15 = Color(0xFFF59E0B);
   static const Color hexFFFB7185 = Color(0xFFFB7185);
   static const Color hexFFFB923C = Color(0xFFFB923C);
-  static const Color hexFFFCE7F3 = Color(0xFFFCE7F3);
-  static const Color hexFFFEF2F2 = Color(0xFFFEF2F2);
-  static const Color hexFFFEF3C7 = Color(0xFFFEF3C7);
-  static const Color hexFFFEF9C3 = Color(0xFFFEF9C3);
-  static const Color hexFFFFE4E6 = Color(0xFFFFE4E6);
-  static const Color hexFFFFE69A = Color(0xFFFFE69A);
+  static const Color hexFFFCE7F3 = Color(0xFFFFF1F2);
+  static const Color hexFFFEF2F2 = Color(0xFFFFF1F2);
+  static const Color hexFFFEF3C7 = Color(0xFFFFFBEB);
+  static const Color hexFFFEF9C3 = Color(0xFFFFFBEB);
+  static const Color hexFFFFE4E6 = Color(0xFFFFF1F2);
+  static const Color hexFFFFE69A = Color(0xFFFFFBEB);
   static const Color hexFFFFEDD5 = Color(0xFFFFEDD5);
   static const Color hexFFFFF1F2 = Color(0xFFFFF1F2);
   static const Color hexFFFFFBEB = Color(0xFFFFFBEB);
@@ -98,6 +100,8 @@ class AppColors {
   static const List<Color> all = [
     white,
     transparent,
+    hexFF020617,
+    hexFF111827,
     hexFFFFFFFF,
     hexFF0F172A,
     hexFF10B981,

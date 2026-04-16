@@ -15,13 +15,13 @@ class MoneyMateBottomNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const selectedColor = AppColors.hexFF137FEC;
-    const unselectedColor = AppColors.hexFF94A3B8;
+    final selectedColor = context.appColors.primary;
+    final unselectedColor = context.appColors.textTertiary;
 
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.white,
-        border: Border(top: BorderSide(color: AppColors.hexFFF1F5F9, width: 1)),
+      decoration: BoxDecoration(
+        color: context.appColors.surface,
+        border: Border(top: BorderSide(color: context.appColors.border, width: 1)),
       ),
       child: SafeArea(
         top: false,

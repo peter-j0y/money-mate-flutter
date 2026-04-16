@@ -40,16 +40,16 @@ class LedgerMonthlyRecordSection extends StatelessWidget {
                   fontSize: 16,
                   height: 28 / 18,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.hexFF1E293B,
+                  color: context.appColors.textPrimary,
                 ),
               ),
               Material(
-                color: AppColors.surfaceMuted,
+                color: context.appColors.surfaceMuted,
                 borderRadius: BorderRadius.circular(9999),
                 child: InkWell(
                   borderRadius: BorderRadius.circular(9999),
                   onTap: onAddTap,
-                  child: const Padding(
+                  child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     child: Text(
                       '+ 추가',
@@ -57,7 +57,7 @@ class LedgerMonthlyRecordSection extends StatelessWidget {
                         fontSize: 12,
                         height: 16 / 12,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.textSecondary,
+                        color: context.appColors.textSecondary,
                       ),
                     ),
                   ),
@@ -70,8 +70,8 @@ class LedgerMonthlyRecordSection extends StatelessWidget {
         LedgerStateCard(
           padding: EdgeInsets.zero,
           borderRadius: 24,
-          backgroundColor: AppColors.surface,
-          borderColor: AppColors.surfaceMuted,
+          backgroundColor: context.appColors.surface,
+          borderColor: context.appColors.surfaceMuted,
           child: Column(
             children: [
               if (items.isEmpty)
@@ -83,7 +83,7 @@ class LedgerMonthlyRecordSection extends StatelessWidget {
                       fontSize: 14,
                       height: 20 / 14,
                       fontWeight: FontWeight.w500,
-                      color: AppColors.textTertiary,
+                      color: context.appColors.textTertiary,
                     ),
                   ),
                 )
@@ -100,10 +100,10 @@ class LedgerMonthlyRecordSection extends StatelessWidget {
                 }),
               Container(
                 width: double.infinity,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: Color.fromRGBO(248, 250, 252, 0.5),
                   border: Border(
-                    top: BorderSide(color: AppColors.background, width: 1),
+                    top: BorderSide(color: context.appColors.background, width: 1),
                   ),
                 ),
                 padding: const EdgeInsets.fromLTRB(16, 13, 16, 12),
@@ -116,16 +116,16 @@ class LedgerMonthlyRecordSection extends StatelessWidget {
                         fontSize: 12,
                         height: 16 / 12,
                         fontWeight: FontWeight.w500,
-                        color: AppColors.textSecondary,
+                        color: context.appColors.textSecondary,
                       ),
                     ),
                     Text(
                       _wonText(totalAmount),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
                         height: 20 / 14,
                         fontWeight: FontWeight.w500,
-                        color: AppColors.hexFF1E293B,
+                        color: context.appColors.textPrimary,
                       ),
                     ),
                   ],
@@ -167,7 +167,7 @@ class _RecordItemTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.surface,
+      color: context.appColors.surface,
       borderRadius:
           isFirst
               ? const BorderRadius.only(
@@ -188,8 +188,8 @@ class _RecordItemTile extends StatelessWidget {
           decoration: BoxDecoration(
             border:
                 hasTopBorder
-                    ? const Border(
-                      top: BorderSide(color: AppColors.background, width: 1),
+                    ? Border(
+                      top: BorderSide(color: context.appColors.background, width: 1),
                     )
                     : null,
           ),

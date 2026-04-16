@@ -214,7 +214,7 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
     final isSubmitEnabledUi = _isFormValid;
 
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: context.appColors.background,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -256,10 +256,10 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
                           focusNode: _amountFocusNode,
                           inputFormatters: const [_AmountInputFormatter()],
                         ),
-                        const Divider(
+                        Divider(
                           height: 2,
                           thickness: 2,
-                          color: AppColors.surfaceMuted,
+                          color: context.appColors.surfaceMuted,
                         ),
                         const SizedBox(height: 24),
                         const _SectionLabel(text: '유형'),
@@ -306,7 +306,7 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const SizedBox(
+                              SizedBox(
                                 width: double.infinity,
                                 height: 28,
                                 child: DecoratedBox(
@@ -315,9 +315,9 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
                                       begin: Alignment.topCenter,
                                       end: Alignment.bottomCenter,
                                       colors: [
-                                        AppColors.rgba_255_255_255_0,
-                                        AppColors.rgba_255_255_255_05,
-                                        AppColors.white,
+                                        context.appColors.background.withValues(alpha: 0),
+                                        context.appColors.background.withValues(alpha: 0.65),
+                                        context.appColors.background,
                                       ],
                                       stops: [0, 0.6, 1],
                                     ),
@@ -325,7 +325,7 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
                                 ),
                               ),
                               Container(
-                                color: AppColors.white,
+                                color: context.appColors.background,
                                 padding: EdgeInsets.fromLTRB(
                                   16,
                                   0,
@@ -339,8 +339,8 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
                                     style: FilledButton.styleFrom(
                                       backgroundColor:
                                           isSubmitEnabledUi
-                                              ? AppColors.primary
-                                              : AppColors.hexFFCBD5E1,
+                                              ? context.appColors.primary
+                                              : context.appColors.border,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(24),
                                       ),
@@ -348,7 +348,7 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
                                       shadowColor:
                                           isSubmitEnabledUi
                                               ? AppColors.rgba_19_127_236_025
-                                              : AppColors.overlay,
+                                              : context.appColors.overlay,
                                     ),
                                     onPressed:
                                         _viewModel.isSaving
@@ -406,11 +406,11 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 14,
         height: 20 / 14,
         fontWeight: FontWeight.w500,
-        color: AppColors.textSecondary,
+        color: context.appColors.textSecondary,
       ),
     );
   }

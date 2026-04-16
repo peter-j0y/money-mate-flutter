@@ -52,7 +52,7 @@ class _RecordTypeButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.overlay,
+      color: context.appColors.overlay,
       child: InkWell(
         borderRadius: BorderRadius.circular(24),
         onTap: onTap,
@@ -60,9 +60,9 @@ class _RecordTypeButton extends StatelessWidget {
           height: 48,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.primary : AppColors.surfaceMuted,
+            color: isSelected ? context.appColors.primary : context.appColors.surfaceMuted,
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: AppColors.overlay, width: 2),
+            border: Border.all(color: context.appColors.overlay, width: 2),
           ),
           child: Text(
             label,
@@ -70,7 +70,7 @@ class _RecordTypeButton extends StatelessWidget {
               fontSize: 14,
               height: 20 / 14,
               fontWeight: FontWeight.w500,
-              color: isSelected ? AppColors.white : AppColors.textSecondary,
+              color: isSelected ? AppColors.white : context.appColors.textSecondary,
             ),
           ),
         ),
