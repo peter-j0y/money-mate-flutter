@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:money_mate/ui/ledger/widgets/add_ledger_record_screen.dart';
-import 'package:money_mate/ui/asset/assets_tab_screen.dart';
+import 'package:money_mate/ui/asset/screen/assets_tab_screen.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:money_mate/ui/ledger/widgets/ledger_tab_screen.dart';
 import 'package:money_mate/ui/core/bottom_navigation_bar.dart';
@@ -103,6 +103,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 },
                 backgroundColor: context.appColors.primary,
+                elevation: 0,
+                focusElevation: 0,
+                hoverElevation: 0,
+                highlightElevation: 0,
+                disabledElevation: 0,
                 shape: const CircleBorder(),
                 child: Icon(Icons.add, color: context.appColors.inverseText, size: 28),
               )
