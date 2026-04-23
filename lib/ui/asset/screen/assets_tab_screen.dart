@@ -3,8 +3,7 @@ import 'package:money_mate/ui/asset/asset_category_card.dart';
 import 'package:money_mate/ui/asset/asset_total_header.dart';
 import 'package:money_mate/ui/asset/portfolio_allocation_card.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
-
-import '../add_asset_bottom_sheet.dart';
+import 'package:money_mate/ui/asset/screen/add_asset_screen.dart';
 
 class AssetsTabScreen extends StatelessWidget {
   const AssetsTabScreen({super.key});
@@ -17,7 +16,12 @@ class AssetsTabScreen extends StatelessWidget {
         children: [
           AssetTotalHeader(
             totalAssetText: '1.55억원',
-            onAddAssetTap: () => showAddAssetBottomSheet(context),
+            onAddAssetTap:
+                () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (context) => const AddAssetScreen(),
+                  ),
+                ),
           ),
           const SizedBox(height: 16),
           const Padding(

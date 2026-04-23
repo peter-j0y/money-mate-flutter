@@ -25,7 +25,24 @@ class LedgerRecords extends Table {
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }
 
-@DriftDatabase(tables: [LedgerRecords])
+class Assets extends Table {
+  IntColumn get id => integer().autoIncrement()();
+
+  TextColumn get assetType => text()();
+
+  TextColumn get assetName => text()();
+
+  IntColumn get amount => integer()();
+
+  RealColumn get shares => real().nullable()();
+
+  BoolColumn get includeInPortfolio =>
+      boolean().withDefault(const Constant(true))();
+
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+}
+
+@DriftDatabase(tables: [LedgerRecords, Assets])
 class AppDatabase extends _$AppDatabase {
   AppDatabase._internal() : super(_openConnection());
 
@@ -34,10 +51,26 @@ class AppDatabase extends _$AppDatabase {
   factory AppDatabase() => _instance;
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onCreate: (Migrator m) async {
+      await m.createAll();
+    },
+    onUpgrade: (Migrator m, int from, int to) async {
+      if (from < 2) {
+        await m.createTable(assets);
+      }
+    },
+  );
 
   Future<int> insertLedgerRecord(LedgerRecordsCompanion entry) {
     return into(ledgerRecords).insert(entry);
+  }
+
+  Future<int> insertAsset(AssetsCompanion entry) {
+    return into(assets).insert(entry);
   }
 
   Future<bool> replaceLedgerRecord(

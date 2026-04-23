@@ -44,11 +44,15 @@ class AppColors {
   static const Color hexFF4D545E = Color(0xFF475569);
   static const Color hexFF6366F1 = Color(0xFF6366F1);
   static const Color hexFF64748B = Color(0xFF64748B);
+  static const Color hexFF6B7280 = Color(0xFF6B7280);
   static const Color hexFF7C3AED = Color(0xFF3B82F6);
+  static const Color hexFF8B5CF6 = Color(0xFF8B5CF6);
   static const Color hexFF8C8C8C = Color(0xFF94A3B8);
+  static const Color hexFF93C5FD = Color(0xFF93C5FD);
   static const Color hexFF94A3B8 = Color(0xFF94A3B8);
   static const Color hexFF98A0B4 = Color(0xFF94A3B8);
   static const Color hexFF9CA3AF = Color(0xFF94A3B8);
+  static const Color hexFF0EA5E9 = Color(0xFF0EA5E9);
   static const Color hexFFA78BFA = Color(0xFF60A5FA);
   static const Color hexFFA855F7 = Color(0xFF3B82F6);
   static const Color hexFFB8F2E6 = Color(0xFFECFDF5);
@@ -68,6 +72,7 @@ class AppColors {
   static const Color hexFFF1F5F9 = Color(0xFFF1F5F9);
   static const Color hexFFF3E8FF = Color(0xFFE0F2FE);
   static const Color hexFFF3F4F6 = Color(0xFFF1F5F9);
+  static const Color hexFFF5F3FF = Color(0xFFF5F3FF);
   static const Color hexFFF43F5E = Color(0xFFF43F5E);
   static const Color hexFFF59E0B = Color(0xFFF59E0B);
   static const Color hexFFF8FAFC = Color(0xFFF8FAFC);
@@ -119,11 +124,15 @@ class AppColors {
     hexFF4D545E,
     hexFF6366F1,
     hexFF64748B,
+    hexFF6B7280,
     hexFF7C3AED,
+    hexFF8B5CF6,
     hexFF8C8C8C,
+    hexFF93C5FD,
     hexFF94A3B8,
     hexFF98A0B4,
     hexFF9CA3AF,
+    hexFF0EA5E9,
     hexFFA78BFA,
     hexFFA855F7,
     hexFFB8F2E6,
@@ -143,6 +152,7 @@ class AppColors {
     hexFFF1F5F9,
     hexFFF3E8FF,
     hexFFF3F4F6,
+    hexFFF5F3FF,
     hexFFF43F5E,
     hexFFF59E0B,
     hexFFF8FAFC,

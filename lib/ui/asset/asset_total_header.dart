@@ -18,7 +18,7 @@ class AssetTotalHeader extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
       decoration: BoxDecoration(
-        color: context.appColors.surface,
+        color: context.appColors.background,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

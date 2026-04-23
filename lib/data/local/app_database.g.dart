@@ -509,15 +509,476 @@ class LedgerRecordsCompanion extends UpdateCompanion<LedgerRecord> {
   }
 }
 
+class $AssetsTable extends Assets with TableInfo<$AssetsTable, Asset> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AssetsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _assetTypeMeta = const VerificationMeta(
+    'assetType',
+  );
+  @override
+  late final GeneratedColumn<String> assetType = GeneratedColumn<String>(
+    'asset_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _assetNameMeta = const VerificationMeta(
+    'assetName',
+  );
+  @override
+  late final GeneratedColumn<String> assetName = GeneratedColumn<String>(
+    'asset_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _amountMeta = const VerificationMeta('amount');
+  @override
+  late final GeneratedColumn<int> amount = GeneratedColumn<int>(
+    'amount',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sharesMeta = const VerificationMeta('shares');
+  @override
+  late final GeneratedColumn<double> shares = GeneratedColumn<double>(
+    'shares',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _includeInPortfolioMeta =
+      const VerificationMeta('includeInPortfolio');
+  @override
+  late final GeneratedColumn<bool> includeInPortfolio = GeneratedColumn<bool>(
+    'include_in_portfolio',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("include_in_portfolio" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    assetType,
+    assetName,
+    amount,
+    shares,
+    includeInPortfolio,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'assets';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Asset> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('asset_type')) {
+      context.handle(
+        _assetTypeMeta,
+        assetType.isAcceptableOrUnknown(data['asset_type']!, _assetTypeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_assetTypeMeta);
+    }
+    if (data.containsKey('asset_name')) {
+      context.handle(
+        _assetNameMeta,
+        assetName.isAcceptableOrUnknown(data['asset_name']!, _assetNameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_assetNameMeta);
+    }
+    if (data.containsKey('amount')) {
+      context.handle(
+        _amountMeta,
+        amount.isAcceptableOrUnknown(data['amount']!, _amountMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_amountMeta);
+    }
+    if (data.containsKey('shares')) {
+      context.handle(
+        _sharesMeta,
+        shares.isAcceptableOrUnknown(data['shares']!, _sharesMeta),
+      );
+    }
+    if (data.containsKey('include_in_portfolio')) {
+      context.handle(
+        _includeInPortfolioMeta,
+        includeInPortfolio.isAcceptableOrUnknown(
+          data['include_in_portfolio']!,
+          _includeInPortfolioMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Asset map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Asset(
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}id'],
+          )!,
+      assetType:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}asset_type'],
+          )!,
+      assetName:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}asset_name'],
+          )!,
+      amount:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}amount'],
+          )!,
+      shares: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}shares'],
+      ),
+      includeInPortfolio:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.bool,
+            data['${effectivePrefix}include_in_portfolio'],
+          )!,
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}created_at'],
+          )!,
+    );
+  }
+
+  @override
+  $AssetsTable createAlias(String alias) {
+    return $AssetsTable(attachedDatabase, alias);
+  }
+}
+
+class Asset extends DataClass implements Insertable<Asset> {
+  final int id;
+  final String assetType;
+  final String assetName;
+  final int amount;
+  final double? shares;
+  final bool includeInPortfolio;
+  final DateTime createdAt;
+  const Asset({
+    required this.id,
+    required this.assetType,
+    required this.assetName,
+    required this.amount,
+    this.shares,
+    required this.includeInPortfolio,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['asset_type'] = Variable<String>(assetType);
+    map['asset_name'] = Variable<String>(assetName);
+    map['amount'] = Variable<int>(amount);
+    if (!nullToAbsent || shares != null) {
+      map['shares'] = Variable<double>(shares);
+    }
+    map['include_in_portfolio'] = Variable<bool>(includeInPortfolio);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  AssetsCompanion toCompanion(bool nullToAbsent) {
+    return AssetsCompanion(
+      id: Value(id),
+      assetType: Value(assetType),
+      assetName: Value(assetName),
+      amount: Value(amount),
+      shares:
+          shares == null && nullToAbsent ? const Value.absent() : Value(shares),
+      includeInPortfolio: Value(includeInPortfolio),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory Asset.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Asset(
+      id: serializer.fromJson<int>(json['id']),
+      assetType: serializer.fromJson<String>(json['assetType']),
+      assetName: serializer.fromJson<String>(json['assetName']),
+      amount: serializer.fromJson<int>(json['amount']),
+      shares: serializer.fromJson<double?>(json['shares']),
+      includeInPortfolio: serializer.fromJson<bool>(json['includeInPortfolio']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'assetType': serializer.toJson<String>(assetType),
+      'assetName': serializer.toJson<String>(assetName),
+      'amount': serializer.toJson<int>(amount),
+      'shares': serializer.toJson<double?>(shares),
+      'includeInPortfolio': serializer.toJson<bool>(includeInPortfolio),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  Asset copyWith({
+    int? id,
+    String? assetType,
+    String? assetName,
+    int? amount,
+    Value<double?> shares = const Value.absent(),
+    bool? includeInPortfolio,
+    DateTime? createdAt,
+  }) => Asset(
+    id: id ?? this.id,
+    assetType: assetType ?? this.assetType,
+    assetName: assetName ?? this.assetName,
+    amount: amount ?? this.amount,
+    shares: shares.present ? shares.value : this.shares,
+    includeInPortfolio: includeInPortfolio ?? this.includeInPortfolio,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  Asset copyWithCompanion(AssetsCompanion data) {
+    return Asset(
+      id: data.id.present ? data.id.value : this.id,
+      assetType: data.assetType.present ? data.assetType.value : this.assetType,
+      assetName: data.assetName.present ? data.assetName.value : this.assetName,
+      amount: data.amount.present ? data.amount.value : this.amount,
+      shares: data.shares.present ? data.shares.value : this.shares,
+      includeInPortfolio:
+          data.includeInPortfolio.present
+              ? data.includeInPortfolio.value
+              : this.includeInPortfolio,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Asset(')
+          ..write('id: $id, ')
+          ..write('assetType: $assetType, ')
+          ..write('assetName: $assetName, ')
+          ..write('amount: $amount, ')
+          ..write('shares: $shares, ')
+          ..write('includeInPortfolio: $includeInPortfolio, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    assetType,
+    assetName,
+    amount,
+    shares,
+    includeInPortfolio,
+    createdAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Asset &&
+          other.id == this.id &&
+          other.assetType == this.assetType &&
+          other.assetName == this.assetName &&
+          other.amount == this.amount &&
+          other.shares == this.shares &&
+          other.includeInPortfolio == this.includeInPortfolio &&
+          other.createdAt == this.createdAt);
+}
+
+class AssetsCompanion extends UpdateCompanion<Asset> {
+  final Value<int> id;
+  final Value<String> assetType;
+  final Value<String> assetName;
+  final Value<int> amount;
+  final Value<double?> shares;
+  final Value<bool> includeInPortfolio;
+  final Value<DateTime> createdAt;
+  const AssetsCompanion({
+    this.id = const Value.absent(),
+    this.assetType = const Value.absent(),
+    this.assetName = const Value.absent(),
+    this.amount = const Value.absent(),
+    this.shares = const Value.absent(),
+    this.includeInPortfolio = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  AssetsCompanion.insert({
+    this.id = const Value.absent(),
+    required String assetType,
+    required String assetName,
+    required int amount,
+    this.shares = const Value.absent(),
+    this.includeInPortfolio = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  }) : assetType = Value(assetType),
+       assetName = Value(assetName),
+       amount = Value(amount);
+  static Insertable<Asset> custom({
+    Expression<int>? id,
+    Expression<String>? assetType,
+    Expression<String>? assetName,
+    Expression<int>? amount,
+    Expression<double>? shares,
+    Expression<bool>? includeInPortfolio,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (assetType != null) 'asset_type': assetType,
+      if (assetName != null) 'asset_name': assetName,
+      if (amount != null) 'amount': amount,
+      if (shares != null) 'shares': shares,
+      if (includeInPortfolio != null)
+        'include_in_portfolio': includeInPortfolio,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  AssetsCompanion copyWith({
+    Value<int>? id,
+    Value<String>? assetType,
+    Value<String>? assetName,
+    Value<int>? amount,
+    Value<double?>? shares,
+    Value<bool>? includeInPortfolio,
+    Value<DateTime>? createdAt,
+  }) {
+    return AssetsCompanion(
+      id: id ?? this.id,
+      assetType: assetType ?? this.assetType,
+      assetName: assetName ?? this.assetName,
+      amount: amount ?? this.amount,
+      shares: shares ?? this.shares,
+      includeInPortfolio: includeInPortfolio ?? this.includeInPortfolio,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (assetType.present) {
+      map['asset_type'] = Variable<String>(assetType.value);
+    }
+    if (assetName.present) {
+      map['asset_name'] = Variable<String>(assetName.value);
+    }
+    if (amount.present) {
+      map['amount'] = Variable<int>(amount.value);
+    }
+    if (shares.present) {
+      map['shares'] = Variable<double>(shares.value);
+    }
+    if (includeInPortfolio.present) {
+      map['include_in_portfolio'] = Variable<bool>(includeInPortfolio.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AssetsCompanion(')
+          ..write('id: $id, ')
+          ..write('assetType: $assetType, ')
+          ..write('assetName: $assetName, ')
+          ..write('amount: $amount, ')
+          ..write('shares: $shares, ')
+          ..write('includeInPortfolio: $includeInPortfolio, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $LedgerRecordsTable ledgerRecords = $LedgerRecordsTable(this);
+  late final $AssetsTable assets = $AssetsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [ledgerRecords];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [ledgerRecords, assets];
 }
 
 typedef $$LedgerRecordsTableCreateCompanionBuilder =
@@ -784,10 +1245,247 @@ typedef $$LedgerRecordsTableProcessedTableManager =
       LedgerRecord,
       PrefetchHooks Function()
     >;
+typedef $$AssetsTableCreateCompanionBuilder =
+    AssetsCompanion Function({
+      Value<int> id,
+      required String assetType,
+      required String assetName,
+      required int amount,
+      Value<double?> shares,
+      Value<bool> includeInPortfolio,
+      Value<DateTime> createdAt,
+    });
+typedef $$AssetsTableUpdateCompanionBuilder =
+    AssetsCompanion Function({
+      Value<int> id,
+      Value<String> assetType,
+      Value<String> assetName,
+      Value<int> amount,
+      Value<double?> shares,
+      Value<bool> includeInPortfolio,
+      Value<DateTime> createdAt,
+    });
+
+class $$AssetsTableFilterComposer
+    extends Composer<_$AppDatabase, $AssetsTable> {
+  $$AssetsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get assetType => $composableBuilder(
+    column: $table.assetType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get assetName => $composableBuilder(
+    column: $table.assetName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get amount => $composableBuilder(
+    column: $table.amount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get shares => $composableBuilder(
+    column: $table.shares,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get includeInPortfolio => $composableBuilder(
+    column: $table.includeInPortfolio,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$AssetsTableOrderingComposer
+    extends Composer<_$AppDatabase, $AssetsTable> {
+  $$AssetsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get assetType => $composableBuilder(
+    column: $table.assetType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get assetName => $composableBuilder(
+    column: $table.assetName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get amount => $composableBuilder(
+    column: $table.amount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get shares => $composableBuilder(
+    column: $table.shares,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get includeInPortfolio => $composableBuilder(
+    column: $table.includeInPortfolio,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$AssetsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AssetsTable> {
+  $$AssetsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get assetType =>
+      $composableBuilder(column: $table.assetType, builder: (column) => column);
+
+  GeneratedColumn<String> get assetName =>
+      $composableBuilder(column: $table.assetName, builder: (column) => column);
+
+  GeneratedColumn<int> get amount =>
+      $composableBuilder(column: $table.amount, builder: (column) => column);
+
+  GeneratedColumn<double> get shares =>
+      $composableBuilder(column: $table.shares, builder: (column) => column);
+
+  GeneratedColumn<bool> get includeInPortfolio => $composableBuilder(
+    column: $table.includeInPortfolio,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$AssetsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AssetsTable,
+          Asset,
+          $$AssetsTableFilterComposer,
+          $$AssetsTableOrderingComposer,
+          $$AssetsTableAnnotationComposer,
+          $$AssetsTableCreateCompanionBuilder,
+          $$AssetsTableUpdateCompanionBuilder,
+          (Asset, BaseReferences<_$AppDatabase, $AssetsTable, Asset>),
+          Asset,
+          PrefetchHooks Function()
+        > {
+  $$AssetsTableTableManager(_$AppDatabase db, $AssetsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () => $$AssetsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer:
+              () => $$AssetsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer:
+              () => $$AssetsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> assetType = const Value.absent(),
+                Value<String> assetName = const Value.absent(),
+                Value<int> amount = const Value.absent(),
+                Value<double?> shares = const Value.absent(),
+                Value<bool> includeInPortfolio = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => AssetsCompanion(
+                id: id,
+                assetType: assetType,
+                assetName: assetName,
+                amount: amount,
+                shares: shares,
+                includeInPortfolio: includeInPortfolio,
+                createdAt: createdAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String assetType,
+                required String assetName,
+                required int amount,
+                Value<double?> shares = const Value.absent(),
+                Value<bool> includeInPortfolio = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => AssetsCompanion.insert(
+                id: id,
+                assetType: assetType,
+                assetName: assetName,
+                amount: amount,
+                shares: shares,
+                includeInPortfolio: includeInPortfolio,
+                createdAt: createdAt,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$AssetsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AssetsTable,
+      Asset,
+      $$AssetsTableFilterComposer,
+      $$AssetsTableOrderingComposer,
+      $$AssetsTableAnnotationComposer,
+      $$AssetsTableCreateCompanionBuilder,
+      $$AssetsTableUpdateCompanionBuilder,
+      (Asset, BaseReferences<_$AppDatabase, $AssetsTable, Asset>),
+      Asset,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
   $$LedgerRecordsTableTableManager get ledgerRecords =>
       $$LedgerRecordsTableTableManager(_db, _db.ledgerRecords);
+  $$AssetsTableTableManager get assets =>
+      $$AssetsTableTableManager(_db, _db.assets);
 }
