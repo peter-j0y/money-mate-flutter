@@ -63,13 +63,18 @@ class PortfolioAllocationCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  icon: const Icon(Icons.tune_rounded, size: 13),
-                  label: const Text(
+                  icon: Icon(
+                    Icons.tune_rounded,
+                    size: 13,
+                    color: context.appColors.textPrimary,
+                  ),
+                  label: Text(
                     '목표 비율 설정',
                     style: TextStyle(
                       fontSize: 12,
                       height: 16 / 12,
                       fontWeight: FontWeight.w500,
+                      color: context.appColors.textPrimary,
                     ),
                   ),
                 ),
