@@ -19,4 +19,8 @@ class AssetLocalDataSource {
       ),
     );
   }
+
+  Stream<List<Asset>> watchAssets() {
+    return _database.watchAssets();
+  }
 }

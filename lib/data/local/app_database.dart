@@ -73,6 +73,13 @@ class AppDatabase extends _$AppDatabase {
     return into(assets).insert(entry);
   }
 
+  Stream<List<Asset>> watchAssets() {
+    return (select(assets)..orderBy([
+      (tbl) => OrderingTerm.desc(tbl.createdAt),
+      (tbl) => OrderingTerm.desc(tbl.id),
+    ])).watch();
+  }
+
   Future<bool> replaceLedgerRecord(
     int id,
     LedgerRecordsCompanion updatedEntry,
