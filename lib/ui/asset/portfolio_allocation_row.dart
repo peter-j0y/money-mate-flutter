@@ -19,16 +19,11 @@ class PortfolioAllocationRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final diff = actualRatio - targetRatio;
     final isUp = diff >= 0;
-    final badgeBg =
-        isUp
-            ? const Color(0xFFFEF2F2)
-            : const Color(0xFFECFDF5);
-    final badgeText =
-        isUp
-            ? const Color(0xFFEF4444)
-            : const Color(0xFF10B981);
+    final badgeColor = isUp ? context.appColors.danger : context.appColors.success;
+    final badgeBg = badgeColor.withValues(alpha: isDark ? 0.2 : 0.1);
 
     return Container(
       height: 53,
@@ -96,7 +91,7 @@ class PortfolioAllocationRow extends StatelessWidget {
                 fontSize: 10,
                 height: 15 / 10,
                 fontWeight: FontWeight.w700,
-                color: badgeText,
+                color: badgeColor,
               ),
             ),
           ),

@@ -81,6 +81,7 @@ class _AssetContentView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final categoryCards = <Widget>[];
 
     for (final category in viewModel.categoryDataList) {
@@ -107,7 +108,7 @@ class _AssetContentView extends StatelessWidget {
             targetRatio: category.targetRatio,
             accentColor: meta.accentColor,
             leadingIcon: meta.icon,
-            leadingBackgroundColor: meta.backgroundColor,
+            leadingBackgroundColor: meta.backgroundColor(isDark),
             items: items,
           ),
         ),

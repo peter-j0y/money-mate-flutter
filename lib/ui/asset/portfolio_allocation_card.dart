@@ -16,10 +16,7 @@ class PortfolioAllocationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final buttonBg =
-        isDark
-            ? context.appColors.surfaceMuted
-            : const Color(0xFFF3F4F6);
+    final buttonBg = context.appColors.surfaceMuted;
     return Container(
       decoration: BoxDecoration(
         color: context.appColors.surface,

@@ -46,8 +46,6 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
       subtitle: '국내·해외 주식, ETF',
       icon: Icons.trending_up_rounded,
       accentColor: AppColors.hexFF3B82F6,
-      iconBackgroundColor: AppColors.hexFFF3F4F6,
-      selectedBackgroundColor: AppColors.hexFFEEF2FF,
     ),
     _AssetTypeOption(
       type: AssetType.cash,
@@ -55,8 +53,6 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
       subtitle: '은행 잔고, 현금',
       icon: Icons.account_balance_wallet_rounded,
       accentColor: AppColors.hexFF10B981,
-      iconBackgroundColor: AppColors.hexFFF3F4F6,
-      selectedBackgroundColor: AppColors.hexFFECFDF5,
     ),
     _AssetTypeOption(
       type: AssetType.realEstate,
@@ -64,8 +60,6 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
       subtitle: '아파트, 토지, 보증금',
       icon: Icons.home_work_outlined,
       accentColor: AppColors.hexFFF59E0B,
-      iconBackgroundColor: AppColors.hexFFF3F4F6,
-      selectedBackgroundColor: AppColors.hexFFFFFBEB,
     ),
     _AssetTypeOption(
       type: AssetType.crypto,
@@ -73,8 +67,6 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
       subtitle: '비트코인, 이더리움 등',
       icon: Icons.currency_bitcoin_rounded,
       accentColor: AppColors.hexFF8B5CF6,
-      iconBackgroundColor: AppColors.hexFFF3F4F6,
-      selectedBackgroundColor: AppColors.hexFFF5F3FF,
     ),
     _AssetTypeOption(
       type: AssetType.savings,
@@ -82,8 +74,6 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
       subtitle: '정기예금, 적금',
       icon: Icons.savings_outlined,
       accentColor: AppColors.hexFF0EA5E9,
-      iconBackgroundColor: AppColors.hexFFF3F4F6,
-      selectedBackgroundColor: AppColors.hexFFE0F2FE,
     ),
     _AssetTypeOption(
       type: AssetType.commodity,
@@ -91,8 +81,6 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
       subtitle: '금, 은, 원유 등',
       icon: Icons.all_inclusive_rounded,
       accentColor: AppColors.hexFFEF4444,
-      iconBackgroundColor: AppColors.hexFFF3F4F6,
-      selectedBackgroundColor: AppColors.hexFFFEF2F2,
     ),
     _AssetTypeOption(
       type: AssetType.other,
@@ -100,8 +88,6 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
       subtitle: '그 외 모든 자산',
       icon: Icons.category_outlined,
       accentColor: AppColors.hexFF6B7280,
-      iconBackgroundColor: AppColors.hexFFF3F4F6,
-      selectedBackgroundColor: AppColors.hexFFF3F4F6,
     ),
   ];
 
@@ -563,7 +549,7 @@ class _TitleWithStepDot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const inactiveDotColor = AppColors.hexFF93C5FD;
+    final inactiveDotColor = context.appColors.primary.withValues(alpha: 0.35);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -587,10 +573,10 @@ class _TitleWithStepDot extends StatelessWidget {
                   ? [
                     _StepDot(width: 18, color: context.appColors.primary),
                     const SizedBox(width: 6),
-                    const _StepDot(width: 6, color: inactiveDotColor),
+                    _StepDot(width: 6, color: inactiveDotColor),
                   ]
                   : [
-                    const _StepDot(width: 6, color: inactiveDotColor),
+                    _StepDot(width: 6, color: inactiveDotColor),
                     const SizedBox(width: 6),
                     _StepDot(width: 18, color: context.appColors.primary),
                   ],
@@ -688,11 +674,11 @@ class _BottomActionArea extends StatelessWidget {
                         ),
                         child: Text(
                           '$selectedTypeTitle 자산 추가',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 18,
                             height: 28 / 18,
                             fontWeight: FontWeight.w500,
-                            color: AppColors.white,
+                            color: context.appColors.inverseText,
                           ),
                         ),
                       ),
@@ -705,7 +691,7 @@ class _BottomActionArea extends StatelessWidget {
                           child: FilledButton(
                             onPressed: onBackTap,
                             style: FilledButton.styleFrom(
-                              backgroundColor: AppColors.hexFFF3F4F6,
+                              backgroundColor: context.appColors.surfaceMuted,
                               foregroundColor: context.appColors.textSecondary,
                               padding: EdgeInsets.zero,
                               minimumSize: const Size(56, 56),
@@ -739,13 +725,13 @@ class _BottomActionArea extends StatelessWidget {
                                 ),
                                 elevation: 0,
                               ),
-                              child: const Text(
+                              child: Text(
                                 '자산 추가',
                                 style: TextStyle(
                                   fontSize: 16,
                                   height: 24 / 16,
                                   fontWeight: FontWeight.w600,
-                                  color: AppColors.white,
+                                  color: context.appColors.inverseText,
                                 ),
                               ),
                             ),
@@ -773,6 +759,11 @@ class _AssetTypeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final selectedBackgroundColor = option.accentColor.withValues(
+      alpha: Theme.of(context).brightness == Brightness.dark ? 0.18 : 0.12,
+    );
+    final iconBackgroundColor = option.accentColor.withValues(alpha: 0.12);
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
@@ -781,9 +772,7 @@ class _AssetTypeCard extends StatelessWidget {
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
           color:
-              isSelected
-                  ? option.selectedBackgroundColor
-                  : context.appColors.surface,
+              isSelected ? selectedBackgroundColor : context.appColors.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected ? option.accentColor : context.appColors.border,
@@ -796,10 +785,7 @@ class _AssetTypeCard extends StatelessWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color:
-                    isSelected
-                        ? option.accentColor
-                        : option.iconBackgroundColor,
+                color: isSelected ? option.accentColor : iconBackgroundColor,
                 shape: BoxShape.circle,
               ),
               alignment: Alignment.center,
@@ -851,10 +837,10 @@ class _AssetTypeCard extends StatelessWidget {
                   color: option.accentColor,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.check_rounded,
                   size: 14,
-                  color: AppColors.white,
+                  color: context.appColors.inverseText,
                 ),
               ),
           ],
@@ -940,14 +926,19 @@ class _AppTextField extends StatelessWidget {
       height: 56,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: AppColors.hexFFF8FAFC,
+        color: context.appColors.surfaceMuted,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.hexFFF3F4F6, width: 2),
+        border: Border.all(color: context.appColors.border, width: 2),
       ),
       alignment: Alignment.centerLeft,
       child: TextField(
         controller: controller,
         onChanged: onChanged,
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+          color: context.appColors.textPrimary,
+        ),
         decoration: InputDecoration(
           border: InputBorder.none,
           isCollapsed: true,
@@ -1296,9 +1287,9 @@ class _AmountInputField extends StatelessWidget {
       height: 56,
       padding: const EdgeInsets.fromLTRB(16, 2, 16, 2),
       decoration: BoxDecoration(
-        color: AppColors.hexFFF8FAFC,
+        color: context.appColors.surfaceMuted,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.hexFFF3F4F6, width: 2),
+        border: Border.all(color: context.appColors.border, width: 2),
       ),
       child: Row(
         children: [
@@ -1306,6 +1297,11 @@ class _AmountInputField extends StatelessWidget {
             child: TextField(
               controller: controller,
               keyboardType: TextInputType.number,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                color: context.appColors.textPrimary,
+              ),
               onChanged: (value) {
                 final digitsOnly = value.replaceAll(RegExp(r'[^0-9]'), '');
                 final parsed = digitsOnly.isEmpty ? 0 : int.parse(digitsOnly);
@@ -1417,6 +1413,11 @@ class _StockHoldingSection extends StatelessWidget {
                     decimal: true,
                   ),
                   onChanged: onSharesChanged,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    color: context.appColors.textPrimary,
+                  ),
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     isCollapsed: true,
@@ -1550,7 +1551,7 @@ class _QuickAmountButton extends StatelessWidget {
         height: 28,
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
-          color: AppColors.hexFFF3F4F6,
+          color: context.appColors.surfaceMuted,
           borderRadius: BorderRadius.circular(14),
         ),
         child: Row(
@@ -1591,6 +1592,15 @@ class _PortfolioOptionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final selectedColor = context.appColors.primary;
+    final selectedBackgroundColor = selectedColor.withValues(
+      alpha: Theme.of(context).brightness == Brightness.dark ? 0.18 : 0.12,
+    );
+    final iconBackgroundColor =
+        selected
+            ? selectedColor
+            : context.appColors.textTertiary.withValues(alpha: 0.18);
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
@@ -1598,10 +1608,10 @@ class _PortfolioOptionCard extends StatelessWidget {
         constraints: const BoxConstraints(minHeight: 76),
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          color: selected ? AppColors.hexFFEEF2FF : AppColors.hexFFF9FAFB,
+          color: selected ? selectedBackgroundColor : context.appColors.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: selected ? AppColors.hexFF3B82F6 : AppColors.hexFFF3F4F6,
+            color: selected ? selectedColor : context.appColors.border,
             width: 2,
           ),
         ),
@@ -1612,14 +1622,14 @@ class _PortfolioOptionCard extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: selected ? AppColors.hexFF3B82F6 : AppColors.hexFFE5E7EB,
+                color: iconBackgroundColor,
                 borderRadius: BorderRadius.circular(14),
               ),
               alignment: Alignment.center,
               child: Icon(
                 icon,
                 size: 18,
-                color: selected ? AppColors.white : accentColor,
+                color: selected ? context.appColors.inverseText : accentColor,
               ),
             ),
             const SizedBox(width: 12),
@@ -1636,7 +1646,7 @@ class _PortfolioOptionCard extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                       color:
                           selected
-                              ? AppColors.hexFF3B82F6
+                              ? selectedColor
                               : context.appColors.textSecondary,
                     ),
                   ),
@@ -1667,8 +1677,6 @@ class _AssetTypeOption {
     required this.subtitle,
     required this.icon,
     required this.accentColor,
-    required this.iconBackgroundColor,
-    required this.selectedBackgroundColor,
   });
 
   final AssetType type;
@@ -1676,8 +1684,6 @@ class _AssetTypeOption {
   final String subtitle;
   final IconData icon;
   final Color accentColor;
-  final Color iconBackgroundColor;
-  final Color selectedBackgroundColor;
 }
 
 String _formatWithComma(int value) {

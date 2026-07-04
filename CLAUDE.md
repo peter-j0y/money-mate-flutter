@@ -47,6 +47,15 @@ lib/
 - **Design System**: Use `context.appColors.*` for theme-aware colors (defined in `app_colors.dart`, `app_semantic_colors.dart`)
 - **Localization**: Korean primary, English secondary
 
+### Color Usage Guidelines
+
+**모든 색상은 라이트/다크 모드 대응이 되어야 합니다.**
+
+- **시맨틱 색상 우선**: `context.appColors.primary`, `context.appColors.danger`, `context.appColors.success` 등 사용
+- **하드코딩 금지**: `Color(0xFF...)` 직접 사용 금지. 반드시 `AppColors` 토큰 사용
+- **배경색 동적 생성**: 다크 모드에서 밝은 배경색이 필요할 경우 `color.withValues(alpha: isDark ? 0.2 : 0.1)` 패턴 사용
+- **테마 체크**: `final isDark = Theme.of(context).brightness == Brightness.dark;`
+
 ### Naming Conventions
 
 - Classes: `UpperCamelCase`

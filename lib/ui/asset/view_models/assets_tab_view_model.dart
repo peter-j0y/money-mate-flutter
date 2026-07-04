@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:money_mate/data/local/app_database.dart';
 import 'package:money_mate/data/local/asset_local_data_source.dart';
 import 'package:money_mate/data/model/entities/asset_entry.dart';
+import 'package:money_mate/ui/core/design_system/app_colors.dart';
 
 class AssetsTabViewModel extends ChangeNotifier {
   AssetsTabViewModel({AssetLocalDataSource? localDataSource})
@@ -117,56 +118,50 @@ class AssetTypeMeta {
     required this.label,
     required this.icon,
     required this.accentColor,
-    required this.backgroundColor,
   });
 
   final String label;
   final IconData icon;
   final Color accentColor;
-  final Color backgroundColor;
+
+  Color backgroundColor(bool isDark) =>
+      accentColor.withValues(alpha: isDark ? 0.15 : 0.1);
 }
 
 const assetTypeMeta = <AssetType, AssetTypeMeta>{
   AssetType.stock: AssetTypeMeta(
     label: '주식',
     icon: Icons.trending_up_rounded,
-    accentColor: Color(0xFF3B82F6),
-    backgroundColor: Color(0xFFEFF6FF),
+    accentColor: AppColors.hexFF3B82F6,
   ),
   AssetType.cash: AssetTypeMeta(
     label: '현금',
     icon: Icons.account_balance_wallet_rounded,
-    accentColor: Color(0xFF10B981),
-    backgroundColor: Color(0xFFECFDF5),
+    accentColor: AppColors.hexFF10B981,
   ),
   AssetType.realEstate: AssetTypeMeta(
     label: '부동산',
     icon: Icons.home_work_outlined,
-    accentColor: Color(0xFFF59E0B),
-    backgroundColor: Color(0xFFFFFBEB),
+    accentColor: AppColors.hexFFF59E0B,
   ),
   AssetType.crypto: AssetTypeMeta(
     label: '가상화폐',
     icon: Icons.currency_bitcoin_rounded,
-    accentColor: Color(0xFF8B5CF6),
-    backgroundColor: Color(0xFFF5F3FF),
+    accentColor: AppColors.hexFF8B5CF6,
   ),
   AssetType.savings: AssetTypeMeta(
     label: '예적금',
     icon: Icons.savings_outlined,
-    accentColor: Color(0xFF0EA5E9),
-    backgroundColor: Color(0xFFF0F9FF),
+    accentColor: AppColors.hexFF0EA5E9,
   ),
   AssetType.commodity: AssetTypeMeta(
     label: '원자재',
     icon: Icons.all_inclusive_rounded,
-    accentColor: Color(0xFFEF4444),
-    backgroundColor: Color(0xFFFEF2F2),
+    accentColor: AppColors.hexFFF43F5E,
   ),
   AssetType.other: AssetTypeMeta(
     label: '기타',
     icon: Icons.category_outlined,
-    accentColor: Color(0xFF6B7280),
-    backgroundColor: Color(0xFFF9FAFB),
+    accentColor: AppColors.hexFF6B7280,
   ),
 };
