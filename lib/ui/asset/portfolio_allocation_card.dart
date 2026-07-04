@@ -6,18 +6,12 @@ import 'package:money_mate/ui/core/design_system/design_system.dart';
 class PortfolioAllocationCard extends StatelessWidget {
   const PortfolioAllocationCard({
     super.key,
+    required this.rows,
     this.onSetTargetTap,
   });
 
+  final List<PortfolioRowData> rows;
   final VoidCallback? onSetTargetTap;
-
-  static const _rows = [
-    _PortfolioRowData(label: '주식', actual: 40.3, target: 40, color: Color(0xFF3B82F6)),
-    _PortfolioRowData(label: '현금', actual: 9.4, target: 15, color: Color(0xFF10B981)),
-    _PortfolioRowData(label: '가상화폐', actual: 14.1, target: 10, color: Color(0xFF8B5CF6)),
-    _PortfolioRowData(label: '예적금', actual: 29.4, target: 25, color: Color(0xFF0EA5E9)),
-    _PortfolioRowData(label: '원자재', actual: 6.8, target: 10, color: Color(0xFFEF4444)),
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -93,19 +87,19 @@ class PortfolioAllocationCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           PortfolioAllocationChart(
-            items: _rows
+            items: rows
                 .map((e) => PortfolioAllocationChartItem(ratio: e.actual, color: e.color))
                 .toList(growable: false),
           ),
           const SizedBox(height: 16),
-          ...List.generate(_rows.length, (index) {
-            final row = _rows[index];
+          ...List.generate(rows.length, (index) {
+            final row = rows[index];
             return PortfolioAllocationRow(
               label: row.label,
               actualRatio: row.actual,
               targetRatio: row.target,
               color: row.color,
-              showDivider: index != _rows.length - 1,
+              showDivider: index != rows.length - 1,
             );
           }),
         ],
@@ -114,8 +108,8 @@ class PortfolioAllocationCard extends StatelessWidget {
   }
 }
 
-class _PortfolioRowData {
-  const _PortfolioRowData({
+class PortfolioRowData {
+  const PortfolioRowData({
     required this.label,
     required this.actual,
     required this.target,

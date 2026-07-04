@@ -1,83 +1,145 @@
 import 'package:flutter/material.dart';
-import 'package:money_mate/data/local/app_database.dart';
-import 'package:money_mate/data/local/asset_local_data_source.dart';
 import 'package:money_mate/ui/asset/asset_category_card.dart';
 import 'package:money_mate/ui/asset/asset_total_header.dart';
 import 'package:money_mate/ui/asset/portfolio_allocation_card.dart';
 import 'package:money_mate/ui/asset/screen/add_asset_screen.dart';
 import 'package:money_mate/ui/asset/screen/portfolio_target_setting_screen.dart';
+import 'package:money_mate/ui/asset/view_models/assets_tab_view_model.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 
-class AssetsTabScreen extends StatelessWidget {
-  AssetsTabScreen({super.key, AssetLocalDataSource? localDataSource})
-    : _localDataSource = localDataSource ?? AssetLocalDataSource();
-
-  final AssetLocalDataSource _localDataSource;
+class AssetsTabScreen extends StatefulWidget {
+  const AssetsTabScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<List<Asset>>(
-      stream: _localDataSource.watchAssets(),
-      builder: (context, snapshot) {
-        final assets = snapshot.data ?? const <Asset>[];
+  State<AssetsTabScreen> createState() => _AssetsTabScreenState();
+}
 
-        if (snapshot.connectionState == ConnectionState.waiting &&
-            !snapshot.hasData) {
-          return const SafeArea(
-            child: Center(child: CircularProgressIndicator()),
-          );
-        }
+class _AssetsTabScreenState extends State<AssetsTabScreen> {
+  final AssetsTabViewModel _viewModel = AssetsTabViewModel();
 
-        if (assets.isEmpty) {
-          return _EmptyAssetsView(onAddAssetTap: () => _openAddAsset(context));
-        }
-
-        return _AssetContentView(
-          onAddAssetTap: () => _openAddAsset(context),
-          onSetTargetTap: () => _openPortfolioTargetSetting(context),
-        );
-      },
-    );
+  @override
+  void initState() {
+    super.initState();
+    _viewModel.addListener(_onViewModelChanged);
   }
 
-  void _openAddAsset(BuildContext context) {
+  @override
+  void dispose() {
+    _viewModel.removeListener(_onViewModelChanged);
+    _viewModel.dispose();
+    super.dispose();
+  }
+
+  void _onViewModelChanged() {
+    if (mounted) setState(() {});
+  }
+
+  void _openAddAsset() {
     Navigator.of(context).push(
       MaterialPageRoute<void>(builder: (context) => const AddAssetScreen()),
     );
   }
 
-  void _openPortfolioTargetSetting(BuildContext context) {
+  void _openPortfolioTargetSetting() {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (context) => const PortfolioTargetSettingScreen(),
       ),
     );
   }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_viewModel.isLoading) {
+      return const SafeArea(
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_viewModel.isEmpty) {
+      return _EmptyAssetsView(onAddAssetTap: _openAddAsset);
+    }
+
+    return _AssetContentView(
+      viewModel: _viewModel,
+      onAddAssetTap: _openAddAsset,
+      onSetTargetTap: _openPortfolioTargetSetting,
+    );
+  }
 }
 
 class _AssetContentView extends StatelessWidget {
   const _AssetContentView({
+    required this.viewModel,
     required this.onAddAssetTap,
     required this.onSetTargetTap,
   });
 
+  final AssetsTabViewModel viewModel;
   final VoidCallback onAddAssetTap;
   final VoidCallback onSetTargetTap;
 
   @override
   Widget build(BuildContext context) {
+    final categoryCards = <Widget>[];
+
+    for (final category in viewModel.categoryDataList) {
+      final meta = assetTypeMeta[category.type]!;
+      final items = category.items.map((item) {
+        return AssetCategoryItemData(
+          name: item.asset.assetName,
+          amountText: item.asset.amount.toKoreanWon(),
+          innerRatioText:
+              '${meta.label} 내 비중 ${item.innerRatio.toStringAsFixed(1)}%',
+          isExcludedFromPortfolio: !item.asset.includeInPortfolio,
+          ticker: item.asset.includeInPortfolio ? null : '포트폴리오 제외',
+        );
+      }).toList();
+
+      categoryCards.add(const SizedBox(height: 12));
+      categoryCards.add(
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: AssetCategoryCard(
+            categoryName: meta.label,
+            totalAmountText: category.totalAmount.toKoreanWon(),
+            actualRatio: category.actualRatio,
+            targetRatio: category.targetRatio,
+            accentColor: meta.accentColor,
+            leadingIcon: meta.icon,
+            leadingBackgroundColor: meta.backgroundColor,
+            items: items,
+          ),
+        ),
+      );
+    }
+
     return SafeArea(
       child: ListView(
         padding: const EdgeInsets.fromLTRB(0, 0, 0, 140),
         children: [
           AssetTotalHeader(
-            totalAssetText: '1.55억원',
+            totalAssetText: viewModel.totalAmount.toKoreanWon(),
             onAddAssetTap: onAddAssetTap,
           ),
           const SizedBox(height: 16),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: PortfolioAllocationCard(onSetTargetTap: onSetTargetTap),
+            child: PortfolioAllocationCard(
+              rows: viewModel.categoryDataList
+                  .where((c) => c.actualRatio > 0)
+                  .map((c) {
+                    final meta = assetTypeMeta[c.type]!;
+                    return PortfolioRowData(
+                      label: meta.label,
+                      actual: c.actualRatio,
+                      target: c.targetRatio,
+                      color: meta.accentColor,
+                    );
+                  })
+                  .toList(),
+              onSetTargetTap: onSetTargetTap,
+            ),
           ),
           const SizedBox(height: 20),
           Padding(
@@ -92,75 +154,7 @@ class _AssetContentView extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 12),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: AssetCategoryCard(
-              categoryName: '주식',
-              totalAmountText: '1,370만원',
-              actualRatio: 40.3,
-              targetRatio: 40,
-              accentColor: const Color(0xFF3B82F6),
-              leadingIcon: Icons.trending_up_rounded,
-              leadingBackgroundColor: const Color(0xFFEFF6FF),
-              items: const [
-                AssetCategoryItemData(
-                  name: '삼성전자',
-                  ticker: '005930',
-                  innerRatioText: '주식 내 비중 62.0%',
-                  amountText: '850만원',
-                ),
-                AssetCategoryItemData(
-                  name: 'S&P500 ETF',
-                  ticker: 'SPY',
-                  innerRatioText: '주식 내 비중 38.0%',
-                  amountText: '520만원',
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: AssetCategoryCard(
-              categoryName: '현금',
-              totalAmountText: '320만원',
-              actualRatio: 9.4,
-              targetRatio: 15,
-              accentColor: const Color(0xFF10B981),
-              leadingIcon: Icons.account_balance_wallet_rounded,
-              leadingBackgroundColor: const Color(0xFFECFDF5),
-              items: const [
-                AssetCategoryItemData(
-                  name: '국민은행 통장',
-                  innerRatioText: '현금 내 비중 100.0%',
-                  amountText: '320만원',
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: AssetCategoryCard(
-              categoryName: '기타',
-              totalAmountText: '70만원',
-              actualRatio: 0,
-              targetRatio: 0,
-              accentColor: const Color(0xFF6B7280),
-              leadingIcon: Icons.category_outlined,
-              leadingBackgroundColor: const Color(0xFFF9FAFB),
-              items: const [
-                AssetCategoryItemData(
-                  name: '기타 자산',
-                  ticker: '포트폴리오 제외',
-                  isExcludedFromPortfolio: true,
-                  innerRatioText: '기타 내 비중 100.0%',
-                  amountText: '70만원',
-                ),
-              ],
-            ),
-          ),
+          ...categoryCards,
           const SizedBox(height: 16),
         ],
       ),

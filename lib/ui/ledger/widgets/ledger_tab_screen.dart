@@ -141,19 +141,6 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
     return '${date.month}월 ${date.day}일 (${weekdays[date.weekday - 1]})';
   }
 
-  String _currencyText(int amount) {
-    final sign = amount < 0 ? '-' : '';
-    final reversed = amount.abs().toString().split('').reversed.toList();
-    final buffer = StringBuffer();
-    for (var i = 0; i < reversed.length; i++) {
-      if (i > 0 && i % 3 == 0) {
-        buffer.write(',');
-      }
-      buffer.write(reversed[i]);
-    }
-    return '$sign${buffer.toString().split('').reversed.join()}원';
-  }
-
   Future<void> _openAddLedgerRecordScreen(LedgerRecordType type) async {
     final didSave = await Navigator.of(context).push<bool>(
       MaterialPageRoute<bool>(
@@ -181,9 +168,9 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: LedgerIncomeSummaryCard(
-          incomeText: _currencyText(_viewModel.monthlyIncomeTotal),
-          expenseText: _currencyText(_viewModel.monthlyExpenseTotal),
-          savableText: _currencyText(_viewModel.monthlySavableTotal),
+          incomeText: _viewModel.monthlyIncomeTotal.toCommaWon(),
+          expenseText: _viewModel.monthlyExpenseTotal.toCommaWon(),
+          savableText: _viewModel.monthlySavableTotal.toCommaWon(),
         ),
       ),
     ];

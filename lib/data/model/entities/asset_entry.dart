@@ -42,3 +42,26 @@ class AssetEntryDraft {
   final double? shares;
   final bool includeInPortfolio;
 }
+
+extension AssetTypeFromCode on AssetType {
+  static AssetType? fromCode(String code) {
+    switch (code) {
+      case 'stock':
+        return AssetType.stock;
+      case 'cash':
+        return AssetType.cash;
+      case 'real_estate':
+        return AssetType.realEstate;
+      case 'crypto':
+        return AssetType.crypto;
+      case 'savings':
+        return AssetType.savings;
+      case 'commodity':
+        return AssetType.commodity;
+      case 'other':
+        return AssetType.other;
+      default:
+        return null;
+    }
+  }
+}
