@@ -1,22 +1,29 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:money_mate/data/local/app_database.dart';
 import 'package:money_mate/data/local/asset_local_data_source.dart';
+import 'package:money_mate/data/local/portfolio_target_local_data_source.dart';
 import 'package:money_mate/data/model/entities/asset_entry.dart';
 import 'package:money_mate/ui/core/design_system/app_colors.dart';
 
 class AssetsTabViewModel extends ChangeNotifier {
-  AssetsTabViewModel({AssetLocalDataSource? localDataSource})
-    : _localDataSource = localDataSource ?? AssetLocalDataSource() {
-    _subscription = _localDataSource.watchAssets().listen(_onAssetsChanged);
+  AssetsTabViewModel({
+    AssetLocalDataSource? assetDataSource,
+    PortfolioTargetLocalDataSource? targetDataSource,
+  }) : _assetDataSource = assetDataSource ?? AssetLocalDataSource(),
+       _targetDataSource = targetDataSource ?? PortfolioTargetLocalDataSource() {
+    _assetSubscription = _assetDataSource.watchAssets().listen(_onAssetsChanged);
+    _targetSubscription = _targetDataSource.watchTargets().listen(_onTargetsChanged);
   }
 
-  final AssetLocalDataSource _localDataSource;
-  StreamSubscription<List<Asset>>? _subscription;
+  final AssetLocalDataSource _assetDataSource;
+  final PortfolioTargetLocalDataSource _targetDataSource;
+  StreamSubscription<List<Asset>>? _assetSubscription;
+  StreamSubscription<List<PortfolioTarget>>? _targetSubscription;
 
   List<Asset> _assets = const [];
+  Map<String, PortfolioTarget> _targetMap = const {};
   bool _isLoading = true;
 
   List<Asset> get assets => _assets;
@@ -25,9 +32,16 @@ class AssetsTabViewModel extends ChangeNotifier {
 
   int get totalAmount => _assets.fold<int>(0, (sum, a) => sum + a.amount);
 
-  int get portfolioTotal => _assets
-      .where((a) => a.includeInPortfolio)
-      .fold<int>(0, (sum, a) => sum + a.amount);
+  int get portfolioTotal {
+    var total = 0;
+    for (final asset in _assets) {
+      if (!asset.includeInPortfolio) continue;
+      final target = _targetMap[asset.assetType];
+      if (target != null && !target.isEnabled) continue;
+      total += asset.amount;
+    }
+    return total;
+  }
 
   List<AssetCategoryData> get categoryDataList {
     final grouped = <AssetType, List<Asset>>{};
@@ -43,11 +57,18 @@ class AssetsTabViewModel extends ChangeNotifier {
       final assetsInCategory = grouped[type];
       if (assetsInCategory == null || assetsInCategory.isEmpty) continue;
 
+      final target = _targetMap[type.code];
+      final isCategoryEnabled = target?.isEnabled ?? true;
+      final targetRatio = target?.targetRatio ?? 0;
+
       final categoryTotal =
           assetsInCategory.fold<int>(0, (sum, a) => sum + a.amount);
-      final portfolioCategoryTotal = assetsInCategory
-          .where((a) => a.includeInPortfolio)
-          .fold<int>(0, (sum, a) => sum + a.amount);
+
+      final portfolioCategoryTotal = isCategoryEnabled
+          ? assetsInCategory
+              .where((a) => a.includeInPortfolio)
+              .fold<int>(0, (sum, a) => sum + a.amount)
+          : 0;
 
       final actualRatio = portfolioTotal > 0
           ? (portfolioCategoryTotal / portfolioTotal) * 100
@@ -66,7 +87,8 @@ class AssetsTabViewModel extends ChangeNotifier {
         type: type,
         totalAmount: categoryTotal,
         actualRatio: actualRatio,
-        targetRatio: 0,
+        targetRatio: targetRatio.toDouble(),
+        isCategoryEnabled: isCategoryEnabled,
         items: items,
       ));
     }
@@ -80,9 +102,15 @@ class AssetsTabViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void _onTargetsChanged(List<PortfolioTarget> targets) {
+    _targetMap = {for (final t in targets) t.assetType: t};
+    notifyListeners();
+  }
+
   @override
   void dispose() {
-    _subscription?.cancel();
+    _assetSubscription?.cancel();
+    _targetSubscription?.cancel();
     super.dispose();
   }
 }
@@ -93,6 +121,7 @@ class AssetCategoryData {
     required this.totalAmount,
     required this.actualRatio,
     required this.targetRatio,
+    required this.isCategoryEnabled,
     required this.items,
   });
 
@@ -100,6 +129,7 @@ class AssetCategoryData {
   final int totalAmount;
   final double actualRatio;
   final double targetRatio;
+  final bool isCategoryEnabled;
   final List<AssetItemData> items;
 }
 

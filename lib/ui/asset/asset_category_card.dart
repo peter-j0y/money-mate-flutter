@@ -12,7 +12,7 @@ class AssetCategoryCard extends StatefulWidget {
     required this.leadingIcon,
     required this.leadingBackgroundColor,
     required this.items,
-    this.isExpanded = true,
+    this.isExpanded = false,
     this.onHeaderTap,
     this.onItemTap,
   });
@@ -164,11 +164,6 @@ class _AssetCategoryCardState extends State<AssetCategoryCard> {
                           ],
                         ),
                         const SizedBox(height: 4),
-                        _RatioBar(
-                          actualRatio: widget.actualRatio,
-                          targetRatio: widget.targetRatio,
-                          color: widget.accentColor,
-                        ),
                       ],
                     ),
                   ),

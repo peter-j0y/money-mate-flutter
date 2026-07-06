@@ -2,25 +2,49 @@ import 'package:flutter/foundation.dart';
 import 'package:money_mate/data/local/asset_local_data_source.dart';
 import 'package:money_mate/data/model/entities/asset_entry.dart';
 import 'package:money_mate/data/model/entities/stock_lookup_result.dart';
+import 'package:money_mate/data/repositories/portfolio_target_repository.dart';
+import 'package:money_mate/data/repositories/portfolio_target_repository_impl.dart';
 import 'package:money_mate/data/repositories/stock_lookup_repository.dart';
 import 'package:money_mate/data/repositories/stock_lookup_repository_impl.dart';
 
 class AddAssetViewModel extends ChangeNotifier {
   AddAssetViewModel({
     AssetLocalDataSource? localDataSource,
+    PortfolioTargetRepository? portfolioTargetRepository,
     StockLookupRepository? stockLookupRepository,
   }) : _localDataSource = localDataSource ?? AssetLocalDataSource(),
+       _portfolioTargetRepository =
+           portfolioTargetRepository ?? PortfolioTargetRepositoryImpl(),
        _stockLookupRepository =
-           stockLookupRepository ?? StockLookupRepositoryImpl();
+           stockLookupRepository ?? StockLookupRepositoryImpl() {
+    _loadPortfolioTargets();
+  }
 
   final AssetLocalDataSource _localDataSource;
+  final PortfolioTargetRepository _portfolioTargetRepository;
   final StockLookupRepository _stockLookupRepository;
 
   bool _isSaving = false;
   String? _errorMessage;
+  Map<AssetType, PortfolioTargetEntry> _targetMap = {};
 
   bool get isSaving => _isSaving;
   String? get errorMessage => _errorMessage;
+
+  bool isCategoryInPortfolio(AssetType type) {
+    final target = _targetMap[type];
+    return target?.isEnabled ?? false;
+  }
+
+  Future<void> _loadPortfolioTargets() async {
+    final targets = await _portfolioTargetRepository.getTargets();
+    _targetMap = {for (final t in targets) t.assetType: t};
+    notifyListeners();
+  }
+
+  Future<void> refreshPortfolioTargets() async {
+    await _loadPortfolioTargets();
+  }
 
   Future<StockLookupResult?> lookupStockByCode(String code) {
     return _stockLookupRepository.lookupByCode(code);

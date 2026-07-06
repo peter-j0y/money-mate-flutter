@@ -969,16 +969,383 @@ class AssetsCompanion extends UpdateCompanion<Asset> {
   }
 }
 
+class $PortfolioTargetsTable extends PortfolioTargets
+    with TableInfo<$PortfolioTargetsTable, PortfolioTarget> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PortfolioTargetsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _assetTypeMeta = const VerificationMeta(
+    'assetType',
+  );
+  @override
+  late final GeneratedColumn<String> assetType = GeneratedColumn<String>(
+    'asset_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+  );
+  static const VerificationMeta _isEnabledMeta = const VerificationMeta(
+    'isEnabled',
+  );
+  @override
+  late final GeneratedColumn<bool> isEnabled = GeneratedColumn<bool>(
+    'is_enabled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_enabled" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _targetRatioMeta = const VerificationMeta(
+    'targetRatio',
+  );
+  @override
+  late final GeneratedColumn<int> targetRatio = GeneratedColumn<int>(
+    'target_ratio',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    assetType,
+    isEnabled,
+    targetRatio,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'portfolio_targets';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PortfolioTarget> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('asset_type')) {
+      context.handle(
+        _assetTypeMeta,
+        assetType.isAcceptableOrUnknown(data['asset_type']!, _assetTypeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_assetTypeMeta);
+    }
+    if (data.containsKey('is_enabled')) {
+      context.handle(
+        _isEnabledMeta,
+        isEnabled.isAcceptableOrUnknown(data['is_enabled']!, _isEnabledMeta),
+      );
+    }
+    if (data.containsKey('target_ratio')) {
+      context.handle(
+        _targetRatioMeta,
+        targetRatio.isAcceptableOrUnknown(
+          data['target_ratio']!,
+          _targetRatioMeta,
+        ),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PortfolioTarget map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PortfolioTarget(
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}id'],
+          )!,
+      assetType:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}asset_type'],
+          )!,
+      isEnabled:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.bool,
+            data['${effectivePrefix}is_enabled'],
+          )!,
+      targetRatio:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}target_ratio'],
+          )!,
+      updatedAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}updated_at'],
+          )!,
+    );
+  }
+
+  @override
+  $PortfolioTargetsTable createAlias(String alias) {
+    return $PortfolioTargetsTable(attachedDatabase, alias);
+  }
+}
+
+class PortfolioTarget extends DataClass implements Insertable<PortfolioTarget> {
+  final int id;
+  final String assetType;
+  final bool isEnabled;
+  final int targetRatio;
+  final DateTime updatedAt;
+  const PortfolioTarget({
+    required this.id,
+    required this.assetType,
+    required this.isEnabled,
+    required this.targetRatio,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['asset_type'] = Variable<String>(assetType);
+    map['is_enabled'] = Variable<bool>(isEnabled);
+    map['target_ratio'] = Variable<int>(targetRatio);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  PortfolioTargetsCompanion toCompanion(bool nullToAbsent) {
+    return PortfolioTargetsCompanion(
+      id: Value(id),
+      assetType: Value(assetType),
+      isEnabled: Value(isEnabled),
+      targetRatio: Value(targetRatio),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory PortfolioTarget.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PortfolioTarget(
+      id: serializer.fromJson<int>(json['id']),
+      assetType: serializer.fromJson<String>(json['assetType']),
+      isEnabled: serializer.fromJson<bool>(json['isEnabled']),
+      targetRatio: serializer.fromJson<int>(json['targetRatio']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'assetType': serializer.toJson<String>(assetType),
+      'isEnabled': serializer.toJson<bool>(isEnabled),
+      'targetRatio': serializer.toJson<int>(targetRatio),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  PortfolioTarget copyWith({
+    int? id,
+    String? assetType,
+    bool? isEnabled,
+    int? targetRatio,
+    DateTime? updatedAt,
+  }) => PortfolioTarget(
+    id: id ?? this.id,
+    assetType: assetType ?? this.assetType,
+    isEnabled: isEnabled ?? this.isEnabled,
+    targetRatio: targetRatio ?? this.targetRatio,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  PortfolioTarget copyWithCompanion(PortfolioTargetsCompanion data) {
+    return PortfolioTarget(
+      id: data.id.present ? data.id.value : this.id,
+      assetType: data.assetType.present ? data.assetType.value : this.assetType,
+      isEnabled: data.isEnabled.present ? data.isEnabled.value : this.isEnabled,
+      targetRatio:
+          data.targetRatio.present ? data.targetRatio.value : this.targetRatio,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PortfolioTarget(')
+          ..write('id: $id, ')
+          ..write('assetType: $assetType, ')
+          ..write('isEnabled: $isEnabled, ')
+          ..write('targetRatio: $targetRatio, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, assetType, isEnabled, targetRatio, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PortfolioTarget &&
+          other.id == this.id &&
+          other.assetType == this.assetType &&
+          other.isEnabled == this.isEnabled &&
+          other.targetRatio == this.targetRatio &&
+          other.updatedAt == this.updatedAt);
+}
+
+class PortfolioTargetsCompanion extends UpdateCompanion<PortfolioTarget> {
+  final Value<int> id;
+  final Value<String> assetType;
+  final Value<bool> isEnabled;
+  final Value<int> targetRatio;
+  final Value<DateTime> updatedAt;
+  const PortfolioTargetsCompanion({
+    this.id = const Value.absent(),
+    this.assetType = const Value.absent(),
+    this.isEnabled = const Value.absent(),
+    this.targetRatio = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  PortfolioTargetsCompanion.insert({
+    this.id = const Value.absent(),
+    required String assetType,
+    this.isEnabled = const Value.absent(),
+    this.targetRatio = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  }) : assetType = Value(assetType);
+  static Insertable<PortfolioTarget> custom({
+    Expression<int>? id,
+    Expression<String>? assetType,
+    Expression<bool>? isEnabled,
+    Expression<int>? targetRatio,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (assetType != null) 'asset_type': assetType,
+      if (isEnabled != null) 'is_enabled': isEnabled,
+      if (targetRatio != null) 'target_ratio': targetRatio,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  PortfolioTargetsCompanion copyWith({
+    Value<int>? id,
+    Value<String>? assetType,
+    Value<bool>? isEnabled,
+    Value<int>? targetRatio,
+    Value<DateTime>? updatedAt,
+  }) {
+    return PortfolioTargetsCompanion(
+      id: id ?? this.id,
+      assetType: assetType ?? this.assetType,
+      isEnabled: isEnabled ?? this.isEnabled,
+      targetRatio: targetRatio ?? this.targetRatio,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (assetType.present) {
+      map['asset_type'] = Variable<String>(assetType.value);
+    }
+    if (isEnabled.present) {
+      map['is_enabled'] = Variable<bool>(isEnabled.value);
+    }
+    if (targetRatio.present) {
+      map['target_ratio'] = Variable<int>(targetRatio.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PortfolioTargetsCompanion(')
+          ..write('id: $id, ')
+          ..write('assetType: $assetType, ')
+          ..write('isEnabled: $isEnabled, ')
+          ..write('targetRatio: $targetRatio, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $LedgerRecordsTable ledgerRecords = $LedgerRecordsTable(this);
   late final $AssetsTable assets = $AssetsTable(this);
+  late final $PortfolioTargetsTable portfolioTargets = $PortfolioTargetsTable(
+    this,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [ledgerRecords, assets];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+    ledgerRecords,
+    assets,
+    portfolioTargets,
+  ];
 }
 
 typedef $$LedgerRecordsTableCreateCompanionBuilder =
@@ -1480,6 +1847,222 @@ typedef $$AssetsTableProcessedTableManager =
       Asset,
       PrefetchHooks Function()
     >;
+typedef $$PortfolioTargetsTableCreateCompanionBuilder =
+    PortfolioTargetsCompanion Function({
+      Value<int> id,
+      required String assetType,
+      Value<bool> isEnabled,
+      Value<int> targetRatio,
+      Value<DateTime> updatedAt,
+    });
+typedef $$PortfolioTargetsTableUpdateCompanionBuilder =
+    PortfolioTargetsCompanion Function({
+      Value<int> id,
+      Value<String> assetType,
+      Value<bool> isEnabled,
+      Value<int> targetRatio,
+      Value<DateTime> updatedAt,
+    });
+
+class $$PortfolioTargetsTableFilterComposer
+    extends Composer<_$AppDatabase, $PortfolioTargetsTable> {
+  $$PortfolioTargetsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get assetType => $composableBuilder(
+    column: $table.assetType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isEnabled => $composableBuilder(
+    column: $table.isEnabled,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get targetRatio => $composableBuilder(
+    column: $table.targetRatio,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$PortfolioTargetsTableOrderingComposer
+    extends Composer<_$AppDatabase, $PortfolioTargetsTable> {
+  $$PortfolioTargetsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get assetType => $composableBuilder(
+    column: $table.assetType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isEnabled => $composableBuilder(
+    column: $table.isEnabled,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get targetRatio => $composableBuilder(
+    column: $table.targetRatio,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PortfolioTargetsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PortfolioTargetsTable> {
+  $$PortfolioTargetsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get assetType =>
+      $composableBuilder(column: $table.assetType, builder: (column) => column);
+
+  GeneratedColumn<bool> get isEnabled =>
+      $composableBuilder(column: $table.isEnabled, builder: (column) => column);
+
+  GeneratedColumn<int> get targetRatio => $composableBuilder(
+    column: $table.targetRatio,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$PortfolioTargetsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PortfolioTargetsTable,
+          PortfolioTarget,
+          $$PortfolioTargetsTableFilterComposer,
+          $$PortfolioTargetsTableOrderingComposer,
+          $$PortfolioTargetsTableAnnotationComposer,
+          $$PortfolioTargetsTableCreateCompanionBuilder,
+          $$PortfolioTargetsTableUpdateCompanionBuilder,
+          (
+            PortfolioTarget,
+            BaseReferences<
+              _$AppDatabase,
+              $PortfolioTargetsTable,
+              PortfolioTarget
+            >,
+          ),
+          PortfolioTarget,
+          PrefetchHooks Function()
+        > {
+  $$PortfolioTargetsTableTableManager(
+    _$AppDatabase db,
+    $PortfolioTargetsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () =>
+                  $$PortfolioTargetsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer:
+              () => $$PortfolioTargetsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer:
+              () => $$PortfolioTargetsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> assetType = const Value.absent(),
+                Value<bool> isEnabled = const Value.absent(),
+                Value<int> targetRatio = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => PortfolioTargetsCompanion(
+                id: id,
+                assetType: assetType,
+                isEnabled: isEnabled,
+                targetRatio: targetRatio,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String assetType,
+                Value<bool> isEnabled = const Value.absent(),
+                Value<int> targetRatio = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => PortfolioTargetsCompanion.insert(
+                id: id,
+                assetType: assetType,
+                isEnabled: isEnabled,
+                targetRatio: targetRatio,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PortfolioTargetsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PortfolioTargetsTable,
+      PortfolioTarget,
+      $$PortfolioTargetsTableFilterComposer,
+      $$PortfolioTargetsTableOrderingComposer,
+      $$PortfolioTargetsTableAnnotationComposer,
+      $$PortfolioTargetsTableCreateCompanionBuilder,
+      $$PortfolioTargetsTableUpdateCompanionBuilder,
+      (
+        PortfolioTarget,
+        BaseReferences<_$AppDatabase, $PortfolioTargetsTable, PortfolioTarget>,
+      ),
+      PortfolioTarget,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -1488,4 +2071,6 @@ class $AppDatabaseManager {
       $$LedgerRecordsTableTableManager(_db, _db.ledgerRecords);
   $$AssetsTableTableManager get assets =>
       $$AssetsTableTableManager(_db, _db.assets);
+  $$PortfolioTargetsTableTableManager get portfolioTargets =>
+      $$PortfolioTargetsTableTableManager(_db, _db.portfolioTargets);
 }

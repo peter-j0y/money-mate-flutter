@@ -40,6 +40,35 @@ lib/
         └── screen/
 ```
 
+### Clean Architecture 원칙
+
+**계층 구조 및 의존성 방향:**
+```
+UI (Screen/Widget) → ViewModel → Repository → DataSource → Database
+```
+
+- **ViewModel**: Repository를 통해서만 데이터 접근 (DataSource 직접 참조 금지)
+- **Repository**: 추상 인터페이스 + 구현체 분리 (`*_repository.dart` + `*_repository_impl.dart`)
+- **DataSource**: 실제 데이터 소스(DB, API) 접근 담당
+
+**파일 구조 예시:**
+```
+lib/data/
+├── local/
+│   └── asset_local_data_source.dart      # DB 접근
+├── repositories/
+│   ├── asset_repository.dart             # 추상 인터페이스
+│   └── asset_repository_impl.dart        # 구현체
+└── model/entities/
+    └── asset_entry.dart                  # 도메인 모델
+```
+
+**새 기능 추가 시:**
+1. Entity 정의 (`data/model/entities/`)
+2. DataSource 구현 (`data/local/` 또는 `data/remote/`)
+3. Repository 인터페이스 + 구현체 생성 (`data/repositories/`)
+4. ViewModel에서 Repository 주입받아 사용
+
 ### Key Patterns
 
 - **State Management**: ChangeNotifier + Provider (no external library)

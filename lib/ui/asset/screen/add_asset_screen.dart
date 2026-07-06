@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:money_mate/data/model/entities/asset_entry.dart';
 import 'package:money_mate/data/model/entities/stock_lookup_result.dart';
-import 'package:money_mate/ui/core/design_system/design_system.dart';
+import 'package:money_mate/ui/asset/screen/portfolio_target_setting_screen.dart';
 import 'package:money_mate/ui/asset/view_models/add_asset_view_model.dart';
+import 'package:money_mate/ui/core/design_system/design_system.dart';
 
 class AddAssetScreen extends StatefulWidget {
   const AddAssetScreen({super.key});
@@ -490,6 +491,21 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
           selected: _includeInPortfolio,
           onTap: () => setState(() => _includeInPortfolio = true),
         ),
+        if (_includeInPortfolio &&
+            !_viewModel.isCategoryInPortfolio(_selectedAssetType.type))
+          _PortfolioCategoryWarning(
+            categoryName: _selectedAssetType.title,
+            onSettingsTap: () async {
+              final result = await Navigator.of(context).push<bool>(
+                MaterialPageRoute(
+                  builder: (_) => const PortfolioTargetSettingScreen(),
+                ),
+              );
+              if (result == true) {
+                _viewModel.refreshPortfolioTargets();
+              }
+            },
+          ),
         const SizedBox(height: 8),
         _PortfolioOptionCard(
           title: '포트폴리오에서 제외',
@@ -1568,6 +1584,108 @@ class _QuickAmountButton extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _PortfolioCategoryWarning extends StatelessWidget {
+  const _PortfolioCategoryWarning({
+    required this.categoryName,
+    required this.onSettingsTap,
+  });
+
+  final String categoryName;
+  final VoidCallback onSettingsTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final warningColor = context.appColors.warning;
+    final bgColor = warningColor.withValues(alpha: isDark ? 0.15 : 0.1);
+
+    return Container(
+      margin: const EdgeInsets.only(top: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: warningColor.withValues(alpha: 0.3),
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            Icons.info_outline_rounded,
+            size: 18,
+            color: warningColor,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '$categoryName 카테고리가 포트폴리오에 없습니다',
+                  style: TextStyle(
+                    fontSize: 13,
+                    height: 18 / 13,
+                    fontWeight: FontWeight.w600,
+                    color: context.appColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '포트폴리오 설정에서 카테고리를 추가해주세요',
+                  style: TextStyle(
+                    fontSize: 12,
+                    height: 16 / 12,
+                    fontWeight: FontWeight.w400,
+                    color: context.appColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                InkWell(
+                  onTap: onSettingsTap,
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: context.appColors.surface,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: context.appColors.border),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '포트폴리오 설정',
+                          style: TextStyle(
+                            fontSize: 12,
+                            height: 16 / 12,
+                            fontWeight: FontWeight.w500,
+                            color: context.appColors.primary,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Icon(
+                          Icons.arrow_forward_rounded,
+                          size: 14,
+                          color: context.appColors.primary,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

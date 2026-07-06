@@ -42,7 +42,19 @@ class Assets extends Table {
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }
 
-@DriftDatabase(tables: [LedgerRecords, Assets])
+class PortfolioTargets extends Table {
+  IntColumn get id => integer().autoIncrement()();
+
+  TextColumn get assetType => text().unique()();
+
+  BoolColumn get isEnabled => boolean().withDefault(const Constant(true))();
+
+  IntColumn get targetRatio => integer().withDefault(const Constant(0))();
+
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+}
+
+@DriftDatabase(tables: [LedgerRecords, Assets, PortfolioTargets])
 class AppDatabase extends _$AppDatabase {
   AppDatabase._internal() : super(_openConnection());
 
@@ -51,7 +63,7 @@ class AppDatabase extends _$AppDatabase {
   factory AppDatabase() => _instance;
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -61,6 +73,9 @@ class AppDatabase extends _$AppDatabase {
     onUpgrade: (Migrator m, int from, int to) async {
       if (from < 2) {
         await m.createTable(assets);
+      }
+      if (from < 3) {
+        await m.createTable(portfolioTargets);
       }
     },
   );
@@ -78,6 +93,18 @@ class AppDatabase extends _$AppDatabase {
       (tbl) => OrderingTerm.desc(tbl.createdAt),
       (tbl) => OrderingTerm.desc(tbl.id),
     ])).watch();
+  }
+
+  Future<void> upsertPortfolioTarget(PortfolioTargetsCompanion entry) {
+    return into(portfolioTargets).insertOnConflictUpdate(entry);
+  }
+
+  Future<List<PortfolioTarget>> getPortfolioTargets() {
+    return select(portfolioTargets).get();
+  }
+
+  Stream<List<PortfolioTarget>> watchPortfolioTargets() {
+    return select(portfolioTargets).watch();
   }
 
   Future<bool> replaceLedgerRecord(
