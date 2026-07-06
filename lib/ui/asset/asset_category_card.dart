@@ -12,6 +12,7 @@ class AssetCategoryCard extends StatefulWidget {
     required this.leadingIcon,
     required this.leadingBackgroundColor,
     required this.items,
+    this.isCategoryEnabled = true,
     this.isExpanded = false,
     this.onHeaderTap,
     this.onItemTap,
@@ -25,6 +26,7 @@ class AssetCategoryCard extends StatefulWidget {
   final IconData leadingIcon;
   final Color leadingBackgroundColor;
   final List<AssetCategoryItemData> items;
+  final bool isCategoryEnabled;
   final bool isExpanded;
   final VoidCallback? onHeaderTap;
   final ValueChanged<AssetCategoryItemData>? onItemTap;
@@ -114,56 +116,58 @@ class _AssetCategoryCardState extends State<AssetCategoryCard> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 6),
-                        Row(
-                          children: [
-                            RichText(
-                              text: TextSpan(
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  height: 16 / 12,
-                                  fontWeight: FontWeight.w500,
-                                  color: context.appColors.textTertiary,
-                                ),
-                                children: [
-                                  const TextSpan(text: '실제 '),
-                                  TextSpan(
-                                    text: '${widget.actualRatio.toStringAsFixed(1)}%',
-                                    style: TextStyle(
-                                      color: widget.accentColor,
-                                      fontWeight: FontWeight.w600,
+                        if (widget.isCategoryEnabled) ...[
+                          const SizedBox(height: 6),
+                          Row(
+                            children: [
+                              RichText(
+                                text: TextSpan(
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    height: 16 / 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: context.appColors.textTertiary,
+                                  ),
+                                  children: [
+                                    const TextSpan(text: '실제 '),
+                                    TextSpan(
+                                      text: '${widget.actualRatio.toStringAsFixed(1)}%',
+                                      style: TextStyle(
+                                        color: widget.accentColor,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const Spacer(),
-                            RichText(
-                              text: TextSpan(
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  height: 16 / 12,
-                                  fontWeight: FontWeight.w500,
-                                  color: context.appColors.textTertiary,
+                                  ],
                                 ),
-                                children: [
-                                  const TextSpan(text: '목표 '),
-                                  TextSpan(
-                                    text: '${widget.targetRatio.toStringAsFixed(0)}%',
-                                    style: TextStyle(
-                                      color: context.appColors.textSecondary,
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: ratioDiffText,
-                                    style: TextStyle(color: ratioDiffColor),
-                                  ),
-                                ],
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
+                              const Spacer(),
+                              RichText(
+                                text: TextSpan(
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    height: 16 / 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: context.appColors.textTertiary,
+                                  ),
+                                  children: [
+                                    const TextSpan(text: '목표 '),
+                                    TextSpan(
+                                      text: '${widget.targetRatio.toStringAsFixed(0)}%',
+                                      style: TextStyle(
+                                        color: context.appColors.textSecondary,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: ratioDiffText,
+                                      style: TextStyle(color: ratioDiffColor),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                        ],
                       ],
                     ),
                   ),

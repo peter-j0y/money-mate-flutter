@@ -109,6 +109,7 @@ class _AssetContentView extends StatelessWidget {
             accentColor: meta.accentColor,
             leadingIcon: meta.icon,
             leadingBackgroundColor: meta.backgroundColor(isDark),
+            isCategoryEnabled: category.isCategoryEnabled,
             items: items,
           ),
         ),
