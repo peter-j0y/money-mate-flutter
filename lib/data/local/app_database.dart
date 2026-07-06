@@ -96,7 +96,13 @@ class AppDatabase extends _$AppDatabase {
   }
 
   Future<void> upsertPortfolioTarget(PortfolioTargetsCompanion entry) {
-    return into(portfolioTargets).insertOnConflictUpdate(entry);
+    return into(portfolioTargets).insert(
+      entry,
+      onConflict: DoUpdate(
+        (old) => entry,
+        target: [portfolioTargets.assetType],
+      ),
+    );
   }
 
   Future<List<PortfolioTarget>> getPortfolioTargets() {

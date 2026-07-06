@@ -98,7 +98,9 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
   bool get _isSubmitEnabled =>
       _assetNameController.text.trim().isNotEmpty &&
       _amount > 0 &&
-      !_viewModel.isSaving;
+      !_viewModel.isSaving &&
+      (!_includeInPortfolio ||
+          _viewModel.isCategoryInPortfolio(_selectedAssetType.type));
 
   bool get _isStockLookupEnabled =>
       _stockCodeController.text.trim().isNotEmpty && !_isStockLookupLoading;

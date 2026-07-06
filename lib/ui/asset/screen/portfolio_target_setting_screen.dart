@@ -681,7 +681,7 @@ class _BottomButtonBar extends StatelessWidget {
             width: double.infinity,
             height: 60,
             child: FilledButton(
-              onPressed: isSaving ? null : onPressed,
+              onPressed: (isSaving || !isBalanced) ? null : onPressed,
               style: FilledButton.styleFrom(
                 backgroundColor: context.appColors.primary,
                 foregroundColor: context.appColors.inverseText,
