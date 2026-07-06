@@ -126,21 +126,7 @@ class _AssetContentView extends StatelessWidget {
           const SizedBox(height: 16),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: PortfolioAllocationCard(
-              rows: viewModel.categoryDataList
-                  .where((c) => c.actualRatio > 0)
-                  .map((c) {
-                    final meta = assetTypeMeta[c.type]!;
-                    return PortfolioRowData(
-                      label: meta.label,
-                      actual: c.actualRatio,
-                      target: c.targetRatio,
-                      color: meta.accentColor,
-                    );
-                  })
-                  .toList(),
-              onSetTargetTap: onSetTargetTap,
-            ),
+            child: _buildPortfolioSection(context),
           ),
           const SizedBox(height: 20),
           Padding(
@@ -157,6 +143,115 @@ class _AssetContentView extends StatelessWidget {
           ),
           ...categoryCards,
           const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPortfolioSection(BuildContext context) {
+    final hasEnabledCategory =
+        viewModel.categoryDataList.any((c) => c.isCategoryEnabled);
+
+    if (!hasEnabledCategory) {
+      return _PortfolioSetupGuideCard(onSetupTap: onSetTargetTap);
+    }
+
+    return PortfolioAllocationCard(
+      rows: viewModel.categoryDataList
+          .where((c) => c.actualRatio > 0)
+          .map((c) {
+            final meta = assetTypeMeta[c.type]!;
+            return PortfolioRowData(
+              label: meta.label,
+              actual: c.actualRatio,
+              target: c.targetRatio,
+              color: meta.accentColor,
+            );
+          })
+          .toList(),
+      onSetTargetTap: onSetTargetTap,
+    );
+  }
+}
+
+class _PortfolioSetupGuideCard extends StatelessWidget {
+  const _PortfolioSetupGuideCard({required this.onSetupTap});
+
+  final VoidCallback onSetupTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: context.appColors.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: context.appColors.border),
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: context.appColors.primary.withValues(
+                alpha: isDark ? 0.18 : 0.1,
+              ),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.pie_chart_outline_rounded,
+              size: 28,
+              color: context.appColors.primary,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            '포트폴리오를 설정해보세요',
+            style: TextStyle(
+              fontSize: 16,
+              height: 22 / 16,
+              fontWeight: FontWeight.w700,
+              color: context.appColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            '목표 비율을 설정하면 자산 배분 현황을\n한눈에 확인할 수 있어요',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 13,
+              height: 18 / 13,
+              fontWeight: FontWeight.w400,
+              color: context.appColors.textTertiary,
+            ),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            height: 44,
+            child: FilledButton(
+              onPressed: onSetupTap,
+              style: FilledButton.styleFrom(
+                elevation: 0,
+                backgroundColor: context.appColors.primary,
+                foregroundColor: context.appColors.inverseText,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text(
+                '포트폴리오 설정하기',
+                style: TextStyle(
+                  fontSize: 14,
+                  height: 20 / 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
