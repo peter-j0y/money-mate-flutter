@@ -109,6 +109,12 @@ class _PortfolioTargetSettingScreenState
                                   value.round(),
                                 )
                             : null,
+                        onValueChanged: item.isEnabled
+                            ? (value) => _viewModel.updateTargetRatio(
+                                  item.type,
+                                  value,
+                                )
+                            : null,
                       );
                     },
                     separatorBuilder: (_, __) => const SizedBox(height: 12),
@@ -207,113 +213,98 @@ class _SummarySection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Text(
+            '포함 유형 목표 합계',
+            style: TextStyle(
+              fontSize: 12,
+              height: 16 / 12,
+              fontWeight: FontWeight.w400,
+              color: context.appColors.textTertiary,
+            ),
+          ),
+          const SizedBox(height: 6),
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              RichText(
+                text: TextSpan(
                   children: [
-                    Text(
-                      '포함 유형 목표 합계',
+                    TextSpan(
+                      text: '$includedTotal',
                       style: TextStyle(
-                        fontSize: 12,
-                        height: 16 / 12,
-                        fontWeight: FontWeight.w400,
-                        color: context.appColors.textTertiary,
+                        fontSize: 28,
+                        height: 34 / 28,
+                        fontWeight: FontWeight.w700,
+                        color: guideColor,
                       ),
                     ),
-                    const SizedBox(height: 2),
-                    RichText(
-                      text: TextSpan(
-                        children: [
-                          TextSpan(
-                            text: '$includedTotal',
-                            style: TextStyle(
-                              fontSize: 24,
-                              height: 32 / 24,
-                              fontWeight: FontWeight.w700,
-                              color: guideColor,
-                            ),
-                          ),
-                          TextSpan(
-                            text: ' / 100%',
-                            style: TextStyle(
-                              fontSize: 14,
-                              height: 20 / 14,
-                              fontWeight: FontWeight.w400,
-                              color: context.appColors.textTertiary,
-                            ),
-                          ),
-                        ],
+                    TextSpan(
+                      text: ' / 100%',
+                      style: TextStyle(
+                        fontSize: 16,
+                        height: 22 / 16,
+                        fontWeight: FontWeight.w400,
+                        color: context.appColors.textTertiary,
                       ),
                     ),
                   ],
                 ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Container(
-                    height: 28,
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    decoration: BoxDecoration(
-                      color: guideColor.withValues(alpha: isDark ? 0.2 : 0.1),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          isBalanced
-                              ? Icons.check_rounded
-                              : Icons.error_outline_rounded,
-                          size: 13,
+              if (!isBalanced) ...[
+                const SizedBox(width: 10),
+                Container(
+                  height: 24,
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  decoration: BoxDecoration(
+                    color: guideColor.withValues(alpha: isDark ? 0.2 : 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.error_outline_rounded,
+                        size: 12,
+                        color: guideColor,
+                      ),
+                      const SizedBox(width: 3),
+                      Text(
+                        '조정 필요',
+                        style: TextStyle(
+                          fontSize: 11,
+                          height: 15 / 11,
+                          fontWeight: FontWeight.w600,
                           color: guideColor,
                         ),
-                        const SizedBox(width: 4),
-                        Text(
-                          isBalanced ? '완벽해요!' : '조정 필요',
-                          style: TextStyle(
-                            fontSize: 12,
-                            height: 16 / 12,
-                            fontWeight: FontWeight.w600,
-                            color: guideColor,
-                          ),
-                        ),
-                      ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+              const Spacer(),
+              SizedBox(
+                height: 36,
+                child: FilledButton.icon(
+                  onPressed: onEqualTap,
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                    backgroundColor: context.appColors.primary,
+                    foregroundColor: context.appColors.inverseText,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    elevation: 0,
+                  ),
+                  icon: const Icon(Icons.auto_awesome_rounded, size: 14),
+                  label: const Text(
+                    '균등 배분',
+                    style: TextStyle(
+                      fontSize: 13,
+                      height: 18 / 13,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  SizedBox(
-                    height: 28,
-                    child: TextButton.icon(
-                      onPressed: onEqualTap,
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        backgroundColor: context.appColors.surfaceMuted,
-                        foregroundColor: context.appColors.textSecondary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                      ),
-                      icon: Icon(
-                        Icons.auto_awesome_rounded,
-                        size: 12,
-                        color: context.appColors.textSecondary,
-                      ),
-                      label: Text(
-                        '균등 배분',
-                        style: TextStyle(
-                          fontSize: 12,
-                          height: 16 / 12,
-                          fontWeight: FontWeight.w500,
-                          color: context.appColors.textSecondary,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ],
           ),
@@ -360,6 +351,7 @@ class _TargetSettingCard extends StatelessWidget {
     required this.onDecrease,
     required this.onIncrease,
     required this.onSliderChanged,
+    required this.onValueChanged,
   });
 
   final TargetItemState item;
@@ -367,6 +359,7 @@ class _TargetSettingCard extends StatelessWidget {
   final VoidCallback? onDecrease;
   final VoidCallback? onIncrease;
   final ValueChanged<double>? onSliderChanged;
+  final ValueChanged<int>? onValueChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -496,6 +489,7 @@ class _TargetSettingCard extends StatelessWidget {
                         color: accentColor,
                         onDecrease: onDecrease,
                         onIncrease: onIncrease,
+                        onValueChanged: onValueChanged,
                       ),
                       const SizedBox(width: 4),
                       Text(
@@ -564,18 +558,82 @@ class _TargetSettingCard extends StatelessWidget {
   }
 }
 
-class _RatioStepper extends StatelessWidget {
+class _RatioStepper extends StatefulWidget {
   const _RatioStepper({
     required this.value,
     required this.color,
     required this.onDecrease,
     required this.onIncrease,
+    required this.onValueChanged,
   });
 
   final int value;
   final Color color;
   final VoidCallback? onDecrease;
   final VoidCallback? onIncrease;
+  final ValueChanged<int>? onValueChanged;
+
+  @override
+  State<_RatioStepper> createState() => _RatioStepperState();
+}
+
+class _RatioStepperState extends State<_RatioStepper> {
+  bool _isEditing = false;
+  late TextEditingController _controller;
+  late FocusNode _focusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: '${widget.value}');
+    _focusNode = FocusNode();
+    _focusNode.addListener(_onFocusChange);
+  }
+
+  @override
+  void didUpdateWidget(covariant _RatioStepper oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!_isEditing && oldWidget.value != widget.value) {
+      _controller.text = '${widget.value}';
+    }
+  }
+
+  @override
+  void dispose() {
+    _focusNode.removeListener(_onFocusChange);
+    _focusNode.dispose();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _onFocusChange() {
+    if (!_focusNode.hasFocus && _isEditing) {
+      _submitValue();
+    }
+  }
+
+  void _startEditing() {
+    if (widget.onValueChanged == null) return;
+    setState(() {
+      _isEditing = true;
+      _controller.text = '${widget.value}';
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _focusNode.requestFocus();
+      _controller.selection = TextSelection(
+        baseOffset: 0,
+        extentOffset: _controller.text.length,
+      );
+    });
+  }
+
+  void _submitValue() {
+    final parsed = int.tryParse(_controller.text);
+    if (parsed != null) {
+      widget.onValueChanged?.call(parsed.clamp(0, 100));
+    }
+    setState(() => _isEditing = false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -584,25 +642,47 @@ class _RatioStepper extends StatelessWidget {
       height: 36,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: color, width: 2),
+        border: Border.all(color: widget.color, width: 2),
       ),
       child: Row(
         children: [
-          _StepButton(symbol: '−', onTap: onDecrease),
+          _StepButton(symbol: '−', onTap: widget.onDecrease),
           Expanded(
-            child: Center(
-              child: Text(
-                '$value',
-                style: TextStyle(
-                  fontSize: 14,
-                  height: 20 / 14,
-                  fontWeight: FontWeight.w700,
-                  color: color,
-                ),
-              ),
-            ),
+            child: _isEditing
+                ? TextField(
+                    controller: _controller,
+                    focusNode: _focusNode,
+                    keyboardType: TextInputType.number,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14,
+                      height: 20 / 14,
+                      fontWeight: FontWeight.w700,
+                      color: widget.color,
+                    ),
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.zero,
+                      isDense: true,
+                    ),
+                    onSubmitted: (_) => _submitValue(),
+                  )
+                : GestureDetector(
+                    onTap: _startEditing,
+                    child: Center(
+                      child: Text(
+                        '${widget.value}',
+                        style: TextStyle(
+                          fontSize: 14,
+                          height: 20 / 14,
+                          fontWeight: FontWeight.w700,
+                          color: widget.color,
+                        ),
+                      ),
+                    ),
+                  ),
           ),
-          _StepButton(symbol: '+', onTap: onIncrease),
+          _StepButton(symbol: '+', onTap: widget.onIncrease),
         ],
       ),
     );
