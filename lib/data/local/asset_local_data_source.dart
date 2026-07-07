@@ -23,4 +23,21 @@ class AssetLocalDataSource {
   Stream<List<Asset>> watchAssets() {
     return _database.watchAssets();
   }
+
+  Future<bool> replaceAsset(int id, AssetEntryDraft draft) {
+    return _database.replaceAsset(
+      id,
+      AssetsCompanion(
+        assetType: Value(draft.assetType.code),
+        assetName: Value(draft.assetName),
+        amount: Value(draft.amount),
+        shares: Value(draft.shares),
+        includeInPortfolio: Value(draft.includeInPortfolio),
+      ),
+    );
+  }
+
+  Future<bool> deleteAsset(int id) {
+    return _database.deleteAsset(id);
+  }
 }

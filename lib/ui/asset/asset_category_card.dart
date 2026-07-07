@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/data/local/app_database.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 
 class AssetCategoryCard extends StatefulWidget {
@@ -218,15 +219,19 @@ class _AssetCategoryCardState extends State<AssetCategoryCard> {
 
 class AssetCategoryItemData {
   const AssetCategoryItemData({
+    required this.asset,
     required this.name,
     required this.amountText,
+    required this.innerRatio,
     required this.innerRatioText,
     this.ticker,
     this.isExcludedFromPortfolio = false,
   });
 
+  final Asset asset;
   final String name;
   final String amountText;
+  final double innerRatio;
   final String innerRatioText;
   final String? ticker;
   final bool isExcludedFromPortfolio;

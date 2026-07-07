@@ -95,6 +95,18 @@ class AppDatabase extends _$AppDatabase {
     ])).watch();
   }
 
+  Future<bool> replaceAsset(int id, AssetsCompanion updatedEntry) async {
+    final affectedRows = await (update(assets)
+      ..where((tbl) => tbl.id.equals(id))).write(updatedEntry);
+    return affectedRows > 0;
+  }
+
+  Future<bool> deleteAsset(int id) async {
+    final affectedRows =
+        await (delete(assets)..where((tbl) => tbl.id.equals(id))).go();
+    return affectedRows > 0;
+  }
+
   Future<void> upsertPortfolioTarget(PortfolioTargetsCompanion entry) {
     return into(portfolioTargets).insert(
       entry,

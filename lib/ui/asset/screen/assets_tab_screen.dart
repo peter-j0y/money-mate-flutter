@@ -3,6 +3,7 @@ import 'package:money_mate/ui/asset/asset_category_card.dart';
 import 'package:money_mate/ui/asset/asset_total_header.dart';
 import 'package:money_mate/ui/asset/portfolio_allocation_card.dart';
 import 'package:money_mate/ui/asset/screen/add_asset_screen.dart';
+import 'package:money_mate/ui/asset/screen/asset_detail_screen.dart';
 import 'package:money_mate/ui/asset/screen/portfolio_target_setting_screen.dart';
 import 'package:money_mate/ui/asset/view_models/assets_tab_view_model.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
@@ -88,8 +89,10 @@ class _AssetContentView extends StatelessWidget {
       final meta = assetTypeMeta[category.type]!;
       final items = category.items.map((item) {
         return AssetCategoryItemData(
+          asset: item.asset,
           name: item.asset.assetName,
           amountText: item.asset.amount.toKoreanWon(),
+          innerRatio: item.innerRatio,
           innerRatioText:
               '${meta.label} 내 비중 ${item.innerRatio.toStringAsFixed(1)}%',
           isExcludedFromPortfolio: !item.asset.includeInPortfolio,
@@ -111,6 +114,23 @@ class _AssetContentView extends StatelessWidget {
             leadingBackgroundColor: meta.backgroundColor(isDark),
             isCategoryEnabled: category.isCategoryEnabled,
             items: items,
+            onItemTap: (item) {
+              final overallRatio =
+                  viewModel.totalAmount > 0
+                      ? (item.asset.amount / viewModel.totalAmount) * 100
+                      : 0.0;
+              Navigator.of(context).push(
+                MaterialPageRoute<bool>(
+                  builder:
+                      (_) => AssetDetailScreen(
+                        asset: item.asset,
+                        categoryMeta: meta,
+                        innerRatio: item.innerRatio,
+                        overallRatio: overallRatio,
+                      ),
+                ),
+              );
+            },
           ),
         ),
       );

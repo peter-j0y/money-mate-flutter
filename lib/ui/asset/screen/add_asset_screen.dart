@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/data/local/app_database.dart';
 import 'package:money_mate/data/model/entities/asset_entry.dart';
 import 'package:money_mate/data/model/entities/stock_lookup_result.dart';
 import 'package:money_mate/ui/asset/screen/portfolio_target_setting_screen.dart';
@@ -6,7 +7,9 @@ import 'package:money_mate/ui/asset/view_models/add_asset_view_model.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 
 class AddAssetScreen extends StatefulWidget {
-  const AddAssetScreen({super.key});
+  const AddAssetScreen({super.key, this.initialAsset});
+
+  final Asset? initialAsset;
 
   @override
   State<AddAssetScreen> createState() => _AddAssetScreenState();
@@ -94,6 +97,7 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
 
   _AssetTypeOption get _selectedAssetType => _assetTypes[_selectedIndex];
   bool get _isStockAsset => _selectedAssetType.type == AssetType.stock;
+  bool get _isEditMode => widget.initialAsset != null;
 
   bool get _isSubmitEnabled =>
       _assetNameController.text.trim().isNotEmpty &&
@@ -104,6 +108,28 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
 
   bool get _isStockLookupEnabled =>
       _stockCodeController.text.trim().isNotEmpty && !_isStockLookupLoading;
+
+  @override
+  void initState() {
+    super.initState();
+    final initial = widget.initialAsset;
+    if (initial == null) {
+      return;
+    }
+
+    _step = 2;
+    final type = AssetTypeFromCode.fromCode(initial.assetType);
+    final index = _assetTypes.indexWhere((option) => option.type == type);
+    _selectedIndex = index >= 0 ? index : 0;
+    _assetNameController.text = initial.assetName;
+    _setAmount(initial.amount);
+    _includeInPortfolio = initial.includeInPortfolio;
+    if (_isStockAsset && initial.shares != null) {
+      _shares = initial.shares;
+      _sharesController.text = _formatShares(_shares);
+      _calculatedStockAmount = initial.amount;
+    }
+  }
 
   @override
   void dispose() {
@@ -131,6 +157,7 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
               children: [
                 _TopBar(
                   currentStep: _step,
+                  isEditMode: _isEditMode,
                   onCloseTap: () => Navigator.of(context).pop(),
                 ),
                 Expanded(
@@ -144,11 +171,18 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
                         alignment: Alignment.bottomCenter,
                         child: _BottomActionArea(
                           step: _step,
+                          isEditMode: _isEditMode,
                           safeAreaBottom: safeAreaBottom,
                           selectedTypeTitle: _selectedAssetType.title,
                           isSubmitEnabled: _isSubmitEnabled,
                           onNextTap: () => setState(() => _step = 2),
-                          onBackTap: () => setState(() => _step = 1),
+                          onBackTap: () {
+                            if (_isEditMode) {
+                              Navigator.of(context).pop();
+                            } else {
+                              setState(() => _step = 1);
+                            }
+                          },
                           onSubmitTap: () {
                             _onSubmitTap();
                           },
@@ -170,13 +204,24 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
       return;
     }
 
-    final isSuccess = await _viewModel.saveAsset(
-      assetType: _selectedAssetType.type,
-      assetName: _assetNameController.text.trim(),
-      amount: _amount,
-      shares: _isStockAsset ? _shares : null,
-      includeInPortfolio: _includeInPortfolio,
-    );
+    final initial = widget.initialAsset;
+    final isSuccess =
+        initial == null
+            ? await _viewModel.saveAsset(
+              assetType: _selectedAssetType.type,
+              assetName: _assetNameController.text.trim(),
+              amount: _amount,
+              shares: _isStockAsset ? _shares : null,
+              includeInPortfolio: _includeInPortfolio,
+            )
+            : await _viewModel.updateAsset(
+              id: initial.id,
+              assetType: _selectedAssetType.type,
+              assetName: _assetNameController.text.trim(),
+              amount: _amount,
+              shares: _isStockAsset ? _shares : null,
+              includeInPortfolio: _includeInPortfolio,
+            );
 
     if (!mounted) {
       return;
@@ -523,9 +568,14 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
 }
 
 class _TopBar extends StatelessWidget {
-  const _TopBar({required this.currentStep, required this.onCloseTap});
+  const _TopBar({
+    required this.currentStep,
+    required this.isEditMode,
+    required this.onCloseTap,
+  });
 
   final int currentStep;
+  final bool isEditMode;
   final VoidCallback onCloseTap;
 
   @override
@@ -552,7 +602,12 @@ class _TopBar extends StatelessWidget {
                 ),
               ),
             ),
-            Center(child: _TitleWithStepDot(currentStep: currentStep)),
+            Center(
+              child: _TitleWithStepDot(
+                currentStep: currentStep,
+                isEditMode: isEditMode,
+              ),
+            ),
           ],
         ),
       ),
@@ -561,9 +616,13 @@ class _TopBar extends StatelessWidget {
 }
 
 class _TitleWithStepDot extends StatelessWidget {
-  const _TitleWithStepDot({required this.currentStep});
+  const _TitleWithStepDot({
+    required this.currentStep,
+    required this.isEditMode,
+  });
 
   final int currentStep;
+  final bool isEditMode;
 
   @override
   Widget build(BuildContext context) {
@@ -574,7 +633,7 @@ class _TitleWithStepDot extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          '자산 추가',
+          isEditMode ? '자산 수정' : '자산 추가',
           style: TextStyle(
             fontSize: 18,
             height: 20 / 14,
@@ -582,23 +641,25 @@ class _TitleWithStepDot extends StatelessWidget {
             color: context.appColors.textPrimary,
           ),
         ),
-        const SizedBox(height: 4),
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children:
-              currentStep == 1
-                  ? [
-                    _StepDot(width: 18, color: context.appColors.primary),
-                    const SizedBox(width: 6),
-                    _StepDot(width: 6, color: inactiveDotColor),
-                  ]
-                  : [
-                    _StepDot(width: 6, color: inactiveDotColor),
-                    const SizedBox(width: 6),
-                    _StepDot(width: 18, color: context.appColors.primary),
-                  ],
-        ),
+        if (!isEditMode) ...[
+          const SizedBox(height: 4),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children:
+                currentStep == 1
+                    ? [
+                      _StepDot(width: 18, color: context.appColors.primary),
+                      const SizedBox(width: 6),
+                      _StepDot(width: 6, color: inactiveDotColor),
+                    ]
+                    : [
+                      _StepDot(width: 6, color: inactiveDotColor),
+                      const SizedBox(width: 6),
+                      _StepDot(width: 18, color: context.appColors.primary),
+                    ],
+          ),
+        ],
       ],
     );
   }
@@ -626,6 +687,7 @@ class _StepDot extends StatelessWidget {
 class _BottomActionArea extends StatelessWidget {
   const _BottomActionArea({
     required this.step,
+    required this.isEditMode,
     required this.safeAreaBottom,
     required this.selectedTypeTitle,
     required this.isSubmitEnabled,
@@ -635,6 +697,7 @@ class _BottomActionArea extends StatelessWidget {
   });
 
   final int step;
+  final bool isEditMode;
   final double safeAreaBottom;
   final String selectedTypeTitle;
   final bool isSubmitEnabled;
@@ -744,7 +807,7 @@ class _BottomActionArea extends StatelessWidget {
                                 elevation: 0,
                               ),
                               child: Text(
-                                '자산 추가',
+                                isEditMode ? '수정하기' : '자산 추가',
                                 style: TextStyle(
                                   fontSize: 16,
                                   height: 24 / 16,
