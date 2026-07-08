@@ -22,6 +22,10 @@ class LedgerRecordItemContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final categoryOption = _categoryOptionOf(item);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final categoryBackgroundColor = categoryOption.accentColor.withValues(
+      alpha: isDark ? 0.2 : 0.1,
+    );
     final isIncome = item.type == LedgerRecordType.income;
     final amountColor = isIncome ? context.appColors.primary : context.appColors.danger;
     final amountPrefix =
@@ -41,12 +45,12 @@ class LedgerRecordItemContent extends StatelessWidget {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: categoryOption.backgroundColor,
+            color: categoryBackgroundColor,
             shape: BoxShape.circle,
           ),
           child: Icon(
             categoryOption.icon,
-            color: categoryOption.iconColor,
+            color: categoryOption.accentColor,
             size: 18,
           ),
         ),

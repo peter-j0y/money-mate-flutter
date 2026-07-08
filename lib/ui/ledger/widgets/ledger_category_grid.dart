@@ -54,6 +54,10 @@ class _LedgerCategoryGridItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = option.accentColor.withValues(
+      alpha: isDark ? 0.2 : 0.1,
+    );
     final content = Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -61,7 +65,7 @@ class _LedgerCategoryGridItem extends StatelessWidget {
           width: 56,
           height: 56,
           decoration: BoxDecoration(
-            color: option.backgroundColor,
+            color: backgroundColor,
             shape: BoxShape.circle,
             border:
                 selected
@@ -69,7 +73,7 @@ class _LedgerCategoryGridItem extends StatelessWidget {
                     : null,
           ),
           alignment: Alignment.center,
-          child: Icon(option.icon, size: 22, color: option.iconColor),
+          child: Icon(option.icon, size: 22, color: option.accentColor),
         ),
         const SizedBox(height: 8),
         Text(
