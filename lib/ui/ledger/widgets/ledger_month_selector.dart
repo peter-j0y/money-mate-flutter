@@ -7,11 +7,13 @@ class LedgerMonthSelector extends StatelessWidget {
     required this.monthLabel,
     this.onPreviousTap,
     this.onNextTap,
+    this.onLabelTap,
   });
 
   final String monthLabel;
   final VoidCallback? onPreviousTap;
   final VoidCallback? onNextTap;
+  final VoidCallback? onLabelTap;
 
   @override
   Widget build(BuildContext context) {
@@ -22,13 +24,23 @@ class LedgerMonthSelector extends StatelessWidget {
         children: [
           _ArrowButton(icon: Icons.chevron_left_rounded, onTap: onPreviousTap),
           const SizedBox(width: 24),
-          Text(
-            monthLabel,
-            style: TextStyle(
-              fontSize: 18,
-              height: 1.4,
-              fontWeight: FontWeight.w500,
-              color: context.appColors.textPrimary,
+          InkWell(
+            borderRadius: BorderRadius.circular(8),
+            onTap: onLabelTap,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 4,
+                vertical: 2,
+              ),
+              child: Text(
+                monthLabel,
+                style: TextStyle(
+                  fontSize: 18,
+                  height: 1.4,
+                  fontWeight: FontWeight.w500,
+                  color: context.appColors.textPrimary,
+                ),
+              ),
             ),
           ),
           const SizedBox(width: 24),

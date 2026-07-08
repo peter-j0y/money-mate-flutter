@@ -157,12 +157,42 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
     }
   }
 
+  Future<void> _openMonthPicker() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _currentMonth,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+      locale: const Locale('ko', 'KR'),
+      initialDatePickerMode: DatePickerMode.year,
+    );
+
+    if (picked == null) {
+      return;
+    }
+
+    final pickedMonth = DateTime(picked.year, picked.month);
+    final isMonthChanged = !_isSameMonth(_currentMonth, pickedMonth);
+
+    setState(() {
+      _currentMonth = pickedMonth;
+      _selectedDate = picked;
+    });
+
+    widget.onSelectedDateChanged?.call(picked);
+
+    if (isMonthChanged) {
+      _viewModel.loadMonth(_currentMonth);
+    }
+  }
+
   List<Widget> _buildCommonSection() {
     return [
       LedgerMonthSelector(
         monthLabel: _monthLabel,
         onPreviousTap: () => _changeMonth(-1),
         onNextTap: () => _changeMonth(1),
+        onLabelTap: _openMonthPicker,
       ),
       const SizedBox(height: 8),
       Padding(
