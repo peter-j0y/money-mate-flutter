@@ -544,13 +544,9 @@ class _DetailBottomActions extends StatelessWidget {
     final safeAreaBottom = MediaQuery.paddingOf(context).bottom;
 
     return Container(
-      decoration: BoxDecoration(
-        border: Border(top: BorderSide(color: context.appColors.border)),
-      ),
       padding: EdgeInsets.fromLTRB(20, 13, 20, safeAreaBottom + 20),
       child: _ActionButton(
         label: '수정하기',
-        icon: Icons.edit_outlined,
         color: context.appColors.inverseText,
         backgroundColor: context.appColors.primary,
         onTap: onEditTap,
@@ -562,14 +558,12 @@ class _DetailBottomActions extends StatelessWidget {
 class _ActionButton extends StatelessWidget {
   const _ActionButton({
     required this.label,
-    required this.icon,
     required this.color,
     required this.backgroundColor,
     required this.onTap,
   });
 
   final String label;
-  final IconData icon;
   final Color color;
   final Color backgroundColor;
   final VoidCallback? onTap;
@@ -588,21 +582,14 @@ class _ActionButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
           ),
           alignment: Alignment.center,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, size: 16, color: color),
-              const SizedBox(width: 6),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 16,
-                  height: 24 / 16,
-                  fontWeight: FontWeight.w600,
-                  color: color,
-                ),
-              ),
-            ],
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 16,
+              height: 24 / 16,
+              fontWeight: FontWeight.w600,
+              color: color,
+            ),
           ),
         ),
       ),
