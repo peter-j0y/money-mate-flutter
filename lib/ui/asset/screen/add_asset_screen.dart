@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:money_mate/data/local/app_database.dart';
 import 'package:money_mate/data/model/entities/asset_entry.dart';
 import 'package:money_mate/ui/asset/screen/portfolio_target_setting_screen.dart';
@@ -27,6 +28,10 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
   final TextEditingController _unitPriceController = TextEditingController(
     text: '0',
   );
+  final FocusNode _assetNameFocusNode = FocusNode();
+  final FocusNode _amountFocusNode = FocusNode();
+  final FocusNode _unitPriceFocusNode = FocusNode();
+  final FocusNode _sharesFocusNode = FocusNode();
   int _amount = 0;
   int _unitPrice = 0;
   double? _shares;
@@ -133,6 +138,10 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
     _amountController.dispose();
     _sharesController.dispose();
     _unitPriceController.dispose();
+    _assetNameFocusNode.dispose();
+    _amountFocusNode.dispose();
+    _unitPriceFocusNode.dispose();
+    _sharesFocusNode.dispose();
     super.dispose();
   }
 
@@ -360,6 +369,10 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
             controller: _assetNameController,
             hintText: '예: 국민은행 통장, 아파트...',
             onChanged: (_) => setState(() {}),
+            focusNode: _assetNameFocusNode,
+            textInputAction: TextInputAction.next,
+            onSubmitted:
+                (_) => FocusScope.of(context).requestFocus(_amountFocusNode),
           ),
           const SizedBox(height: 20),
         ],
@@ -378,6 +391,9 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
                 _recalculateStockAmount();
               });
             },
+            nameFocusNode: _assetNameFocusNode,
+            unitPriceFocusNode: _unitPriceFocusNode,
+            sharesFocusNode: _sharesFocusNode,
           ),
         ] else ...[
           _SectionLabel(text: '현재 금액'),
@@ -388,6 +404,9 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
               _amount = value;
               setState(() {});
             },
+            focusNode: _amountFocusNode,
+            textInputAction: TextInputAction.done,
+            onSubmitted: (_) => FocusScope.of(context).unfocus(),
           ),
           const SizedBox(height: 12),
           Wrap(
@@ -881,11 +900,17 @@ class _AppTextField extends StatelessWidget {
     required this.controller,
     required this.hintText,
     this.onChanged,
+    this.focusNode,
+    this.textInputAction,
+    this.onSubmitted,
   });
 
   final TextEditingController controller;
   final String hintText;
   final ValueChanged<String>? onChanged;
+  final FocusNode? focusNode;
+  final TextInputAction? textInputAction;
+  final ValueChanged<String>? onSubmitted;
 
   @override
   Widget build(BuildContext context) {
@@ -901,6 +926,9 @@ class _AppTextField extends StatelessWidget {
       child: TextField(
         controller: controller,
         onChanged: onChanged,
+        focusNode: focusNode,
+        textInputAction: textInputAction,
+        onSubmitted: onSubmitted,
         style: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w400,
@@ -922,10 +950,19 @@ class _AppTextField extends StatelessWidget {
 }
 
 class _AmountInputField extends StatelessWidget {
-  const _AmountInputField({required this.controller, required this.onChanged});
+  const _AmountInputField({
+    required this.controller,
+    required this.onChanged,
+    this.focusNode,
+    this.textInputAction,
+    this.onSubmitted,
+  });
 
   final TextEditingController controller;
   final ValueChanged<int> onChanged;
+  final FocusNode? focusNode;
+  final TextInputAction? textInputAction;
+  final ValueChanged<String>? onSubmitted;
 
   @override
   Widget build(BuildContext context) {
@@ -942,6 +979,9 @@ class _AmountInputField extends StatelessWidget {
           Expanded(
             child: TextField(
               controller: controller,
+              focusNode: focusNode,
+              textInputAction: textInputAction,
+              onSubmitted: onSubmitted,
               keyboardType: TextInputType.number,
               style: TextStyle(
                 fontSize: 16,
@@ -995,6 +1035,9 @@ class _StockHoldingSection extends StatelessWidget {
     required this.onNameChanged,
     required this.onSharesChanged,
     required this.onUnitPriceChanged,
+    required this.nameFocusNode,
+    required this.unitPriceFocusNode,
+    required this.sharesFocusNode,
   });
 
   final TextEditingController nameController;
@@ -1005,6 +1048,9 @@ class _StockHoldingSection extends StatelessWidget {
   final ValueChanged<String> onNameChanged;
   final ValueChanged<String> onSharesChanged;
   final ValueChanged<int> onUnitPriceChanged;
+  final FocusNode nameFocusNode;
+  final FocusNode unitPriceFocusNode;
+  final FocusNode sharesFocusNode;
 
   @override
   Widget build(BuildContext context) {
@@ -1023,6 +1069,10 @@ class _StockHoldingSection extends StatelessWidget {
           controller: nameController,
           hintText: '예: 삼성전자, Apple Inc.',
           onChanged: onNameChanged,
+          focusNode: nameFocusNode,
+          textInputAction: TextInputAction.next,
+          onSubmitted:
+              (_) => FocusScope.of(context).requestFocus(unitPriceFocusNode),
         ),
         const SizedBox(height: 20),
         _SectionLabel(text: '1주당 가격'),
@@ -1030,6 +1080,10 @@ class _StockHoldingSection extends StatelessWidget {
         _AmountInputField(
           controller: unitPriceController,
           onChanged: onUnitPriceChanged,
+          focusNode: unitPriceFocusNode,
+          textInputAction: TextInputAction.next,
+          onSubmitted:
+              (_) => FocusScope.of(context).requestFocus(sharesFocusNode),
         ),
         const SizedBox(height: 20),
         _SectionLabel(text: '보유 주수'),
@@ -1047,9 +1101,21 @@ class _StockHoldingSection extends StatelessWidget {
               Expanded(
                 child: TextField(
                   controller: sharesController,
+                  focusNode: sharesFocusNode,
+                  textInputAction: TextInputAction.done,
+                  onSubmitted: (_) => FocusScope.of(context).unfocus(),
                   keyboardType: const TextInputType.numberWithOptions(
                     decimal: true,
                   ),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                    TextInputFormatter.withFunction((oldValue, newValue) {
+                      if (RegExp(r'^\d*\.?\d*$').hasMatch(newValue.text)) {
+                        return newValue;
+                      }
+                      return oldValue;
+                    }),
+                  ],
                   onChanged: onSharesChanged,
                   style: TextStyle(
                     fontSize: 16,
