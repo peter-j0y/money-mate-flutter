@@ -281,7 +281,6 @@ class _DetailHero extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      color: categoryMeta.accentColor.withValues(alpha: isDark ? 0.14 : 0.08),
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
