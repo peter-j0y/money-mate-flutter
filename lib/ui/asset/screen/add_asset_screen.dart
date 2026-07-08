@@ -390,16 +390,6 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
             },
           ),
           const SizedBox(height: 12),
-          Text(
-            '빠른 입력',
-            style: TextStyle(
-              fontSize: 12,
-              height: 16 / 12,
-              fontWeight: FontWeight.w400,
-              color: context.appColors.textTertiary,
-            ),
-          ),
-          const SizedBox(height: 8),
           Wrap(
             spacing: 8,
             runSpacing: 8,
