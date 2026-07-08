@@ -1,29 +1,22 @@
 import 'package:flutter/foundation.dart';
 import 'package:money_mate/data/model/entities/asset_entry.dart';
-import 'package:money_mate/data/model/entities/stock_lookup_result.dart';
 import 'package:money_mate/data/repositories/asset_repository.dart';
 import 'package:money_mate/data/repositories/asset_repository_impl.dart';
 import 'package:money_mate/data/repositories/portfolio_target_repository.dart';
 import 'package:money_mate/data/repositories/portfolio_target_repository_impl.dart';
-import 'package:money_mate/data/repositories/stock_lookup_repository.dart';
-import 'package:money_mate/data/repositories/stock_lookup_repository_impl.dart';
 
 class AddAssetViewModel extends ChangeNotifier {
   AddAssetViewModel({
     AssetRepository? assetRepository,
     PortfolioTargetRepository? portfolioTargetRepository,
-    StockLookupRepository? stockLookupRepository,
   }) : _assetRepository = assetRepository ?? AssetRepositoryImpl(),
        _portfolioTargetRepository =
-           portfolioTargetRepository ?? PortfolioTargetRepositoryImpl(),
-       _stockLookupRepository =
-           stockLookupRepository ?? StockLookupRepositoryImpl() {
+           portfolioTargetRepository ?? PortfolioTargetRepositoryImpl() {
     _loadPortfolioTargets();
   }
 
   final AssetRepository _assetRepository;
   final PortfolioTargetRepository _portfolioTargetRepository;
-  final StockLookupRepository _stockLookupRepository;
 
   bool _isSaving = false;
   String? _errorMessage;
@@ -45,10 +38,6 @@ class AddAssetViewModel extends ChangeNotifier {
 
   Future<void> refreshPortfolioTargets() async {
     await _loadPortfolioTargets();
-  }
-
-  Future<StockLookupResult?> lookupStockByCode(String code) {
-    return _stockLookupRepository.lookupByCode(code);
   }
 
   Future<bool> saveAsset({

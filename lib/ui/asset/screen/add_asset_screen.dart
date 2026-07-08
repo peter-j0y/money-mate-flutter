@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:money_mate/data/local/app_database.dart';
 import 'package:money_mate/data/model/entities/asset_entry.dart';
-import 'package:money_mate/data/model/entities/stock_lookup_result.dart';
 import 'package:money_mate/ui/asset/screen/portfolio_target_setting_screen.dart';
 import 'package:money_mate/ui/asset/view_models/add_asset_view_model.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
@@ -17,23 +16,21 @@ class AddAssetScreen extends StatefulWidget {
 
 class _AddAssetScreenState extends State<AddAssetScreen> {
   final AddAssetViewModel _viewModel = AddAssetViewModel();
-  static const int _usdToKrwRate = 1380;
   int _step = 1;
   int _selectedIndex = 0;
 
   final TextEditingController _assetNameController = TextEditingController();
-  final TextEditingController _stockCodeController = TextEditingController();
   final TextEditingController _amountController = TextEditingController(
     text: '0',
   );
   final TextEditingController _sharesController = TextEditingController();
+  final TextEditingController _unitPriceController = TextEditingController(
+    text: '0',
+  );
   int _amount = 0;
-  int _calculatedStockAmount = 0;
+  int _unitPrice = 0;
   double? _shares;
   bool _includeInPortfolio = true;
-  StockLookupResult? _stockLookupResult;
-  String? _stockLookupError;
-  bool _isStockLookupLoading = false;
 
   static const List<int> _quickAmounts = [
     500000,
@@ -106,9 +103,6 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
       (!_includeInPortfolio ||
           _viewModel.isCategoryInPortfolio(_selectedAssetType.type));
 
-  bool get _isStockLookupEnabled =>
-      _stockCodeController.text.trim().isNotEmpty && !_isStockLookupLoading;
-
   @override
   void initState() {
     super.initState();
@@ -124,10 +118,11 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
     _assetNameController.text = initial.assetName;
     _setAmount(initial.amount);
     _includeInPortfolio = initial.includeInPortfolio;
-    if (_isStockAsset && initial.shares != null) {
+    if (_isStockAsset && initial.shares != null && initial.shares! > 0) {
       _shares = initial.shares;
       _sharesController.text = _formatShares(_shares);
-      _calculatedStockAmount = initial.amount;
+      _unitPrice = (initial.amount / initial.shares!).round();
+      _unitPriceController.text = _formatWithComma(_unitPrice);
     }
   }
 
@@ -135,9 +130,9 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
   void dispose() {
     _viewModel.dispose();
     _assetNameController.dispose();
-    _stockCodeController.dispose();
     _amountController.dispose();
     _sharesController.dispose();
+    _unitPriceController.dispose();
     super.dispose();
   }
 
@@ -254,111 +249,19 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
     setState(() {
       _selectedIndex = index;
       _assetNameController.clear();
-      _stockCodeController.clear();
-      _stockLookupResult = null;
-      _stockLookupError = null;
-      _isStockLookupLoading = false;
-      _calculatedStockAmount = 0;
-    });
-  }
-
-  void _onStockCodeChanged(String value) {
-    final normalized = value.trim().toUpperCase();
-    setState(() {
-      if (_stockLookupResult != null &&
-          normalized != _stockLookupResult!.code) {
-        _stockLookupResult = null;
-        _assetNameController.clear();
-      }
-      _stockLookupError = null;
-    });
-  }
-
-  Future<void> _onLookupStockTap() async {
-    final inputCode = _stockCodeController.text.trim().toUpperCase();
-    if (inputCode.isEmpty) {
-      return;
-    }
-
-    setState(() {
-      _isStockLookupLoading = true;
-      _stockLookupResult = null;
-      _stockLookupError = null;
-    });
-
-    final result = await _viewModel.lookupStockByCode(inputCode);
-
-    if (!mounted) {
-      return;
-    }
-
-    setState(() {
-      _isStockLookupLoading = false;
-      if (result == null) {
-        _assetNameController.clear();
-        _calculatedStockAmount = 0;
-        _setAmount(0);
-        _stockLookupError = '"$inputCode" 코드를 찾을 수 없어요. (예: 005930, AAPL, SPY)';
-        return;
-      }
-
-      _stockLookupResult = result;
-      _stockCodeController.text = result.code;
-      _assetNameController.text = result.companyName;
-      _recalculateStockAmount();
-    });
-  }
-
-  void _onClearStockCodeTap() {
-    setState(() {
-      _stockCodeController.clear();
-      _stockLookupResult = null;
-      _stockLookupError = null;
-      _assetNameController.clear();
-      _calculatedStockAmount = 0;
-      _setAmount(0);
-    });
-  }
-
-  void _onApplyStockNameTap() {
-    final result = _stockLookupResult;
-    if (result == null) {
-      return;
-    }
-    setState(() {
-      _assetNameController.text = result.companyName;
-      _recalculateStockAmount();
+      _unitPriceController.text = '0';
+      _unitPrice = 0;
     });
   }
 
   void _recalculateStockAmount() {
-    final result = _stockLookupResult;
     final shares = _shares;
-    if (result == null || shares == null || shares <= 0) {
-      _calculatedStockAmount = 0;
+    if (shares == null || shares <= 0 || _unitPrice <= 0) {
       _setAmount(0);
       return;
     }
 
-    final unitPrice = _extractNumeric(result.latestPriceText);
-    final exchangeRate = _exchangeRateForMarket(result.market);
-    _calculatedStockAmount = (shares * unitPrice * exchangeRate).round();
-    _setAmount(_calculatedStockAmount);
-  }
-
-  int _exchangeRateForMarket(String market) {
-    final normalized = market.trim().toUpperCase();
-    if (normalized == 'KRX' ||
-        normalized == 'KOSPI' ||
-        normalized == 'KOSDAQ') {
-      return 1;
-    }
-    return _usdToKrwRate;
-  }
-
-  double _extractNumeric(String value) {
-    final sanitized = value.replaceAll(RegExp(r'[^0-9.]'), '');
-    return double.tryParse(sanitized) ?? 0;
+    _setAmount((shares * _unitPrice).round());
   }
 
   void _setAmount(int value) {
@@ -450,21 +353,7 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
           ),
         ),
         const SizedBox(height: 20),
-        if (_isStockAsset)
-          _StockLookupSection(
-            codeController: _stockCodeController,
-            result: _stockLookupResult,
-            errorMessage: _stockLookupError,
-            isLookupEnabled: _isStockLookupEnabled,
-            isLookupLoading: _isStockLookupLoading,
-            onCodeChanged: _onStockCodeChanged,
-            onLookupTap: () {
-              _onLookupStockTap();
-            },
-            onClearCodeTap: _onClearStockCodeTap,
-            onApplyStockNameTap: _onApplyStockNameTap,
-          )
-        else ...[
+        if (!_isStockAsset) ...[
           _SectionLabel(text: '자산명'),
           const SizedBox(height: 8),
           _AppTextField(
@@ -472,32 +361,34 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
             hintText: '예: 국민은행 통장, 아파트...',
             onChanged: (_) => setState(() {}),
           ),
+          const SizedBox(height: 20),
         ],
-        const SizedBox(height: 20),
-        if (_isStockAsset)
+        if (_isStockAsset) ...[
           _StockHoldingSection(
-            stockName: _stockLookupResult?.companyName,
+            nameController: _assetNameController,
             sharesController: _sharesController,
+            unitPriceController: _unitPriceController,
             shares: _shares,
-            unitPriceText: _stockLookupResult?.latestPriceText,
-            exchangeRate:
-                _stockLookupResult == null
-                    ? _usdToKrwRate
-                    : _exchangeRateForMarket(_stockLookupResult!.market),
-            evaluatedAmount: _calculatedStockAmount,
+            evaluatedAmount: _amount,
+            onNameChanged: (_) => setState(() {}),
             onSharesChanged: _onSharesChanged,
+            onUnitPriceChanged: (value) {
+              setState(() {
+                _unitPrice = value;
+                _recalculateStockAmount();
+              });
+            },
           ),
-        const SizedBox(height: 20),
-        _SectionLabel(text: '현재 금액'),
-        const SizedBox(height: 8),
-        _AmountInputField(
-          controller: _amountController,
-          onChanged: (value) {
-            _amount = value;
-            setState(() {});
-          },
-        ),
-        if (!_isStockAsset) ...[
+        ] else ...[
+          _SectionLabel(text: '현재 금액'),
+          const SizedBox(height: 8),
+          _AmountInputField(
+            controller: _amountController,
+            onChanged: (value) {
+              _amount = value;
+              setState(() {});
+            },
+          ),
           const SizedBox(height: 12),
           Text(
             '빠른 입력',
@@ -766,30 +657,35 @@ class _BottomActionArea extends StatelessWidget {
                     )
                     : Row(
                       children: [
-                        SizedBox(
-                          width: 56,
-                          height: 56,
-                          child: FilledButton(
-                            onPressed: onBackTap,
-                            style: FilledButton.styleFrom(
-                              backgroundColor: context.appColors.surfaceMuted,
-                              foregroundColor: context.appColors.textSecondary,
-                              padding: EdgeInsets.zero,
-                              minimumSize: const Size(56, 56),
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              alignment: Alignment.center,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
+                        if (!isEditMode) ...[
+                          SizedBox(
+                            width: 56,
+                            height: 56,
+                            child: FilledButton(
+                              onPressed: onBackTap,
+                              style: FilledButton.styleFrom(
+                                backgroundColor:
+                                    context.appColors.surfaceMuted,
+                                foregroundColor:
+                                    context.appColors.textSecondary,
+                                padding: EdgeInsets.zero,
+                                minimumSize: const Size(56, 56),
+                                tapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
+                                alignment: Alignment.center,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                elevation: 0,
                               ),
-                              elevation: 0,
-                            ),
-                            child: const Icon(
-                              Icons.chevron_left_rounded,
-                              size: 22,
+                              child: const Icon(
+                                Icons.chevron_left_rounded,
+                                size: 22,
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 12),
+                          const SizedBox(width: 12),
+                        ],
                         Expanded(
                           child: SizedBox(
                             height: 56,
@@ -1035,327 +931,6 @@ class _AppTextField extends StatelessWidget {
   }
 }
 
-class _StockLookupSection extends StatelessWidget {
-  const _StockLookupSection({
-    required this.codeController,
-    required this.result,
-    required this.errorMessage,
-    required this.isLookupEnabled,
-    required this.isLookupLoading,
-    required this.onCodeChanged,
-    required this.onLookupTap,
-    required this.onClearCodeTap,
-    required this.onApplyStockNameTap,
-  });
-
-  final TextEditingController codeController;
-  final StockLookupResult? result;
-  final String? errorMessage;
-  final bool isLookupEnabled;
-  final bool isLookupLoading;
-  final ValueChanged<String> onCodeChanged;
-  final VoidCallback onLookupTap;
-  final VoidCallback onClearCodeTap;
-  final VoidCallback onApplyStockNameTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final isMatched = result != null;
-    final successColor = context.appColors.success;
-    final successBackground = successColor.withValues(alpha: 0.12);
-    final successBorder = successColor.withValues(alpha: 0.55);
-    final primaryBadgeBackground = context.appColors.primary.withValues(
-      alpha: 0.18,
-    );
-    final successBadgeBackground = successColor.withValues(alpha: 0.18);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            RichText(
-              text: TextSpan(
-                style: TextStyle(
-                  fontSize: 14,
-                  height: 20 / 14,
-                  fontWeight: FontWeight.w500,
-                  color: context.appColors.textSecondary,
-                ),
-                children: [
-                  const TextSpan(text: '종목 코드 '),
-                  TextSpan(
-                    text: '(선택)',
-                    style: TextStyle(
-                      color: context.appColors.textTertiary.withValues(
-                        alpha: 0.55,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const Spacer(),
-            Container(
-              height: 21,
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              decoration: BoxDecoration(
-                color: context.appColors.primary.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(999),
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                '추후 가격 자동 연동',
-                style: TextStyle(
-                  fontSize: 11,
-                  height: 16.5 / 11,
-                  fontWeight: FontWeight.w500,
-                  color: context.appColors.primary,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            Expanded(
-              child: Container(
-                height: 52,
-                padding: const EdgeInsets.symmetric(horizontal: 18),
-                decoration: BoxDecoration(
-                  color: context.appColors.surfaceMuted,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: isMatched ? successColor : context.appColors.border,
-                    width: 2,
-                  ),
-                ),
-                alignment: Alignment.centerLeft,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: codeController,
-                        onChanged: onCodeChanged,
-                        textCapitalization: TextCapitalization.characters,
-                        style: TextStyle(
-                          fontSize: 14,
-                          height: 20 / 14,
-                          fontWeight:
-                              isMatched ? FontWeight.w600 : FontWeight.w400,
-                          color:
-                              isMatched
-                                  ? successColor.withValues(alpha: 0.7)
-                                  : context.appColors.textPrimary,
-                        ),
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          isCollapsed: true,
-                          hintText: '예: 005930, AAPL, SPY',
-                          hintStyle: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                            color: context.appColors.textPrimary.withValues(
-                              alpha: 0.5,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    if (isMatched)
-                      InkWell(
-                        onTap: onClearCodeTap,
-                        borderRadius: BorderRadius.circular(12),
-                        child: Padding(
-                          padding: const EdgeInsets.all(2),
-                          child: Icon(
-                            Icons.close_rounded,
-                            size: 16,
-                            color: context.appColors.textTertiary,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            SizedBox(
-              width: 77,
-              height: 52,
-              child: FilledButton.icon(
-                onPressed: isLookupEnabled ? onLookupTap : null,
-                icon: Icon(
-                  isLookupLoading
-                      ? Icons.hourglass_top_rounded
-                      : Icons.search_rounded,
-                  size: 15,
-                ),
-                label: Text(
-                  isLookupLoading ? '조회중' : '조회',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    height: 20 / 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  backgroundColor: context.appColors.primary,
-                  disabledBackgroundColor: context.appColors.primary.withValues(
-                    alpha: 0.4,
-                  ),
-                  foregroundColor: context.appColors.inverseText,
-                  disabledForegroundColor: context.appColors.inverseText,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  elevation: 0,
-                ),
-              ),
-            ),
-          ],
-        ),
-        if (errorMessage != null) ...[
-          const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.only(left: 4),
-            child: Text(
-              errorMessage!,
-              style: TextStyle(
-                fontSize: 12,
-                height: 16 / 12,
-                fontWeight: FontWeight.w400,
-                color: context.appColors.danger,
-              ),
-            ),
-          ),
-        ],
-        if (result != null) ...[
-          const SizedBox(height: 12),
-          Container(
-            width: double.infinity,
-            constraints: const BoxConstraints(minHeight: 79),
-            padding: const EdgeInsets.fromLTRB(15, 15, 15, 16),
-            decoration: BoxDecoration(
-              color: successBackground,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: successBorder),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 4,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          Text(
-                            result!.companyName,
-                            style: TextStyle(
-                              fontSize: 14,
-                              height: 20 / 14,
-                              fontWeight: FontWeight.w700,
-                              color: successColor,
-                            ),
-                          ),
-                          _StockTag(
-                            text: result!.code,
-                            backgroundColor: successBadgeBackground,
-                            textColor: successColor,
-                          ),
-                          _StockTag(
-                            text: result!.market,
-                            backgroundColor: primaryBadgeBackground,
-                            textColor: context.appColors.primary,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        result!.latestPriceText,
-                        style: TextStyle(
-                          fontSize: 16,
-                          height: 24 / 16,
-                          fontWeight: FontWeight.w700,
-                          color: successColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 10),
-                SizedBox(
-                  height: 28,
-                  child: FilledButton(
-                    onPressed: onApplyStockNameTap,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: successColor,
-                      foregroundColor: context.appColors.inverseText,
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: const Text(
-                      '종목명 적용',
-                      style: TextStyle(
-                        fontSize: 12,
-                        height: 16 / 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ],
-    );
-  }
-}
-
-class _StockTag extends StatelessWidget {
-  const _StockTag({
-    required this.text,
-    required this.backgroundColor,
-    required this.textColor,
-  });
-
-  final String text;
-  final Color backgroundColor;
-  final Color textColor;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 19,
-      padding: const EdgeInsets.symmetric(horizontal: 6),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(999),
-      ),
-      alignment: Alignment.center,
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 10,
-          height: 15 / 10,
-          fontWeight: FontWeight.w600,
-          color: textColor,
-        ),
-      ),
-    );
-  }
-}
-
 class _AmountInputField extends StatelessWidget {
   const _AmountInputField({required this.controller, required this.onChanged});
 
@@ -1422,31 +997,31 @@ class _AmountInputField extends StatelessWidget {
 
 class _StockHoldingSection extends StatelessWidget {
   const _StockHoldingSection({
-    required this.stockName,
+    required this.nameController,
     required this.sharesController,
+    required this.unitPriceController,
     required this.shares,
-    required this.unitPriceText,
-    required this.exchangeRate,
     required this.evaluatedAmount,
+    required this.onNameChanged,
     required this.onSharesChanged,
+    required this.onUnitPriceChanged,
   });
 
-  final String? stockName;
+  final TextEditingController nameController;
   final TextEditingController sharesController;
+  final TextEditingController unitPriceController;
   final double? shares;
-  final String? unitPriceText;
-  final int exchangeRate;
   final int evaluatedAmount;
+  final ValueChanged<String> onNameChanged;
   final ValueChanged<String> onSharesChanged;
+  final ValueChanged<int> onUnitPriceChanged;
 
   @override
   Widget build(BuildContext context) {
-    final hasQuote = stockName != null && unitPriceText != null;
     final summaryBg = context.appColors.primary.withValues(alpha: 0.12);
     final summaryPrimary = context.appColors.primary;
     final summarySecondary = context.appColors.primary.withValues(alpha: 0.55);
     final sharesText = _formatShares(shares);
-    final exchangeRateText = _formatWithComma(exchangeRate);
     final evaluatedText = _toKoreanWon(evaluatedAmount);
 
     return Column(
@@ -1454,25 +1029,17 @@ class _StockHoldingSection extends StatelessWidget {
       children: [
         _SectionLabel(text: '종목명'),
         const SizedBox(height: 8),
-        Container(
-          height: 56,
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(
-            color: context.appColors.surfaceMuted,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: context.appColors.primary, width: 2),
-          ),
-          alignment: Alignment.centerLeft,
-          child: Text(
-            stockName ?? '종목 조회 후 자동 입력',
-            style: TextStyle(
-              fontSize: 16,
-              height: 24 / 16,
-              fontWeight: FontWeight.w400,
-              color: context.appColors.textPrimary.withValues(alpha: 0.55),
-            ),
-          ),
+        _AppTextField(
+          controller: nameController,
+          hintText: '예: 삼성전자, Apple Inc.',
+          onChanged: onNameChanged,
+        ),
+        const SizedBox(height: 20),
+        _SectionLabel(text: '1주당 가격'),
+        const SizedBox(height: 8),
+        _AmountInputField(
+          controller: unitPriceController,
+          onChanged: onUnitPriceChanged,
         ),
         const SizedBox(height: 20),
         _SectionLabel(text: '보유 주수'),
@@ -1483,7 +1050,7 @@ class _StockHoldingSection extends StatelessWidget {
           decoration: BoxDecoration(
             color: context.appColors.surfaceMuted,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: context.appColors.primary, width: 2),
+            border: Border.all(color: context.appColors.border, width: 2),
           ),
           child: Row(
             children: [
@@ -1569,27 +1136,7 @@ class _StockHoldingSection extends StatelessWidget {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    unitPriceText ?? '-',
-                    style: TextStyle(
-                      fontSize: 12,
-                      height: 16 / 12,
-                      fontWeight: FontWeight.w600,
-                      color: summaryPrimary,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    '×',
-                    style: TextStyle(
-                      fontSize: 12,
-                      height: 16 / 12,
-                      fontWeight: FontWeight.w400,
-                      color: summarySecondary,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    '$exchangeRateText원',
+                    '${unitPriceController.text}원',
                     style: TextStyle(
                       fontSize: 12,
                       height: 16 / 12,
@@ -1601,7 +1148,7 @@ class _StockHoldingSection extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                '= ${hasQuote ? evaluatedText : '-'}',
+                '= $evaluatedText',
                 style: TextStyle(
                   fontSize: 16,
                   height: 24 / 16,
