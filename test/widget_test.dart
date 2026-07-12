@@ -13,7 +13,7 @@ void main() {
   testWidgets('Bottom navigation switches tab content', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const MoneyMateApp());
+    await tester.pumpWidget(const MoneyMateApp(appVersion: '1.0.0'));
 
     expect(find.text('2024년 3월'), findsOneWidget);
     expect(find.text('달력'), findsOneWidget);

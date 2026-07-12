@@ -5,13 +5,32 @@ import 'package:money_mate/ui/asset/screen/assets_tab_screen.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:money_mate/ui/ledger/widgets/ledger_tab_screen.dart';
 import 'package:money_mate/ui/core/bottom_navigation_bar.dart';
+import 'package:money_mate/ui/more/screen/more_tab_screen.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
-void main() {
-  runApp(const MoneyMateApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final packageInfo = await PackageInfo.fromPlatform();
+  runApp(MoneyMateApp(appVersion: packageInfo.version));
 }
 
-class MoneyMateApp extends StatelessWidget {
-  const MoneyMateApp({super.key});
+class MoneyMateApp extends StatefulWidget {
+  const MoneyMateApp({super.key, required this.appVersion});
+
+  final String appVersion;
+
+  @override
+  State<MoneyMateApp> createState() => _MoneyMateAppState();
+}
+
+class _MoneyMateAppState extends State<MoneyMateApp> {
+  ThemeMode _themeMode = ThemeMode.system;
+
+  void _setDarkModeEnabled(bool enabled) {
+    setState(() {
+      _themeMode = enabled ? ThemeMode.dark : ThemeMode.light;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +39,7 @@ class MoneyMateApp extends StatelessWidget {
       title: 'Money Mate',
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
-      themeMode: ThemeMode.system,
+      themeMode: _themeMode,
       locale: const Locale('ko', 'KR'),
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
@@ -28,13 +47,26 @@ class MoneyMateApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [Locale('ko', 'KR'), Locale('en', 'US')],
-      home: const HomeScreen(),
+      home: HomeScreen(
+        themeMode: _themeMode,
+        onDarkModeChanged: _setDarkModeEnabled,
+        appVersion: widget.appVersion,
+      ),
     );
   }
 }
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({
+    super.key,
+    required this.themeMode,
+    required this.onDarkModeChanged,
+    required this.appVersion,
+  });
+
+  final ThemeMode themeMode;
+  final ValueChanged<bool> onDarkModeChanged;
+  final String appVersion;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -67,6 +99,13 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  bool _isDarkModeEnabled(BuildContext context) {
+    if (widget.themeMode == ThemeMode.system) {
+      return MediaQuery.platformBrightnessOf(context) == Brightness.dark;
+    }
+    return widget.themeMode == ThemeMode.dark;
+  }
+
   @override
   Widget build(BuildContext context) {
     final pages = [
@@ -76,9 +115,11 @@ class _HomeScreenState extends State<HomeScreen> {
         onSelectedDateChanged: (date) => _selectedLedgerDate = date,
       ),
       AssetsTabScreen(key: ValueKey('assets-tab-${_tabRefreshVersion[1]}')),
-      KeyedSubtree(
+      MoreTabScreen(
         key: ValueKey('more-tab-${_tabRefreshVersion[2]}'),
-        child: const _TabPage(title: '설정', subtitle: '설정 및 계정 관리'),
+        isDarkModeEnabled: _isDarkModeEnabled(context),
+        onDarkModeChanged: widget.onDarkModeChanged,
+        appVersion: widget.appVersion,
       ),
     ];
 
@@ -113,60 +154,6 @@ class _HomeScreenState extends State<HomeScreen> {
               )
               : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-    );
-  }
-}
-
-class _TabPage extends StatelessWidget {
-  const _TabPage({required this.title, required this.subtitle});
-
-  final String title;
-  final String subtitle;
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.w800,
-                color: context.appColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              subtitle,
-              style: Theme.of(
-                context,
-              ).textTheme.bodyLarge?.copyWith(color: context.appColors.textSecondary),
-            ),
-            const Spacer(),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: context.appColors.surface,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: context.appColors.border),
-              ),
-              child: const Text(
-                'Figma 디자인 값을 연결해 픽셀 단위로 맞출 준비가 되어 있습니다.',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: AppColors.hexFF334155,
-                  height: 1.5,
-                ),
-              ),
-            ),
-            const SizedBox(height: 120),
-          ],
-        ),
-      ),
     );
   }
 }
