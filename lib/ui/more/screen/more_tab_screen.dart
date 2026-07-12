@@ -1,9 +1,48 @@
+import 'dart:io';
+
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:money_mate/data/model/entities/app_theme_mode.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:money_mate/ui/more/notion_legal_links.dart';
 import 'package:money_mate/ui/more/screen/theme_setting_screen.dart';
 import 'package:money_mate/ui/more/screen/web_view_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+const String _supportEmail = 'support.peterstudio@gmail.com';
+
+Future<({String osVersion, String deviceModel})> _getDeviceInfo() async {
+  final plugin = DeviceInfoPlugin();
+  if (Platform.isAndroid) {
+    final info = await plugin.androidInfo;
+    return (osVersion: 'Android ${info.version.release}', deviceModel: info.model);
+  }
+  if (Platform.isIOS) {
+    final info = await plugin.iosInfo;
+    return (osVersion: 'iOS ${info.systemVersion}', deviceModel: info.utsname.machine);
+  }
+  return (
+    osVersion: Platform.operatingSystemVersion,
+    deviceModel: Platform.operatingSystem,
+  );
+}
+
+String _buildSupportEmailBody({
+  required String appVersion,
+  required String osVersion,
+  required String deviceModel,
+}) {
+  return '✍️ 오류 제보 및 문의 내용:\n'
+      '\n'
+      '\n'
+      '\n'
+      '----------------------------------\n'
+      '💡 아래 정보는 오류 해결을 위한 기술 데이터로 오류 해결을 위해서만 사용됩니다.\n'
+      '• 앱 버전: $appVersion\n'
+      '• OS 버전: $osVersion\n'
+      '• 기기명: $deviceModel\n'
+      '----------------------------------';
+}
 
 class MoreTabScreen extends StatelessWidget {
   const MoreTabScreen({
@@ -41,10 +80,35 @@ class MoreTabScreen extends StatelessWidget {
     );
   }
 
-  void _contactSupport(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('help@moneymate.app 으로 문의해주세요.')),
+  Future<void> _contactSupport(BuildContext context) async {
+    final deviceInfo = await _getDeviceInfo();
+    final subject = Uri.encodeComponent('[머니메이트] 문의하기');
+    final body = Uri.encodeComponent(
+      _buildSupportEmailBody(
+        appVersion: appVersion,
+        osVersion: deviceInfo.osVersion,
+        deviceModel: deviceInfo.deviceModel,
+      ),
     );
+    final uri = Uri.parse(
+      'mailto:$_supportEmail?subject=$subject&body=$body',
+    );
+
+    var launched = false;
+    try {
+      launched = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+    } catch (_) {
+      launched = false;
+    }
+
+    if (!launched && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('메일 앱을 열 수 없어요. $_supportEmail 으로 문의해주세요.')),
+      );
+    }
   }
 
   void _openPrivacyPolicy(BuildContext context) {
