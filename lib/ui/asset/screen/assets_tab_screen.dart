@@ -138,7 +138,7 @@ class _AssetContentView extends StatelessWidget {
 
     return SafeArea(
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(0, 0, 0, 140),
+        padding: const EdgeInsets.fromLTRB(0, 0, 0, 48),
         children: [
           AssetTotalHeader(
             totalAssetText: viewModel.totalAmount.toKoreanWon(),

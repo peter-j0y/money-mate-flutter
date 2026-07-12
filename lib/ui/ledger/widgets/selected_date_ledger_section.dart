@@ -107,7 +107,7 @@ class SelectedDateLedgerSection extends StatelessWidget {
                       )
                       : ListView.separated(
                         controller: controller,
-                        padding: const EdgeInsets.only(bottom: 36),
+                        padding: const EdgeInsets.only(bottom: 48),
                         itemCount: items.length,
                         separatorBuilder:
                             (context, index) => const SizedBox(height: 8),
