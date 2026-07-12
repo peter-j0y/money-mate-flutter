@@ -1,19 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/data/model/entities/app_theme_mode.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:money_mate/ui/more/notion_legal_links.dart';
+import 'package:money_mate/ui/more/screen/theme_setting_screen.dart';
 import 'package:money_mate/ui/more/screen/web_view_screen.dart';
 
 class MoreTabScreen extends StatelessWidget {
   const MoreTabScreen({
     super.key,
-    required this.isDarkModeEnabled,
-    required this.onDarkModeChanged,
+    required this.themeMode,
+    required this.onThemeModeChanged,
     required this.appVersion,
   });
 
-  final bool isDarkModeEnabled;
-  final ValueChanged<bool> onDarkModeChanged;
+  final AppThemeMode themeMode;
+  final ValueChanged<AppThemeMode> onThemeModeChanged;
   final String appVersion;
+
+  void _openThemeSetting(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder:
+            (_) => ThemeSettingScreen(
+              currentThemeMode: themeMode,
+              onThemeModeChanged: onThemeModeChanged,
+            ),
+      ),
+    );
+  }
 
   void _openNotices(BuildContext context) {
     Navigator.of(context).push(
@@ -73,76 +87,88 @@ class MoreTabScreen extends StatelessWidget {
       backgroundColor: context.appColors.background,
       body: SafeArea(
         child: ListView(
-          padding: EdgeInsets.fromLTRB(16, 20, 16, safeAreaBottom + 100),
+          padding: EdgeInsets.fromLTRB(16, 20, 16, safeAreaBottom + 36),
           children: [
             const _Header(),
             const SizedBox(height: 24),
-            _SettingsRow(
-              icon: Icons.campaign_outlined,
-              accentColor: AppColors.hexFF0EA5E9,
-              title: '공지사항',
-              subtitle: '새로운 소식을 확인해요',
-              trailing: const _RowChevron(),
-              onTap: () => _openNotices(context),
-            ),
-            const SizedBox(height: 8),
-            _SettingsRow(
-              icon: Icons.dark_mode_outlined,
-              accentColor: AppColors.hexFF8B5CF6,
-              title: '다크 모드',
-              subtitle: '화면을 어둡게 표시해요',
-              trailing: Switch(
-                value: isDarkModeEnabled,
-                activeColor: context.appColors.primary,
-                onChanged: onDarkModeChanged,
-              ),
-            ),
-            const SizedBox(height: 8),
-            _SettingsRow(
-              icon: Icons.mail_outline_rounded,
-              accentColor: context.appColors.success,
-              title: '문의하기',
-              subtitle: '궁금한 점을 문의해보세요',
-              trailing: const _RowChevron(),
-              onTap: () => _contactSupport(context),
-            ),
-            const SizedBox(height: 8),
-            _SettingsRow(
-              icon: Icons.privacy_tip_outlined,
-              accentColor: context.appColors.primary,
-              title: '개인정보처리방침',
-              trailing: const _RowChevron(),
-              onTap: () => _openPrivacyPolicy(context),
-            ),
-            const SizedBox(height: 8),
-            _SettingsRow(
-              icon: Icons.description_outlined,
-              accentColor: AppColors.hexFF6B7280,
-              title: '이용약관',
-              trailing: const _RowChevron(),
-              onTap: () => _openTermsOfService(context),
-            ),
-            const SizedBox(height: 8),
-            _SettingsRow(
-              icon: Icons.article_outlined,
-              accentColor: AppColors.hexFFF97316,
-              title: '오픈소스 라이선스',
-              trailing: const _RowChevron(),
-              onTap: () => _openOpenSourceLicenses(context),
-            ),
-            const SizedBox(height: 8),
-            _SettingsRow(
-              icon: Icons.info_outline_rounded,
-              accentColor: AppColors.hexFF6B7280,
-              title: '앱 정보',
-              trailing: Text(
-                appVersion,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  color: context.appColors.textTertiary,
+            _SettingsSection(
+              title: '일반',
+              rows: [
+                _SettingsRow(
+                  icon: Icons.campaign_outlined,
+                  accentColor: AppColors.hexFF0EA5E9,
+                  title: '공지사항',
+                  trailing: const _RowChevron(),
+                  onTap: () => _openNotices(context),
                 ),
-              ),
+                _SettingsRow(
+                  icon: Icons.dark_mode_outlined,
+                  accentColor: AppColors.hexFF8B5CF6,
+                  title: '테마 설정',
+                  subtitle: themeMode.label,
+                  trailing: const _RowChevron(),
+                  onTap: () => _openThemeSetting(context),
+                ),
+              ],
+            ),
+            const SizedBox(height: 28),
+            _SettingsSection(
+              title: '고객지원',
+              rows: [
+                _SettingsRow(
+                  icon: Icons.mail_outline_rounded,
+                  accentColor: context.appColors.success,
+                  title: '문의하기',
+                  trailing: const _RowChevron(),
+                  onTap: () => _contactSupport(context),
+                ),
+              ],
+            ),
+            const SizedBox(height: 28),
+            _SettingsSection(
+              title: '약관 및 정책',
+              rows: [
+                _SettingsRow(
+                  icon: Icons.privacy_tip_outlined,
+                  accentColor: context.appColors.primary,
+                  title: '개인정보처리방침',
+                  trailing: const _RowChevron(),
+                  onTap: () => _openPrivacyPolicy(context),
+                ),
+                _SettingsRow(
+                  icon: Icons.description_outlined,
+                  accentColor: AppColors.hexFF6B7280,
+                  title: '이용약관',
+                  trailing: const _RowChevron(),
+                  onTap: () => _openTermsOfService(context),
+                ),
+                _SettingsRow(
+                  icon: Icons.article_outlined,
+                  accentColor: AppColors.hexFFF97316,
+                  title: '오픈소스 라이선스',
+                  trailing: const _RowChevron(),
+                  onTap: () => _openOpenSourceLicenses(context),
+                ),
+              ],
+            ),
+            const SizedBox(height: 28),
+            _SettingsSection(
+              title: '앱 정보',
+              rows: [
+                _SettingsRow(
+                  icon: Icons.info_outline_rounded,
+                  accentColor: AppColors.hexFF6B7280,
+                  title: '앱 정보',
+                  trailing: Text(
+                    appVersion,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: context.appColors.textTertiary,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -168,6 +194,38 @@ class _Header extends StatelessWidget {
             color: context.appColors.textPrimary,
           ),
         ),
+      ],
+    );
+  }
+}
+
+class _SettingsSection extends StatelessWidget {
+  const _SettingsSection({required this.title, required this.rows});
+
+  final String title;
+  final List<Widget> rows;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+          child: Text(
+            title,
+            style: TextStyle(
+              fontSize: 13,
+              height: 16 / 13,
+              fontWeight: FontWeight.w600,
+              color: context.appColors.textTertiary,
+            ),
+          ),
+        ),
+        for (var i = 0; i < rows.length; i++) ...[
+          rows[i],
+          if (i != rows.length - 1) const SizedBox(height: 8),
+        ],
       ],
     );
   }

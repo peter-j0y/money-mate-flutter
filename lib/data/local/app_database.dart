@@ -54,7 +54,16 @@ class PortfolioTargets extends Table {
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
 }
 
-@DriftDatabase(tables: [LedgerRecords, Assets, PortfolioTargets])
+class AppSettings extends Table {
+  IntColumn get id => integer()();
+
+  TextColumn get themeMode => text().withDefault(const Constant('system'))();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+@DriftDatabase(tables: [LedgerRecords, Assets, PortfolioTargets, AppSettings])
 class AppDatabase extends _$AppDatabase {
   AppDatabase._internal() : super(_openConnection());
 
@@ -62,8 +71,10 @@ class AppDatabase extends _$AppDatabase {
 
   factory AppDatabase() => _instance;
 
+  static const int _settingsRowId = 0;
+
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -77,8 +88,33 @@ class AppDatabase extends _$AppDatabase {
       if (from < 3) {
         await m.createTable(portfolioTargets);
       }
+      if (from < 4) {
+        await m.createTable(appSettings);
+      }
     },
   );
+
+  Future<String?> getThemeMode() async {
+    final row =
+        await (select(appSettings)
+          ..where((tbl) => tbl.id.equals(_settingsRowId))).getSingleOrNull();
+    return row?.themeMode;
+  }
+
+  Stream<String?> watchThemeMode() {
+    return (select(appSettings)..where(
+      (tbl) => tbl.id.equals(_settingsRowId),
+    )).watchSingleOrNull().map((row) => row?.themeMode);
+  }
+
+  Future<void> setThemeMode(String themeMode) {
+    return into(appSettings).insertOnConflictUpdate(
+      AppSettingsCompanion(
+        id: const Value(_settingsRowId),
+        themeMode: Value(themeMode),
+      ),
+    );
+  }
 
   Future<int> insertLedgerRecord(LedgerRecordsCompanion entry) {
     return into(ledgerRecords).insert(entry);
