@@ -237,61 +237,6 @@ class AssetCategoryItemData {
   final bool isExcludedFromPortfolio;
 }
 
-class _RatioBar extends StatelessWidget {
-  const _RatioBar({
-    required this.actualRatio,
-    required this.targetRatio,
-    required this.color,
-  });
-
-  final double actualRatio;
-  final double targetRatio;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    final actual = actualRatio.clamp(0, 100).toDouble();
-    final target = targetRatio.clamp(0, 100).toDouble();
-
-    return SizedBox(
-      height: 8,
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final markerLeft =
-              ((target / 100) * constraints.maxWidth - 1).clamp(
-                0.0,
-                constraints.maxWidth - 2,
-              ).toDouble();
-          return ClipRRect(
-            borderRadius: BorderRadius.circular(999),
-            child: Stack(
-              children: [
-                Container(color: context.appColors.surfaceMuted),
-                FractionallySizedBox(
-                  widthFactor: actual / 100,
-                  alignment: Alignment.centerLeft,
-                  child: Opacity(
-                    opacity: 0.85,
-                    child: Container(color: color),
-                  ),
-                ),
-                Positioned(
-                  left: markerLeft,
-                  child: Container(
-                    width: 2,
-                    height: 8,
-                    color: context.appColors.textTertiary,
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
 class _AssetCategoryItemRow extends StatelessWidget {
   const _AssetCategoryItemRow({
     required this.item,
