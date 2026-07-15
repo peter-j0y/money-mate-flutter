@@ -2,10 +2,8 @@ import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:money_mate/data/model/entities/app_theme_mode.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:money_mate/ui/more/notion_legal_links.dart';
-import 'package:money_mate/ui/more/screen/theme_setting_screen.dart';
 import 'package:money_mate/ui/more/screen/web_view_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -45,28 +43,9 @@ String _buildSupportEmailBody({
 }
 
 class MoreTabScreen extends StatelessWidget {
-  const MoreTabScreen({
-    super.key,
-    required this.themeMode,
-    required this.onThemeModeChanged,
-    required this.appVersion,
-  });
+  const MoreTabScreen({super.key, required this.appVersion});
 
-  final AppThemeMode themeMode;
-  final ValueChanged<AppThemeMode> onThemeModeChanged;
   final String appVersion;
-
-  void _openThemeSetting(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder:
-            (_) => ThemeSettingScreen(
-              currentThemeMode: themeMode,
-              onThemeModeChanged: onThemeModeChanged,
-            ),
-      ),
-    );
-  }
 
   void _openNotices(BuildContext context) {
     Navigator.of(context).push(
@@ -165,14 +144,6 @@ class MoreTabScreen extends StatelessWidget {
                   trailing: const _RowChevron(),
                   onTap: () => _openNotices(context),
                 ),
-                _SettingsRow(
-                  icon: Icons.dark_mode_outlined,
-                  accentColor: AppColors.hexFF8B5CF6,
-                  title: '테마 설정',
-                  subtitle: themeMode.label,
-                  trailing: const _RowChevron(),
-                  onTap: () => _openThemeSetting(context),
-                ),
               ],
             ),
             const SizedBox(height: 28),
@@ -192,6 +163,8 @@ class MoreTabScreen extends StatelessWidget {
             _SettingsSection(
               title: '약관 및 정책',
               rows: [
+
+
                 _SettingsRow(
                   icon: Icons.privacy_tip_outlined,
                   accentColor: context.appColors.primary,
@@ -301,14 +274,12 @@ class _SettingsRow extends StatelessWidget {
     required this.accentColor,
     required this.title,
     required this.trailing,
-    this.subtitle,
     this.onTap,
   });
 
   final IconData icon;
   final Color accentColor;
   final String title;
-  final String? subtitle;
   final Widget trailing;
   final VoidCallback? onTap;
 
@@ -354,18 +325,6 @@ class _SettingsRow extends StatelessWidget {
                         color: context.appColors.textPrimary,
                       ),
                     ),
-                    if (subtitle != null) ...[
-                      const SizedBox(height: 2),
-                      Text(
-                        subtitle!,
-                        style: TextStyle(
-                          fontSize: 12,
-                          height: 16 / 12,
-                          fontWeight: FontWeight.w400,
-                          color: context.appColors.textTertiary,
-                        ),
-                      ),
-                    ],
                   ],
                 ),
               ),

@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:money_mate/data/model/entities/app_theme_mode.dart';
-import 'package:money_mate/data/repositories/app_settings_repository.dart';
-import 'package:money_mate/data/repositories/app_settings_repository_impl.dart';
 import 'package:money_mate/ui/ledger/widgets/add_ledger_record_screen.dart';
 import 'package:money_mate/ui/asset/screen/assets_tab_screen.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
@@ -17,48 +14,10 @@ Future<void> main() async {
   runApp(MoneyMateApp(appVersion: packageInfo.version));
 }
 
-class MoneyMateApp extends StatefulWidget {
+class MoneyMateApp extends StatelessWidget {
   const MoneyMateApp({super.key, required this.appVersion});
 
   final String appVersion;
-
-  @override
-  State<MoneyMateApp> createState() => _MoneyMateAppState();
-}
-
-class _MoneyMateAppState extends State<MoneyMateApp> {
-  final AppSettingsRepository _appSettingsRepository =
-      AppSettingsRepositoryImpl();
-
-  AppThemeMode _appThemeMode = AppThemeMode.system;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadThemeMode();
-  }
-
-  Future<void> _loadThemeMode() async {
-    final themeMode = await _appSettingsRepository.getThemeMode();
-    if (!mounted) return;
-    setState(() => _appThemeMode = themeMode);
-  }
-
-  Future<void> _setAppThemeMode(AppThemeMode themeMode) async {
-    setState(() => _appThemeMode = themeMode);
-    await _appSettingsRepository.setThemeMode(themeMode);
-  }
-
-  ThemeMode get _themeMode {
-    switch (_appThemeMode) {
-      case AppThemeMode.system:
-        return ThemeMode.system;
-      case AppThemeMode.light:
-        return ThemeMode.light;
-      case AppThemeMode.dark:
-        return ThemeMode.dark;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +26,7 @@ class _MoneyMateAppState extends State<MoneyMateApp> {
       title: 'Money Mate',
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
-      themeMode: _themeMode,
+      themeMode: ThemeMode.system,
       locale: const Locale('ko', 'KR'),
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
@@ -75,25 +34,14 @@ class _MoneyMateAppState extends State<MoneyMateApp> {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [Locale('ko', 'KR'), Locale('en', 'US')],
-      home: HomeScreen(
-        appThemeMode: _appThemeMode,
-        onThemeModeChanged: _setAppThemeMode,
-        appVersion: widget.appVersion,
-      ),
+      home: HomeScreen(appVersion: appVersion),
     );
   }
 }
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({
-    super.key,
-    required this.appThemeMode,
-    required this.onThemeModeChanged,
-    required this.appVersion,
-  });
+  const HomeScreen({super.key, required this.appVersion});
 
-  final AppThemeMode appThemeMode;
-  final ValueChanged<AppThemeMode> onThemeModeChanged;
   final String appVersion;
 
   @override
@@ -138,8 +86,6 @@ class _HomeScreenState extends State<HomeScreen> {
       AssetsTabScreen(key: ValueKey('assets-tab-${_tabRefreshVersion[1]}')),
       MoreTabScreen(
         key: ValueKey('more-tab-${_tabRefreshVersion[2]}'),
-        themeMode: widget.appThemeMode,
-        onThemeModeChanged: widget.onThemeModeChanged,
         appVersion: widget.appVersion,
       ),
     ];
