@@ -206,7 +206,49 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
     ];
   }
 
+  void _handleCalendarMonthChanged(DateTime month) {
+    if (_isSameMonth(_currentMonth, month)) {
+      return;
+    }
+    setState(() {
+      _currentMonth = month;
+      _selectedDate = DateTime(month.year, month.month, 1);
+    });
+    widget.onSelectedDateChanged?.call(_selectedDate!);
+    _viewModel.loadMonth(_currentMonth);
+  }
+
+  void _handleCalendarDateTap(DateTime date) {
+    setState(() {
+      _selectedDate = date;
+    });
+
+    final selectedMonth = DateTime(date.year, date.month);
+    if (!_isSameMonth(_currentMonth, selectedMonth)) {
+      setState(() {
+        _currentMonth = selectedMonth;
+      });
+      _viewModel.loadMonth(_currentMonth);
+    }
+
+    widget.onSelectedDateChanged?.call(date);
+  }
+
+  void _handleLedgerItemTap(LedgerEntry item) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (context) => LedgerRecordDetailScreen(entry: item),
+      ),
+    );
+  }
+
   Widget _buildCalendarTab() {
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
+    return isLandscape ? _buildCalendarTabLandscape() : _buildCalendarTabPortrait();
+  }
+
+  Widget _buildCalendarTabPortrait() {
     return Column(
       children: [
         ..._buildCommonSection(),
@@ -235,32 +277,8 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
                   collapseProgress: collapseProgress,
                   incomeTotalForDate: _viewModel.incomeTotalForDate,
                   expenseTotalForDate: _viewModel.expenseTotalForDate,
-                  onMonthChanged: (month) {
-                    if (_isSameMonth(_currentMonth, month)) {
-                      return;
-                    }
-                    setState(() {
-                      _currentMonth = month;
-                      _selectedDate = DateTime(month.year, month.month, 1);
-                    });
-                    widget.onSelectedDateChanged?.call(_selectedDate!);
-                    _viewModel.loadMonth(_currentMonth);
-                  },
-                  onDateTap: (date) {
-                    setState(() {
-                      _selectedDate = date;
-                    });
-
-                    final selectedMonth = DateTime(date.year, date.month);
-                    if (!_isSameMonth(_currentMonth, selectedMonth)) {
-                      setState(() {
-                        _currentMonth = selectedMonth;
-                      });
-                      _viewModel.loadMonth(_currentMonth);
-                    }
-
-                    widget.onSelectedDateChanged?.call(date);
-                  },
+                  onMonthChanged: _handleCalendarMonthChanged,
+                  onDateTap: _handleCalendarDateTap,
                 );
               },
             ),
@@ -274,13 +292,50 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
             isLoading: _viewModel.isLoading,
             errorMessage: _viewModel.errorMessage,
             selectedDateLabelBuilder: _selectedDateLabel,
-            onItemTap: (item) {
-              Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (context) => LedgerRecordDetailScreen(entry: item),
+            onItemTap: _handleLedgerItemTap,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCalendarTabLandscape() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Expanded(
+          flex: 5,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Column(
+              children: [
+                ..._buildCommonSection(),
+                const SizedBox(height: 12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: LedgerCalendar(
+                    displayedMonth: _currentMonth,
+                    selectedDate: _selectedDate,
+                    incomeTotalForDate: _viewModel.incomeTotalForDate,
+                    expenseTotalForDate: _viewModel.expenseTotalForDate,
+                    onMonthChanged: _handleCalendarMonthChanged,
+                    onDateTap: _handleCalendarDateTap,
+                  ),
                 ),
-              );
-            },
+              ],
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 4,
+          child: SelectedDateLedgerSection(
+            key: _calendarScrollKey,
+            selectedDate: _selectedDate,
+            items: _selectedDateItems,
+            isLoading: _viewModel.isLoading,
+            errorMessage: _viewModel.errorMessage,
+            selectedDateLabelBuilder: _selectedDateLabel,
+            onItemTap: _handleLedgerItemTap,
           ),
         ),
       ],
