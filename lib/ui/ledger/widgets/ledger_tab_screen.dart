@@ -251,8 +251,8 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
   Widget _buildCalendarTabPortrait() {
     // 달력 높이는 고정이라 글씨 크기가 커지거나 화면 세로가 짧은 기기에서는
     // 헤더+달력만으로 화면을 다 채워 하단 리스트가 가려질 수 있다.
-    // CustomScrollView + SliverFillRemaining으로 감싸서, 그런 경우에도
-    // 전체를 스크롤해 하단 리스트까지 도달할 수 있게 한다.
+    // CustomScrollView로 감싸고 리스트를 내용 높이만큼만 차지하게 해서,
+    // 그런 경우에도 전체를 스크롤해 하단 리스트까지 도달할 수 있게 한다.
     return CustomScrollView(
       key: _calendarScrollKey,
       slivers: [
@@ -295,8 +295,7 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
             ],
           ),
         ),
-        SliverFillRemaining(
-          hasScrollBody: true,
+        SliverToBoxAdapter(
           child: SelectedDateLedgerSection(
             selectedDate: _selectedDate,
             items: _selectedDateItems,

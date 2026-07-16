@@ -85,40 +85,43 @@ class SelectedDateLedgerSection extends StatelessWidget {
                 ),
               ),
             )
+          else if (isLoading)
+            SizedBox(
+              height: _emptyStateHeight,
+              child: const LedgerStateCard(
+                child: Center(child: CircularProgressIndicator()),
+              ),
+            )
+          else if (errorMessage != null)
+            SizedBox(
+              height: _emptyStateHeight,
+              child: LedgerStateCard(
+                child: Center(
+                  child: Text(
+                    errorMessage!,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14,
+                      height: 20 / 14,
+                      fontWeight: FontWeight.w500,
+                      color: context.appColors.danger,
+                    ),
+                  ),
+                ),
+              ),
+            )
           else
-            Expanded(
-              child:
-                  isLoading
-                      ? const LedgerStateCard(
-                        child: Center(child: CircularProgressIndicator()),
-                      )
-                      : errorMessage != null
-                      ? LedgerStateCard(
-                        child: Text(
-                          errorMessage!,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 14,
-                            height: 20 / 14,
-                            fontWeight: FontWeight.w500,
-                            color: context.appColors.danger,
-                          ),
-                        ),
-                      )
-                      : ListView.separated(
-                        controller: controller,
-                        padding: const EdgeInsets.only(bottom: 48),
-                        itemCount: items.length,
-                        separatorBuilder:
-                            (context, index) => const SizedBox(height: 8),
-                        itemBuilder: (context, index) {
-                          final item = items[index];
-                          return _DailyLedgerListTile(
-                            item: item,
-                            onTap: onItemTap,
-                          );
-                        },
-                      ),
+            ListView.separated(
+              controller: controller,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              padding: const EdgeInsets.only(bottom: 48),
+              itemCount: items.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 8),
+              itemBuilder: (context, index) {
+                final item = items[index];
+                return _DailyLedgerListTile(item: item, onTap: onItemTap);
+              },
             ),
         ],
       ),
