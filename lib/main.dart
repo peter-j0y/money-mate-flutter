@@ -1,3 +1,4 @@
+import 'package:clarity_flutter/clarity_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
@@ -25,7 +26,21 @@ Future<void> main() async {
   };
 
   final packageInfo = await PackageInfo.fromPlatform();
-  runApp(MoneyMateApp(appVersion: packageInfo.version));
+  final app = MoneyMateApp(appVersion: packageInfo.version);
+
+  if (kDebugMode) {
+    runApp(app);
+  } else {
+    runApp(
+      ClarityWidget(
+        app: app,
+        clarityConfig: ClarityConfig(
+          projectId: 'xnfuc7entv',
+          logLevel: LogLevel.None,
+        ),
+      ),
+    );
+  }
 }
 
 class MoneyMateApp extends StatelessWidget {
