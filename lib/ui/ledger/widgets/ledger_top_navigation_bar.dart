@@ -58,7 +58,6 @@ class _TopNavItem extends StatelessWidget {
           child: Center(
             child: Text(
               label,
-              textScaler: TextScaler.noScaling,
               style: TextStyle(
                 fontSize: 20,
                 height: 28 / 18,

@@ -35,7 +35,15 @@ class MoneyMateApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [Locale('ko', 'KR'), Locale('en', 'US')],
-      builder: (context, child) => KeyboardDoneBar(child: child!),
+      builder: (context, child) {
+        final mediaQuery = MediaQuery.of(context);
+        return MediaQuery(
+          data: mediaQuery.copyWith(
+            textScaler: mediaQuery.textScaler.clamp(maxScaleFactor: 1.3),
+          ),
+          child: KeyboardDoneBar(child: child!),
+        );
+      },
       home: HomeScreen(appVersion: appVersion),
     );
   }

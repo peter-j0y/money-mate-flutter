@@ -261,7 +261,6 @@ class _CalendarMonthGrid extends StatelessWidget {
                               children: [
                                 Text(
                                   '${day.day}',
-                                  textScaler: TextScaler.noScaling,
                                   style: TextStyle(
                                     fontSize: 14,
                                     height: 20 / 14,

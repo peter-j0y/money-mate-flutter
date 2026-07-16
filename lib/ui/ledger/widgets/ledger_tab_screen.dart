@@ -249,44 +249,55 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
   }
 
   Widget _buildCalendarTabPortrait() {
-    return Column(
-      children: [
-        ..._buildCommonSection(),
-        const SizedBox(height: 12),
-        GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onVerticalDragEnd: (details) {
-            final velocity = details.primaryVelocity ?? 0;
-            if (velocity.abs() < _calendarSwipeVelocityThreshold) {
-              return;
-            }
-            setState(() {
-              _isCalendarCollapsed = velocity < 0;
-            });
-          },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: TweenAnimationBuilder<double>(
-              tween: Tween<double>(end: _isCalendarCollapsed ? 1 : 0),
-              duration: const Duration(milliseconds: 280),
-              curve: Curves.easeInOutCubic,
-              builder: (context, collapseProgress, _) {
-                return LedgerCalendar(
-                  displayedMonth: _currentMonth,
-                  selectedDate: _selectedDate,
-                  collapseProgress: collapseProgress,
-                  incomeTotalForDate: _viewModel.incomeTotalForDate,
-                  expenseTotalForDate: _viewModel.expenseTotalForDate,
-                  onMonthChanged: _handleCalendarMonthChanged,
-                  onDateTap: _handleCalendarDateTap,
-                );
-              },
-            ),
+    // 달력 높이는 고정이라 글씨 크기가 커지거나 화면 세로가 짧은 기기에서는
+    // 헤더+달력만으로 화면을 다 채워 하단 리스트가 가려질 수 있다.
+    // CustomScrollView + SliverFillRemaining으로 감싸서, 그런 경우에도
+    // 전체를 스크롤해 하단 리스트까지 도달할 수 있게 한다.
+    return CustomScrollView(
+      key: _calendarScrollKey,
+      slivers: [
+        SliverToBoxAdapter(
+          child: Column(
+            children: [
+              ..._buildCommonSection(),
+              const SizedBox(height: 12),
+              GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onVerticalDragEnd: (details) {
+                  final velocity = details.primaryVelocity ?? 0;
+                  if (velocity.abs() < _calendarSwipeVelocityThreshold) {
+                    return;
+                  }
+                  setState(() {
+                    _isCalendarCollapsed = velocity < 0;
+                  });
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween<double>(end: _isCalendarCollapsed ? 1 : 0),
+                    duration: const Duration(milliseconds: 280),
+                    curve: Curves.easeInOutCubic,
+                    builder: (context, collapseProgress, _) {
+                      return LedgerCalendar(
+                        displayedMonth: _currentMonth,
+                        selectedDate: _selectedDate,
+                        collapseProgress: collapseProgress,
+                        incomeTotalForDate: _viewModel.incomeTotalForDate,
+                        expenseTotalForDate: _viewModel.expenseTotalForDate,
+                        onMonthChanged: _handleCalendarMonthChanged,
+                        onDateTap: _handleCalendarDateTap,
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-        Expanded(
+        SliverFillRemaining(
+          hasScrollBody: true,
           child: SelectedDateLedgerSection(
-            key: _calendarScrollKey,
             selectedDate: _selectedDate,
             items: _selectedDateItems,
             isLoading: _viewModel.isLoading,
