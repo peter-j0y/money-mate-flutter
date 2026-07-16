@@ -293,7 +293,7 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
               child: const Text('취소'),
             ),
             TextButton(
-              style: TextButton.styleFrom(foregroundColor: context.appColors.primary),
+              style: TextButton.styleFrom(foregroundColor: context.appColors.danger),
               onPressed: () => Navigator.of(dialogContext).pop(true),
               child: const Text('삭제'),
             ),
