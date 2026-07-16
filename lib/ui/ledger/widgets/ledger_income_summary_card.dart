@@ -41,7 +41,7 @@ class LedgerIncomeSummaryCard extends StatelessWidget {
           ),
           Expanded(
             child: _SummaryValueColumn(
-              title: '저축 가능',
+              title: '합계',
               value: savableText,
               valueColor: context.appColors.success,
             ),
