@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:money_mate/data/local/app_database.dart';
+import 'package:money_mate/data/local/db_crashlytics_logger.dart';
 import 'package:money_mate/data/model/entities/asset_entry.dart';
 
 class PortfolioTargetLocalDataSource {
@@ -13,13 +14,17 @@ class PortfolioTargetLocalDataSource {
     required bool isEnabled,
     required int targetRatio,
   }) {
-    return _database.upsertPortfolioTarget(
-      PortfolioTargetsCompanion.insert(
-        assetType: assetType.code,
-        isEnabled: Value(isEnabled),
-        targetRatio: Value(targetRatio),
-        updatedAt: Value(DateTime.now()),
+    return logDbErrors(
+      'PortfolioTarget.upsert',
+      () => _database.upsertPortfolioTarget(
+        PortfolioTargetsCompanion.insert(
+          assetType: assetType.code,
+          isEnabled: Value(isEnabled),
+          targetRatio: Value(targetRatio),
+          updatedAt: Value(DateTime.now()),
+        ),
       ),
+      context: {'assetType': assetType.code, 'targetRatio': targetRatio},
     );
   }
 
@@ -34,11 +39,14 @@ class PortfolioTargetLocalDataSource {
   }
 
   Future<List<PortfolioTarget>> getTargets() {
-    return _database.getPortfolioTargets();
+    return logDbErrors('PortfolioTarget.getAll', () => _database.getPortfolioTargets());
   }
 
   Stream<List<PortfolioTarget>> watchTargets() {
-    return _database.watchPortfolioTargets();
+    return logDbStreamErrors(
+      'PortfolioTarget.watch',
+      () => _database.watchPortfolioTargets(),
+    );
   }
 }
 

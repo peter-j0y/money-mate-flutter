@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:money_mate/data/local/app_database.dart';
+import 'package:money_mate/data/local/db_crashlytics_logger.dart';
 import '../model/entities/ledger_record.dart';
 
 class LedgerRecordLocalDataSource {
@@ -9,43 +10,63 @@ class LedgerRecordLocalDataSource {
   final AppDatabase _database;
 
   Future<int> addRecord(LedgerEntryDraft draft) {
-    return _database.insertLedgerRecord(
-      LedgerRecordsCompanion.insert(
-        type: _typeToDto(draft.type),
-        category: draft.category,
-        amount: draft.amount,
-        date: draft.date,
-        paymentMethod: Value(_paymentMethodToDto(draft.paymentMethod)),
-        memo: Value(draft.memo),
+    return logDbErrors(
+      'LedgerRecord.add',
+      () => _database.insertLedgerRecord(
+        LedgerRecordsCompanion.insert(
+          type: _typeToDto(draft.type),
+          category: draft.category,
+          amount: draft.amount,
+          date: draft.date,
+          paymentMethod: Value(_paymentMethodToDto(draft.paymentMethod)),
+          memo: Value(draft.memo),
+        ),
       ),
+      context: {'type': draft.type, 'category': draft.category},
     );
   }
 
   Future<bool> replaceRecord(int id, LedgerEntryDraft draft) {
-    return _database.replaceLedgerRecord(
-      id,
-      LedgerRecordsCompanion(
-        type: Value(_typeToDto(draft.type)),
-        category: Value(draft.category),
-        amount: Value(draft.amount),
-        date: Value(draft.date),
-        paymentMethod: Value(_paymentMethodToDto(draft.paymentMethod)),
-        memo: Value(draft.memo),
+    return logDbErrors(
+      'LedgerRecord.replace',
+      () => _database.replaceLedgerRecord(
+        id,
+        LedgerRecordsCompanion(
+          type: Value(_typeToDto(draft.type)),
+          category: Value(draft.category),
+          amount: Value(draft.amount),
+          date: Value(draft.date),
+          paymentMethod: Value(_paymentMethodToDto(draft.paymentMethod)),
+          memo: Value(draft.memo),
+        ),
       ),
+      context: {'id': id, 'type': draft.type, 'category': draft.category},
     );
   }
 
   Future<bool> deleteRecord(int id) {
-    return _database.deleteLedgerRecord(id);
+    return logDbErrors(
+      'LedgerRecord.delete',
+      () => _database.deleteLedgerRecord(id),
+      context: {'id': id},
+    );
   }
 
   Future<List<LedgerEntry>> fetchMonthlyRecords(DateTime month) async {
-    final rows = await _database.fetchMonthlyRecords(month);
+    final rows = await logDbErrors(
+      'LedgerRecord.fetchMonthly',
+      () => _database.fetchMonthlyRecords(month),
+      context: {'month': month.toIso8601String()},
+    );
     return _mapToLedgerEntries(rows);
   }
 
   Stream<List<LedgerEntry>> watchMonthlyRecords(DateTime month) {
-    return _database.watchMonthlyRecords(month).map(_mapToLedgerEntries);
+    return logDbStreamErrors(
+      'LedgerRecord.watchMonthly',
+      () => _database.watchMonthlyRecords(month),
+      context: {'month': month.toIso8601String()},
+    ).map(_mapToLedgerEntries);
   }
 
   List<LedgerEntry> _mapToLedgerEntries(List<LedgerRecord> rows) {
