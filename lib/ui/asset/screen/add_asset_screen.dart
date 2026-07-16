@@ -49,49 +49,42 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
     _AssetTypeOption(
       type: AssetType.stock,
       title: '주식',
-      subtitle: '국내·해외 주식, ETF',
       icon: Icons.trending_up_rounded,
       accentColor: AppColors.hexFF3B82F6,
     ),
     _AssetTypeOption(
       type: AssetType.cash,
       title: '현금',
-      subtitle: '은행 잔고, 현금',
       icon: Icons.account_balance_wallet_rounded,
       accentColor: AppColors.hexFF10B981,
     ),
     _AssetTypeOption(
       type: AssetType.realEstate,
       title: '부동산',
-      subtitle: '아파트, 토지, 보증금',
       icon: Icons.home_work_outlined,
       accentColor: AppColors.hexFFF59E0B,
     ),
     _AssetTypeOption(
       type: AssetType.crypto,
       title: '가상화폐',
-      subtitle: '비트코인, 이더리움 등',
       icon: Icons.currency_bitcoin_rounded,
       accentColor: AppColors.hexFF8B5CF6,
     ),
     _AssetTypeOption(
       type: AssetType.savings,
       title: '예적금',
-      subtitle: '정기예금, 적금',
       icon: Icons.savings_outlined,
       accentColor: AppColors.hexFF0EA5E9,
     ),
     _AssetTypeOption(
       type: AssetType.commodity,
       title: '원자재',
-      subtitle: '금, 은, 원유 등',
       icon: Icons.all_inclusive_rounded,
       accentColor: AppColors.hexFFEF4444,
     ),
     _AssetTypeOption(
       type: AssetType.other,
       title: '기타',
-      subtitle: '그 외 모든 자산',
       icon: Icons.category_outlined,
       accentColor: AppColors.hexFF6B7280,
     ),
@@ -432,7 +425,7 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
         const SizedBox(height: 8),
         _PortfolioOptionCard(
           title: '포트폴리오에 포함',
-          subtitle: '목표 비율 차트에 반영되고 리밸런싱 신호를 받아요',
+          subtitle: '목표 비율 차트에 반영돼요',
           icon: Icons.pie_chart_outline_rounded,
           accentColor: AppColors.hexFF6B7280,
           selected: _includeInPortfolio,
@@ -786,33 +779,17 @@ class _AssetTypeCard extends StatelessWidget {
             ),
             const SizedBox(width: 16),
             Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    option.title,
-                    style: TextStyle(
-                      fontSize: 16,
-                      height: 24 / 16,
-                      fontWeight: FontWeight.w600,
-                      color:
-                          isSelected
-                              ? option.accentColor
-                              : context.appColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    option.subtitle,
-                    style: TextStyle(
-                      fontSize: 12,
-                      height: 16 / 12,
-                      fontWeight: FontWeight.w500,
-                      color: context.appColors.textTertiary,
-                    ),
-                  ),
-                ],
+              child: Text(
+                option.title,
+                style: TextStyle(
+                  fontSize: 16,
+                  height: 24 / 16,
+                  fontWeight: FontWeight.w600,
+                  color:
+                      isSelected
+                          ? option.accentColor
+                          : context.appColors.textPrimary,
+                ),
               ),
             ),
             if (isSelected)
@@ -1460,14 +1437,12 @@ class _AssetTypeOption {
   const _AssetTypeOption({
     required this.type,
     required this.title,
-    required this.subtitle,
     required this.icon,
     required this.accentColor,
   });
 
   final AssetType type;
   final String title;
-  final String subtitle;
   final IconData icon;
   final Color accentColor;
 }
