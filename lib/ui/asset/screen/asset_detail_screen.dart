@@ -516,7 +516,7 @@ class _PortfolioStatusCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  includeInPortfolio ? '목표 비율 차트 및 리밸런싱에 반영돼요' : '목표 비율 계산에서 제외돼요',
+                  includeInPortfolio ? '목표 비율 차트에 반영돼요' : '목표 비율 계산에서 제외돼요',
                   style: TextStyle(
                     fontSize: 12,
                     height: 16 / 12,
