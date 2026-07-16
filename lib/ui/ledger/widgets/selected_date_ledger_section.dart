@@ -68,18 +68,21 @@ class SelectedDateLedgerSection extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           if (items.isEmpty && !isLoading && errorMessage == null)
-            SizedBox(
-              height: _emptyStateHeight,
-              child: LedgerStateCard(
-                child: Center(
-                  child: Text(
-                    '해당 날짜에 등록된 내역이 없어요',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14,
-                      height: 20 / 14,
-                      fontWeight: FontWeight.w500,
-                      color: context.appColors.textTertiary,
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: SizedBox(
+                height: _emptyStateHeight,
+                child: LedgerStateCard(
+                  child: Center(
+                    child: Text(
+                      '해당 날짜에 등록된 내역이 없어요',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 14,
+                        height: 20 / 14,
+                        fontWeight: FontWeight.w500,
+                        color: context.appColors.textTertiary,
+                      ),
                     ),
                   ),
                 ),
