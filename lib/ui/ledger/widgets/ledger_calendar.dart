@@ -55,7 +55,7 @@ class _LedgerCalendarState extends State<LedgerCalendar> {
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(initialPage: _centerPage);
+    _pageController = PageController(initialPage: _centerPage, keepPage: false);
   }
 
   @override
