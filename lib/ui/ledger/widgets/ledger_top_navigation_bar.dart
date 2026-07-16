@@ -15,7 +15,7 @@ class LedgerTopNavigationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: const BoxConstraints(minHeight: 46),
+      height: 46,
       decoration: BoxDecoration(color: context.appColors.background),
       child: Row(
         children: [
@@ -54,10 +54,11 @@ class _TopNavItem extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 4),
           child: Center(
             child: Text(
               label,
+              textScaler: TextScaler.noScaling,
               style: TextStyle(
                 fontSize: 20,
                 height: 28 / 18,
