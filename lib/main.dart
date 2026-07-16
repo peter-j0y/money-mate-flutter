@@ -5,6 +5,7 @@ import 'package:money_mate/ui/asset/screen/assets_tab_screen.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:money_mate/ui/ledger/widgets/ledger_tab_screen.dart';
 import 'package:money_mate/ui/core/bottom_navigation_bar.dart';
+import 'package:money_mate/ui/core/keyboard_done_bar.dart';
 import 'package:money_mate/ui/more/screen/more_tab_screen.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -34,6 +35,7 @@ class MoneyMateApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [Locale('ko', 'KR'), Locale('en', 'US')],
+      builder: (context, child) => KeyboardDoneBar(child: child!),
       home: HomeScreen(appVersion: appVersion),
     );
   }
