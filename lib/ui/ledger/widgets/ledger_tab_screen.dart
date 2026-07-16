@@ -31,12 +31,10 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
   static const double _calendarSwipeVelocityThreshold = 200;
 
   final LedgerTabViewModel _viewModel = LedgerTabViewModel();
-  final PageStorageKey<String> _calendarScrollKey = const PageStorageKey(
+  final ValueKey<String> _calendarScrollKey = const ValueKey(
     'ledger-calendar-scroll',
   );
-  final PageStorageKey<String> _listScrollKey = const PageStorageKey(
-    'ledger-list-scroll',
-  );
+  final ValueKey<String> _listScrollKey = const ValueKey('ledger-list-scroll');
 
   DateTime _currentMonth = DateTime.now();
   DateTime? _selectedDate;
