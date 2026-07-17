@@ -4,7 +4,6 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:money_mate/ui/more/notion_legal_links.dart';
-import 'package:money_mate/ui/more/screen/web_view_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 const String _supportEmail = 'support.peterstudio@gmail.com';
@@ -47,16 +46,27 @@ class MoreTabScreen extends StatelessWidget {
 
   final String appVersion;
 
+  Future<void> _openExternalLink(BuildContext context, String url) async {
+    var launched = false;
+    try {
+      launched = await launchUrl(
+        Uri.parse(url),
+        mode: LaunchMode.inAppBrowserView,
+        browserConfiguration: const BrowserConfiguration(showTitle: true),
+      );
+    } catch (_) {
+      launched = false;
+    }
+
+    if (!launched && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('페이지를 열 수 없어요. 잠시 후 다시 시도해주세요.')),
+      );
+    }
+  }
+
   void _openNotices(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder:
-            (_) => const WebViewScreen(
-              title: '공지사항',
-              url: NotionLegalLinks.notice,
-            ),
-      ),
-    );
+    _openExternalLink(context, NotionLegalLinks.notice);
   }
 
   Future<void> _contactSupport(BuildContext context) async {
@@ -91,27 +101,11 @@ class MoreTabScreen extends StatelessWidget {
   }
 
   void _openPrivacyPolicy(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder:
-            (_) => const WebViewScreen(
-              title: '개인정보처리방침',
-              url: NotionLegalLinks.privacyPolicy,
-            ),
-      ),
-    );
+    _openExternalLink(context, NotionLegalLinks.privacyPolicy);
   }
 
   void _openTermsOfService(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder:
-            (_) => const WebViewScreen(
-              title: '이용약관',
-              url: NotionLegalLinks.termsOfService,
-            ),
-      ),
-    );
+    _openExternalLink(context, NotionLegalLinks.termsOfService);
   }
 
   void _openOpenSourceLicenses(BuildContext context) {
