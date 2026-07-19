@@ -51,42 +51,49 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
       title: '주식',
       icon: Icons.trending_up_rounded,
       accentColor: AppColors.hexFF3B82F6,
+      nameHint: '삼성전자, S&P500 ETF 등',
     ),
     _AssetTypeOption(
       type: AssetType.cash,
       title: '현금',
       icon: Icons.account_balance_wallet_rounded,
       accentColor: AppColors.hexFF10B981,
+      nameHint: '현금, 달러, 비상금 등',
     ),
     _AssetTypeOption(
       type: AssetType.realEstate,
       title: '부동산',
       icon: Icons.home_work_outlined,
       accentColor: AppColors.hexFFF59E0B,
+      nameHint: '보증금, 상가 등',
     ),
     _AssetTypeOption(
       type: AssetType.crypto,
       title: '가상화폐',
       icon: Icons.currency_bitcoin_rounded,
       accentColor: AppColors.hexFF8B5CF6,
+      nameHint: '비트코인, 이더리움 등',
     ),
     _AssetTypeOption(
       type: AssetType.savings,
       title: '예적금',
       icon: Icons.savings_outlined,
       accentColor: AppColors.hexFF0EA5E9,
+      nameHint: '주택 청약, 청년미래적금 등',
     ),
     _AssetTypeOption(
       type: AssetType.commodity,
       title: '원자재',
       icon: Icons.all_inclusive_rounded,
       accentColor: AppColors.hexFFEF4444,
+      nameHint: '금, 은, 원유 등',
     ),
     _AssetTypeOption(
       type: AssetType.other,
       title: '기타',
       icon: Icons.category_outlined,
       accentColor: AppColors.hexFF6B7280,
+      nameHint: '각종 포인트 등',
     ),
   ];
 
@@ -360,7 +367,7 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
           const SizedBox(height: 8),
           _AppTextField(
             controller: _assetNameController,
-            hintText: '예: 국민은행 통장, 아파트...',
+            hintText: _selectedAssetType.nameHint,
             onChanged: (_) => setState(() {}),
             focusNode: _assetNameFocusNode,
             textInputAction: TextInputAction.next,
@@ -1044,7 +1051,7 @@ class _StockHoldingSection extends StatelessWidget {
         const SizedBox(height: 8),
         _AppTextField(
           controller: nameController,
-          hintText: '예: 삼성전자, Apple Inc.',
+          hintText: '삼성전자, S&P500 ETF 등',
           onChanged: onNameChanged,
           focusNode: nameFocusNode,
           textInputAction: TextInputAction.next,
@@ -1439,12 +1446,14 @@ class _AssetTypeOption {
     required this.title,
     required this.icon,
     required this.accentColor,
+    required this.nameHint,
   });
 
   final AssetType type;
   final String title;
   final IconData icon;
   final Color accentColor;
+  final String nameHint;
 }
 
 String _formatWithComma(int value) {
