@@ -1329,6 +1329,276 @@ class PortfolioTargetsCompanion extends UpdateCompanion<PortfolioTarget> {
   }
 }
 
+class $FavoriteLedgerRecordsTable extends FavoriteLedgerRecords
+    with TableInfo<$FavoriteLedgerRecordsTable, FavoriteLedgerRecord> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FavoriteLedgerRecordsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _ledgerRecordIdMeta = const VerificationMeta(
+    'ledgerRecordId',
+  );
+  @override
+  late final GeneratedColumn<int> ledgerRecordId = GeneratedColumn<int>(
+    'ledger_record_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES ledger_records (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, ledgerRecordId, createdAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'favorite_ledger_records';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<FavoriteLedgerRecord> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('ledger_record_id')) {
+      context.handle(
+        _ledgerRecordIdMeta,
+        ledgerRecordId.isAcceptableOrUnknown(
+          data['ledger_record_id']!,
+          _ledgerRecordIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_ledgerRecordIdMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {ledgerRecordId},
+  ];
+  @override
+  FavoriteLedgerRecord map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FavoriteLedgerRecord(
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}id'],
+          )!,
+      ledgerRecordId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}ledger_record_id'],
+          )!,
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}created_at'],
+          )!,
+    );
+  }
+
+  @override
+  $FavoriteLedgerRecordsTable createAlias(String alias) {
+    return $FavoriteLedgerRecordsTable(attachedDatabase, alias);
+  }
+}
+
+class FavoriteLedgerRecord extends DataClass
+    implements Insertable<FavoriteLedgerRecord> {
+  final int id;
+  final int ledgerRecordId;
+  final DateTime createdAt;
+  const FavoriteLedgerRecord({
+    required this.id,
+    required this.ledgerRecordId,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['ledger_record_id'] = Variable<int>(ledgerRecordId);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  FavoriteLedgerRecordsCompanion toCompanion(bool nullToAbsent) {
+    return FavoriteLedgerRecordsCompanion(
+      id: Value(id),
+      ledgerRecordId: Value(ledgerRecordId),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory FavoriteLedgerRecord.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FavoriteLedgerRecord(
+      id: serializer.fromJson<int>(json['id']),
+      ledgerRecordId: serializer.fromJson<int>(json['ledgerRecordId']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'ledgerRecordId': serializer.toJson<int>(ledgerRecordId),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  FavoriteLedgerRecord copyWith({
+    int? id,
+    int? ledgerRecordId,
+    DateTime? createdAt,
+  }) => FavoriteLedgerRecord(
+    id: id ?? this.id,
+    ledgerRecordId: ledgerRecordId ?? this.ledgerRecordId,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  FavoriteLedgerRecord copyWithCompanion(FavoriteLedgerRecordsCompanion data) {
+    return FavoriteLedgerRecord(
+      id: data.id.present ? data.id.value : this.id,
+      ledgerRecordId:
+          data.ledgerRecordId.present
+              ? data.ledgerRecordId.value
+              : this.ledgerRecordId,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FavoriteLedgerRecord(')
+          ..write('id: $id, ')
+          ..write('ledgerRecordId: $ledgerRecordId, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, ledgerRecordId, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FavoriteLedgerRecord &&
+          other.id == this.id &&
+          other.ledgerRecordId == this.ledgerRecordId &&
+          other.createdAt == this.createdAt);
+}
+
+class FavoriteLedgerRecordsCompanion
+    extends UpdateCompanion<FavoriteLedgerRecord> {
+  final Value<int> id;
+  final Value<int> ledgerRecordId;
+  final Value<DateTime> createdAt;
+  const FavoriteLedgerRecordsCompanion({
+    this.id = const Value.absent(),
+    this.ledgerRecordId = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  FavoriteLedgerRecordsCompanion.insert({
+    this.id = const Value.absent(),
+    required int ledgerRecordId,
+    this.createdAt = const Value.absent(),
+  }) : ledgerRecordId = Value(ledgerRecordId);
+  static Insertable<FavoriteLedgerRecord> custom({
+    Expression<int>? id,
+    Expression<int>? ledgerRecordId,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (ledgerRecordId != null) 'ledger_record_id': ledgerRecordId,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  FavoriteLedgerRecordsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? ledgerRecordId,
+    Value<DateTime>? createdAt,
+  }) {
+    return FavoriteLedgerRecordsCompanion(
+      id: id ?? this.id,
+      ledgerRecordId: ledgerRecordId ?? this.ledgerRecordId,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (ledgerRecordId.present) {
+      map['ledger_record_id'] = Variable<int>(ledgerRecordId.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FavoriteLedgerRecordsCompanion(')
+          ..write('id: $id, ')
+          ..write('ledgerRecordId: $ledgerRecordId, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -1337,6 +1607,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $PortfolioTargetsTable portfolioTargets = $PortfolioTargetsTable(
     this,
   );
+  late final $FavoriteLedgerRecordsTable favoriteLedgerRecords =
+      $FavoriteLedgerRecordsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1345,7 +1617,18 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     ledgerRecords,
     assets,
     portfolioTargets,
+    favoriteLedgerRecords,
   ];
+  @override
+  StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'ledger_records',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('favorite_ledger_records', kind: UpdateKind.delete)],
+    ),
+  ]);
 }
 
 typedef $$LedgerRecordsTableCreateCompanionBuilder =
@@ -1370,6 +1653,43 @@ typedef $$LedgerRecordsTableUpdateCompanionBuilder =
       Value<String?> memo,
       Value<DateTime> createdAt,
     });
+
+final class $$LedgerRecordsTableReferences
+    extends BaseReferences<_$AppDatabase, $LedgerRecordsTable, LedgerRecord> {
+  $$LedgerRecordsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static MultiTypedResultKey<
+    $FavoriteLedgerRecordsTable,
+    List<FavoriteLedgerRecord>
+  >
+  _favoriteLedgerRecordsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.favoriteLedgerRecords,
+        aliasName: $_aliasNameGenerator(
+          db.ledgerRecords.id,
+          db.favoriteLedgerRecords.ledgerRecordId,
+        ),
+      );
+
+  $$FavoriteLedgerRecordsTableProcessedTableManager
+  get favoriteLedgerRecordsRefs {
+    final manager = $$FavoriteLedgerRecordsTableTableManager(
+      $_db,
+      $_db.favoriteLedgerRecords,
+    ).filter((f) => f.ledgerRecordId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _favoriteLedgerRecordsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
 
 class $$LedgerRecordsTableFilterComposer
     extends Composer<_$AppDatabase, $LedgerRecordsTable> {
@@ -1419,6 +1739,32 @@ class $$LedgerRecordsTableFilterComposer
     column: $table.createdAt,
     builder: (column) => ColumnFilters(column),
   );
+
+  Expression<bool> favoriteLedgerRecordsRefs(
+    Expression<bool> Function($$FavoriteLedgerRecordsTableFilterComposer f) f,
+  ) {
+    final $$FavoriteLedgerRecordsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.favoriteLedgerRecords,
+          getReferencedColumn: (t) => t.ledgerRecordId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$FavoriteLedgerRecordsTableFilterComposer(
+                $db: $db,
+                $table: $db.favoriteLedgerRecords,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$LedgerRecordsTableOrderingComposer
@@ -1505,6 +1851,32 @@ class $$LedgerRecordsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  Expression<T> favoriteLedgerRecordsRefs<T extends Object>(
+    Expression<T> Function($$FavoriteLedgerRecordsTableAnnotationComposer a) f,
+  ) {
+    final $$FavoriteLedgerRecordsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.favoriteLedgerRecords,
+          getReferencedColumn: (t) => t.ledgerRecordId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$FavoriteLedgerRecordsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.favoriteLedgerRecords,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$LedgerRecordsTableTableManager
@@ -1518,12 +1890,9 @@ class $$LedgerRecordsTableTableManager
           $$LedgerRecordsTableAnnotationComposer,
           $$LedgerRecordsTableCreateCompanionBuilder,
           $$LedgerRecordsTableUpdateCompanionBuilder,
-          (
-            LedgerRecord,
-            BaseReferences<_$AppDatabase, $LedgerRecordsTable, LedgerRecord>,
-          ),
+          (LedgerRecord, $$LedgerRecordsTableReferences),
           LedgerRecord,
-          PrefetchHooks Function()
+          PrefetchHooks Function({bool favoriteLedgerRecordsRefs})
         > {
   $$LedgerRecordsTableTableManager(_$AppDatabase db, $LedgerRecordsTable table)
     : super(
@@ -1586,11 +1955,45 @@ class $$LedgerRecordsTableTableManager
                       .map(
                         (e) => (
                           e.readTable(table),
-                          BaseReferences(db, table, e),
+                          $$LedgerRecordsTableReferences(db, table, e),
                         ),
                       )
                       .toList(),
-          prefetchHooksCallback: null,
+          prefetchHooksCallback: ({favoriteLedgerRecordsRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (favoriteLedgerRecordsRefs) db.favoriteLedgerRecords,
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (favoriteLedgerRecordsRefs)
+                    await $_getPrefetchedData<
+                      LedgerRecord,
+                      $LedgerRecordsTable,
+                      FavoriteLedgerRecord
+                    >(
+                      currentTable: table,
+                      referencedTable: $$LedgerRecordsTableReferences
+                          ._favoriteLedgerRecordsRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$LedgerRecordsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).favoriteLedgerRecordsRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.ledgerRecordId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
         ),
       );
 }
@@ -1605,12 +2008,9 @@ typedef $$LedgerRecordsTableProcessedTableManager =
       $$LedgerRecordsTableAnnotationComposer,
       $$LedgerRecordsTableCreateCompanionBuilder,
       $$LedgerRecordsTableUpdateCompanionBuilder,
-      (
-        LedgerRecord,
-        BaseReferences<_$AppDatabase, $LedgerRecordsTable, LedgerRecord>,
-      ),
+      (LedgerRecord, $$LedgerRecordsTableReferences),
       LedgerRecord,
-      PrefetchHooks Function()
+      PrefetchHooks Function({bool favoriteLedgerRecordsRefs})
     >;
 typedef $$AssetsTableCreateCompanionBuilder =
     AssetsCompanion Function({
@@ -2063,6 +2463,307 @@ typedef $$PortfolioTargetsTableProcessedTableManager =
       PortfolioTarget,
       PrefetchHooks Function()
     >;
+typedef $$FavoriteLedgerRecordsTableCreateCompanionBuilder =
+    FavoriteLedgerRecordsCompanion Function({
+      Value<int> id,
+      required int ledgerRecordId,
+      Value<DateTime> createdAt,
+    });
+typedef $$FavoriteLedgerRecordsTableUpdateCompanionBuilder =
+    FavoriteLedgerRecordsCompanion Function({
+      Value<int> id,
+      Value<int> ledgerRecordId,
+      Value<DateTime> createdAt,
+    });
+
+final class $$FavoriteLedgerRecordsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $FavoriteLedgerRecordsTable,
+          FavoriteLedgerRecord
+        > {
+  $$FavoriteLedgerRecordsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $LedgerRecordsTable _ledgerRecordIdTable(_$AppDatabase db) =>
+      db.ledgerRecords.createAlias(
+        $_aliasNameGenerator(
+          db.favoriteLedgerRecords.ledgerRecordId,
+          db.ledgerRecords.id,
+        ),
+      );
+
+  $$LedgerRecordsTableProcessedTableManager get ledgerRecordId {
+    final $_column = $_itemColumn<int>('ledger_record_id')!;
+
+    final manager = $$LedgerRecordsTableTableManager(
+      $_db,
+      $_db.ledgerRecords,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_ledgerRecordIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$FavoriteLedgerRecordsTableFilterComposer
+    extends Composer<_$AppDatabase, $FavoriteLedgerRecordsTable> {
+  $$FavoriteLedgerRecordsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$LedgerRecordsTableFilterComposer get ledgerRecordId {
+    final $$LedgerRecordsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.ledgerRecordId,
+      referencedTable: $db.ledgerRecords,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LedgerRecordsTableFilterComposer(
+            $db: $db,
+            $table: $db.ledgerRecords,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FavoriteLedgerRecordsTableOrderingComposer
+    extends Composer<_$AppDatabase, $FavoriteLedgerRecordsTable> {
+  $$FavoriteLedgerRecordsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$LedgerRecordsTableOrderingComposer get ledgerRecordId {
+    final $$LedgerRecordsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.ledgerRecordId,
+      referencedTable: $db.ledgerRecords,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LedgerRecordsTableOrderingComposer(
+            $db: $db,
+            $table: $db.ledgerRecords,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FavoriteLedgerRecordsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $FavoriteLedgerRecordsTable> {
+  $$FavoriteLedgerRecordsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  $$LedgerRecordsTableAnnotationComposer get ledgerRecordId {
+    final $$LedgerRecordsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.ledgerRecordId,
+      referencedTable: $db.ledgerRecords,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LedgerRecordsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.ledgerRecords,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FavoriteLedgerRecordsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $FavoriteLedgerRecordsTable,
+          FavoriteLedgerRecord,
+          $$FavoriteLedgerRecordsTableFilterComposer,
+          $$FavoriteLedgerRecordsTableOrderingComposer,
+          $$FavoriteLedgerRecordsTableAnnotationComposer,
+          $$FavoriteLedgerRecordsTableCreateCompanionBuilder,
+          $$FavoriteLedgerRecordsTableUpdateCompanionBuilder,
+          (FavoriteLedgerRecord, $$FavoriteLedgerRecordsTableReferences),
+          FavoriteLedgerRecord,
+          PrefetchHooks Function({bool ledgerRecordId})
+        > {
+  $$FavoriteLedgerRecordsTableTableManager(
+    _$AppDatabase db,
+    $FavoriteLedgerRecordsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () => $$FavoriteLedgerRecordsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer:
+              () => $$FavoriteLedgerRecordsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer:
+              () => $$FavoriteLedgerRecordsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> ledgerRecordId = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => FavoriteLedgerRecordsCompanion(
+                id: id,
+                ledgerRecordId: ledgerRecordId,
+                createdAt: createdAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int ledgerRecordId,
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => FavoriteLedgerRecordsCompanion.insert(
+                id: id,
+                ledgerRecordId: ledgerRecordId,
+                createdAt: createdAt,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable(table),
+                          $$FavoriteLedgerRecordsTableReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: ({ledgerRecordId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                T extends TableManagerState<
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic
+                >
+              >(state) {
+                if (ledgerRecordId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.ledgerRecordId,
+                            referencedTable:
+                                $$FavoriteLedgerRecordsTableReferences
+                                    ._ledgerRecordIdTable(db),
+                            referencedColumn:
+                                $$FavoriteLedgerRecordsTableReferences
+                                    ._ledgerRecordIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$FavoriteLedgerRecordsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $FavoriteLedgerRecordsTable,
+      FavoriteLedgerRecord,
+      $$FavoriteLedgerRecordsTableFilterComposer,
+      $$FavoriteLedgerRecordsTableOrderingComposer,
+      $$FavoriteLedgerRecordsTableAnnotationComposer,
+      $$FavoriteLedgerRecordsTableCreateCompanionBuilder,
+      $$FavoriteLedgerRecordsTableUpdateCompanionBuilder,
+      (FavoriteLedgerRecord, $$FavoriteLedgerRecordsTableReferences),
+      FavoriteLedgerRecord,
+      PrefetchHooks Function({bool ledgerRecordId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -2073,4 +2774,6 @@ class $AppDatabaseManager {
       $$AssetsTableTableManager(_db, _db.assets);
   $$PortfolioTargetsTableTableManager get portfolioTargets =>
       $$PortfolioTargetsTableTableManager(_db, _db.portfolioTargets);
+  $$FavoriteLedgerRecordsTableTableManager get favoriteLedgerRecords =>
+      $$FavoriteLedgerRecordsTableTableManager(_db, _db.favoriteLedgerRecords);
 }

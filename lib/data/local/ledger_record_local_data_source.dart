@@ -70,20 +70,20 @@ class LedgerRecordLocalDataSource {
   }
 
   List<LedgerEntry> _mapToLedgerEntries(List<LedgerRecord> rows) {
-    return rows
-        .map(
-          (row) => LedgerEntry(
-            id: row.id,
-            type: _typeToUi(row.type),
-            category: row.category,
-            amount: row.amount,
-            date: row.date,
-            paymentMethod: _paymentMethodToUi(row.paymentMethod),
-            memo: row.memo,
-            createdAt: row.createdAt,
-          ),
-        )
-        .toList(growable: false);
+    return rows.map(mapRow).toList(growable: false);
+  }
+
+  LedgerEntry mapRow(LedgerRecord row) {
+    return LedgerEntry(
+      id: row.id,
+      type: _typeToUi(row.type),
+      category: row.category,
+      amount: row.amount,
+      date: row.date,
+      paymentMethod: _paymentMethodToUi(row.paymentMethod),
+      memo: row.memo,
+      createdAt: row.createdAt,
+    );
   }
 
   LedgerRecordType _typeToUi(String value) {

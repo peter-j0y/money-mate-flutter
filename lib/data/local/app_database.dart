@@ -54,7 +54,23 @@ class PortfolioTargets extends Table {
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
 }
 
-@DriftDatabase(tables: [LedgerRecords, Assets, PortfolioTargets])
+class FavoriteLedgerRecords extends Table {
+  IntColumn get id => integer().autoIncrement()();
+
+  IntColumn get ledgerRecordId =>
+      integer().references(LedgerRecords, #id, onDelete: KeyAction.cascade)();
+
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+    {ledgerRecordId},
+  ];
+}
+
+@DriftDatabase(
+  tables: [LedgerRecords, Assets, PortfolioTargets, FavoriteLedgerRecords],
+)
 class AppDatabase extends _$AppDatabase {
   AppDatabase._internal() : super(_openConnection());
 
@@ -63,7 +79,7 @@ class AppDatabase extends _$AppDatabase {
   factory AppDatabase() => _instance;
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -80,6 +96,12 @@ class AppDatabase extends _$AppDatabase {
       if (from >= 4 && from < 5) {
         await m.deleteTable('app_settings');
       }
+      if (from < 6) {
+        await m.createTable(favoriteLedgerRecords);
+      }
+    },
+    beforeOpen: (details) async {
+      await customStatement('PRAGMA foreign_keys = ON');
     },
   );
 
@@ -169,6 +191,49 @@ class AppDatabase extends _$AppDatabase {
         (tbl) => OrderingTerm.desc(tbl.date),
         (tbl) => OrderingTerm.desc(tbl.id),
       ]);
+  }
+
+  Future<void> addFavoriteLedgerRecord(int ledgerRecordId) {
+    return into(favoriteLedgerRecords).insert(
+      FavoriteLedgerRecordsCompanion.insert(ledgerRecordId: ledgerRecordId),
+      mode: InsertMode.insertOrIgnore,
+    );
+  }
+
+  Future<void> removeFavoriteLedgerRecord(int ledgerRecordId) async {
+    await (delete(favoriteLedgerRecords)
+      ..where((tbl) => tbl.ledgerRecordId.equals(ledgerRecordId))).go();
+  }
+
+  Stream<Set<int>> watchFavoriteLedgerRecordIds() {
+    final query = selectOnly(favoriteLedgerRecords)
+      ..addColumns([favoriteLedgerRecords.ledgerRecordId]);
+    return query.watch().map(
+      (rows) =>
+          rows
+              .map((row) => row.read(favoriteLedgerRecords.ledgerRecordId)!)
+              .toSet(),
+    );
+  }
+
+  Stream<List<LedgerRecord>> watchFavoriteLedgerRecords() {
+    final query =
+        select(ledgerRecords).join([
+            innerJoin(
+              favoriteLedgerRecords,
+              favoriteLedgerRecords.ledgerRecordId.equalsExp(
+                ledgerRecords.id,
+              ),
+            ),
+          ])
+          ..orderBy([OrderingTerm.desc(favoriteLedgerRecords.createdAt)]);
+
+    return query.watch().map(
+      (rows) =>
+          rows.map((row) => row.readTable(ledgerRecords)).toList(
+            growable: false,
+          ),
+    );
   }
 }
 
