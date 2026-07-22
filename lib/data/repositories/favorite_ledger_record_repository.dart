@@ -1,8 +1,7 @@
-import '../model/entities/ledger_record.dart';
+import '../model/entities/favorite_ledger_record.dart';
 
 abstract class FavoriteLedgerRecordRepository {
-  Future<void> addFavorite(int ledgerRecordId);
-  Future<void> removeFavorite(int ledgerRecordId);
-  Stream<Set<int>> watchFavoriteRecordIds();
-  Stream<List<LedgerEntry>> watchFavoriteRecords();
+  Future<int> addFavorite(FavoriteLedgerEntryDraft draft);
+  Future<bool> deleteFavorite(int id);
+  Stream<List<FavoriteLedgerEntry>> watchFavoriteRecords();
 }

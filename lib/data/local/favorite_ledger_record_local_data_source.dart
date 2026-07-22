@@ -1,46 +1,61 @@
+import 'package:drift/drift.dart';
 import 'package:money_mate/data/local/app_database.dart';
 import 'package:money_mate/data/local/db_crashlytics_logger.dart';
-import 'package:money_mate/data/local/ledger_record_local_data_source.dart';
-import '../model/entities/ledger_record.dart';
+import 'package:money_mate/data/local/ledger_record_codec.dart';
+import '../model/entities/favorite_ledger_record.dart';
 
 class FavoriteLedgerRecordLocalDataSource {
-  FavoriteLedgerRecordLocalDataSource({
-    AppDatabase? database,
-    LedgerRecordLocalDataSource? ledgerRecordLocalDataSource,
-  }) : _database = database ?? AppDatabase(),
-       _ledgerRecordLocalDataSource =
-           ledgerRecordLocalDataSource ?? LedgerRecordLocalDataSource();
+  FavoriteLedgerRecordLocalDataSource({AppDatabase? database})
+    : _database = database ?? AppDatabase();
 
   final AppDatabase _database;
-  final LedgerRecordLocalDataSource _ledgerRecordLocalDataSource;
 
-  Future<void> addFavorite(int ledgerRecordId) {
+  Future<int> addFavorite(FavoriteLedgerEntryDraft draft) {
     return logDbErrors(
       'FavoriteLedgerRecord.add',
-      () => _database.addFavoriteLedgerRecord(ledgerRecordId),
-      context: {'ledgerRecordId': ledgerRecordId},
+      () => _database.insertFavoriteLedgerRecord(
+        FavoriteLedgerRecordsCompanion.insert(
+          type: ledgerRecordTypeToDto(draft.type),
+          category: draft.category,
+          amount: draft.amount,
+          paymentMethod: Value(expensePaymentMethodToDto(draft.paymentMethod)),
+          memo: Value(draft.memo),
+        ),
+      ),
+      context: {'type': draft.type, 'category': draft.category},
     );
   }
 
-  Future<void> removeFavorite(int ledgerRecordId) {
+  Future<bool> deleteFavorite(int id) {
     return logDbErrors(
-      'FavoriteLedgerRecord.remove',
-      () => _database.removeFavoriteLedgerRecord(ledgerRecordId),
-      context: {'ledgerRecordId': ledgerRecordId},
+      'FavoriteLedgerRecord.delete',
+      () => _database.deleteFavoriteLedgerRecord(id),
+      context: {'id': id},
     );
   }
 
-  Stream<Set<int>> watchFavoriteRecordIds() {
+  Stream<List<FavoriteLedgerEntry>> watchFavoriteRecords() {
     return logDbStreamErrors(
-      'FavoriteLedgerRecord.watchIds',
-      () => _database.watchFavoriteLedgerRecordIds(),
-    );
-  }
-
-  Stream<List<LedgerEntry>> watchFavoriteRecords() {
-    return logDbStreamErrors(
-      'FavoriteLedgerRecord.watchRecords',
+      'FavoriteLedgerRecord.watch',
       () => _database.watchFavoriteLedgerRecords(),
-    ).map((rows) => rows.map(_ledgerRecordLocalDataSource.mapRow).toList(growable: false));
+    ).map(_mapToFavoriteEntries);
+  }
+
+  List<FavoriteLedgerEntry> _mapToFavoriteEntries(
+    List<FavoriteLedgerRecord> rows,
+  ) {
+    return rows.map(mapRow).toList(growable: false);
+  }
+
+  FavoriteLedgerEntry mapRow(FavoriteLedgerRecord row) {
+    return FavoriteLedgerEntry(
+      id: row.id,
+      type: ledgerRecordTypeFromDto(row.type),
+      category: row.category,
+      amount: row.amount,
+      paymentMethod: expensePaymentMethodFromDto(row.paymentMethod),
+      memo: row.memo,
+      createdAt: row.createdAt,
+    );
   }
 }

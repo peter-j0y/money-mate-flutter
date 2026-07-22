@@ -7,6 +7,7 @@ import 'package:money_mate/ui/ledger/widgets/ledger_view_toggle.dart';
 
 import 'ledger_income_summary_card.dart';
 import 'add_ledger_record_screen.dart';
+import 'favorite_ledger_records_screen.dart';
 import 'ledger_month_selector.dart';
 import 'ledger_monthly_record_section.dart';
 import 'ledger_record_detail_screen.dart';
@@ -232,6 +233,14 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
     widget.onSelectedDateChanged?.call(date);
   }
 
+  void _openFavoritesScreen() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (context) => const FavoriteLedgerRecordsScreen(),
+      ),
+    );
+  }
+
   void _handleLedgerItemTap(LedgerEntry item) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
@@ -407,9 +416,22 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-              child: LedgerTopNavigationBar(
-                selectedView: _selectedView,
-                onChanged: (view) => setState(() => _selectedView = view),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: LedgerTopNavigationBar(
+                      selectedView: _selectedView,
+                      onChanged: (view) => setState(() => _selectedView = view),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: _openFavoritesScreen,
+                    icon: Icon(
+                      Icons.bookmark_border_rounded,
+                      color: context.appColors.textPrimary,
+                    ),
+                  ),
+                ],
               ),
             ),
             Expanded(

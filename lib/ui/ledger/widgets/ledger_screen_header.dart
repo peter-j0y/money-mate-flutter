@@ -19,6 +19,7 @@ class LedgerScreenHeader extends StatelessWidget {
     required this.title,
     required this.onCloseTap,
     this.actions = const [],
+    this.trailing,
     this.padding = const EdgeInsets.fromLTRB(0, 16, 0, 8),
     this.closeButtonSize = 48,
   });
@@ -26,6 +27,7 @@ class LedgerScreenHeader extends StatelessWidget {
   final String title;
   final VoidCallback onCloseTap;
   final List<LedgerScreenHeaderAction> actions;
+  final Widget? trailing;
   final EdgeInsetsGeometry padding;
   final double closeButtonSize;
 
@@ -63,7 +65,9 @@ class LedgerScreenHeader extends StatelessWidget {
                 color: context.appColors.textPrimary,
               ),
             ),
-            if (actions.isNotEmpty)
+            if (trailing != null)
+              Align(alignment: Alignment.centerRight, child: trailing)
+            else if (actions.isNotEmpty)
               Align(
                 alignment: Alignment.centerRight,
                 child: Row(
