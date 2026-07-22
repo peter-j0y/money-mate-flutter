@@ -17,10 +17,18 @@ class AddLedgerRecordScreen extends StatefulWidget {
     super.key,
     this.initialDate,
     this.initialType = LedgerRecordType.expense,
+    this.initialCategory,
+    this.initialAmount,
+    this.initialPaymentMethod,
+    this.initialMemo,
   });
 
   final DateTime? initialDate;
   final LedgerRecordType initialType;
+  final String? initialCategory;
+  final int? initialAmount;
+  final ExpensePaymentMethod? initialPaymentMethod;
+  final String? initialMemo;
 
   @override
   State<AddLedgerRecordScreen> createState() => _AddLedgerRecordScreenState();
@@ -76,6 +84,27 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
     super.initState();
     _selectedTypeIndex = widget.initialType == LedgerRecordType.income ? 0 : 1;
     _selectedDate = widget.initialDate ?? DateTime.now();
+    final initialCategory = widget.initialCategory;
+    if (initialCategory != null) {
+      final categoryIndex = _categoryOptions.indexWhere(
+        (option) => option.label == initialCategory,
+      );
+      if (_selectedTypeIndex == 0) {
+        _selectedIncomeCategoryIndex = categoryIndex;
+      } else {
+        _selectedExpenseCategoryIndex = categoryIndex;
+      }
+    }
+    final initialAmount = widget.initialAmount;
+    if (initialAmount != null && initialAmount > 0) {
+      _amountController.text = _AmountInputFormatter.formatDigits(
+        initialAmount.toString(),
+      );
+    }
+    _selectedExpensePaymentMethod = widget.initialPaymentMethod;
+    if (widget.initialMemo != null) {
+      _memoController.text = widget.initialMemo!;
+    }
     _amountController.addListener(_onAmountChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) {
@@ -433,10 +462,7 @@ class _AmountInputFormatter extends TextInputFormatter {
       );
     }
 
-    final trimmedLeadingZero = digitsOnly.replaceFirst(RegExp(r'^0+'), '');
-    final normalizedDigits =
-        trimmedLeadingZero.isEmpty ? '0' : trimmedLeadingZero;
-    final formatted = _formatWithComma(normalizedDigits);
+    final formatted = formatDigits(digitsOnly);
 
     return TextEditingValue(
       text: formatted,
@@ -445,7 +471,14 @@ class _AmountInputFormatter extends TextInputFormatter {
     );
   }
 
-  String _formatWithComma(String digits) {
+  static String formatDigits(String digits) {
+    final trimmedLeadingZero = digits.replaceFirst(RegExp(r'^0+'), '');
+    final normalizedDigits =
+        trimmedLeadingZero.isEmpty ? '0' : trimmedLeadingZero;
+    return _formatWithComma(normalizedDigits);
+  }
+
+  static String _formatWithComma(String digits) {
     final buffer = StringBuffer();
 
     for (var i = 0; i < digits.length; i++) {

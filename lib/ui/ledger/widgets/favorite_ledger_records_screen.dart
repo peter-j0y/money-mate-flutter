@@ -4,6 +4,7 @@ import 'package:money_mate/data/model/entities/ledger_record.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:money_mate/ui/ledger/view_models/favorite_ledger_records_view_model.dart';
 import 'package:money_mate/ui/ledger/widgets/add_favorite_ledger_record_screen.dart';
+import 'package:money_mate/ui/ledger/widgets/add_ledger_record_screen.dart';
 import 'package:money_mate/ui/ledger/widgets/ledger_record_item_content.dart';
 import 'package:money_mate/ui/ledger/widgets/ledger_screen_header.dart';
 import 'package:money_mate/ui/ledger/widgets/ledger_state_card.dart';
@@ -127,36 +128,64 @@ class _FavoriteLedgerRecordsScreenState
       itemCount: items.length,
       separatorBuilder: (context, index) => const SizedBox(height: 8),
       itemBuilder: (context, index) {
-        return _FavoriteRecordTile(favorite: items[index]);
+        return _FavoriteRecordTile(
+          favorite: items[index],
+          onTap: () => _openAddLedgerRecordScreen(items[index]),
+        );
       },
     );
+  }
+
+  Future<void> _openAddLedgerRecordScreen(FavoriteLedgerEntry favorite) async {
+    final didSave = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder:
+            (context) => AddLedgerRecordScreen(
+              initialDate: DateTime.now(),
+              initialType: favorite.type,
+              initialCategory: favorite.category,
+              initialAmount: favorite.amount,
+              initialPaymentMethod: favorite.paymentMethod,
+              initialMemo: favorite.memo,
+            ),
+      ),
+    );
+
+    if (didSave == true && mounted) {
+      Navigator.of(context).pop(true);
+    }
   }
 }
 
 class _FavoriteRecordTile extends StatelessWidget {
-  const _FavoriteRecordTile({required this.favorite});
+  const _FavoriteRecordTile({required this.favorite, required this.onTap});
 
   final FavoriteLedgerEntry favorite;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: context.appColors.surface,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      padding: const EdgeInsets.all(16),
-      child: LedgerRecordItemContent(
-        item: LedgerEntry(
-          id: favorite.id,
-          type: favorite.type,
-          category: favorite.category,
-          amount: favorite.amount,
-          date: favorite.createdAt,
-          paymentMethod: favorite.paymentMethod,
-          memo: favorite.memo,
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        decoration: BoxDecoration(
+          color: context.appColors.surface,
+          borderRadius: BorderRadius.circular(16),
         ),
-        amountStyle: LedgerAmountStyle.signed,
+        padding: const EdgeInsets.all(16),
+        child: LedgerRecordItemContent(
+          item: LedgerEntry(
+            id: favorite.id,
+            type: favorite.type,
+            category: favorite.category,
+            amount: favorite.amount,
+            date: favorite.createdAt,
+            paymentMethod: favorite.paymentMethod,
+            memo: favorite.memo,
+          ),
+          amountStyle: LedgerAmountStyle.signed,
+        ),
       ),
     );
   }
