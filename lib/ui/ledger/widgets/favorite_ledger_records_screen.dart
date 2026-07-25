@@ -23,6 +23,9 @@ class _FavoriteLedgerRecordsScreenState
   final FavoriteLedgerRecordsViewModel _viewModel =
       FavoriteLedgerRecordsViewModel();
 
+  bool _isEditMode = false;
+  Set<int> _selectedIds = {};
+
   @override
   void initState() {
     super.initState();
@@ -47,9 +50,7 @@ class _FavoriteLedgerRecordsScreenState
     if (_viewModel.isAtLimit) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            '즐겨찾기는 최대 $maxFavoriteLedgerRecordCount개까지 저장할 수 있어요.',
-          ),
+          content: Text('즐겨찾기는 최대 $maxFavoriteLedgerRecordCount개까지 저장할 수 있어요.'),
         ),
       );
       return;
@@ -60,6 +61,88 @@ class _FavoriteLedgerRecordsScreenState
         builder: (context) => const AddFavoriteLedgerRecordScreen(),
       ),
     );
+  }
+
+  void _enterEditMode({int? initialSelectedId}) {
+    setState(() {
+      _isEditMode = true;
+      _selectedIds = initialSelectedId == null ? {} : {initialSelectedId};
+    });
+  }
+
+  void _exitEditMode() {
+    setState(() {
+      _isEditMode = false;
+      _selectedIds = {};
+    });
+  }
+
+  void _toggleSelection(int id) {
+    setState(() {
+      if (_selectedIds.contains(id)) {
+        _selectedIds.remove(id);
+      } else {
+        _selectedIds.add(id);
+      }
+    });
+  }
+
+  Future<void> _onDeleteSelectedTap() async {
+    if (_selectedIds.isEmpty || _viewModel.isDeleting) {
+      return;
+    }
+
+    final shouldDelete = await _showDeleteConfirmDialog();
+    if (!mounted || !shouldDelete) {
+      return;
+    }
+
+    final isSuccess = await _viewModel.deleteFavorites(_selectedIds);
+    if (!mounted) {
+      return;
+    }
+
+    if (isSuccess) {
+      setState(() => _selectedIds = {});
+      return;
+    }
+
+    final message = _viewModel.actionErrorMessage ?? '삭제 중 오류가 발생했습니다.';
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  Future<bool> _showDeleteConfirmDialog() async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          backgroundColor: context.appColors.surface,
+          content: Text(
+            '선택한 ${_selectedIds.length}개 항목을 삭제할까요? 삭제하면 복구할 수 없어요.',
+          ),
+          actions: [
+            TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: context.appColors.primary,
+              ),
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('취소'),
+            ),
+            TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: context.appColors.danger,
+              ),
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: const Text('삭제'),
+            ),
+          ],
+        );
+      },
+    );
+
+    return result ?? false;
   }
 
   @override
@@ -73,15 +156,31 @@ class _FavoriteLedgerRecordsScreenState
             LedgerScreenHeader(
               title: '즐겨찾기',
               onCloseTap: () => Navigator.pop(context),
-              trailing: IconButton(
-                onPressed: _openAddFavoriteScreen,
-                icon: Icon(
-                  Icons.add_rounded,
-                  color: context.appColors.textPrimary,
-                ),
-              ),
+              trailing:
+                  _isEditMode
+                      ? null
+                      : Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            onPressed: () => _enterEditMode(),
+                            icon: Icon(
+                              Icons.edit_outlined,
+                              color: context.appColors.textPrimary,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: _openAddFavoriteScreen,
+                            icon: Icon(
+                              Icons.add_rounded,
+                              color: context.appColors.textPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
             ),
             Expanded(child: _buildBody()),
+            if (_isEditMode) _buildEditModeActionBar(),
           ],
         ),
       ),
@@ -140,11 +239,108 @@ class _FavoriteLedgerRecordsScreenState
       itemCount: items.length,
       separatorBuilder: (context, index) => const SizedBox(height: 8),
       itemBuilder: (context, index) {
+        final favorite = items[index];
         return _FavoriteRecordTile(
-          favorite: items[index],
-          onTap: () => _openAddLedgerRecordScreen(items[index]),
+          favorite: favorite,
+          isEditMode: _isEditMode,
+          isSelected: _selectedIds.contains(favorite.id),
+          onTap: () {
+            if (_isEditMode) {
+              _toggleSelection(favorite.id);
+            } else {
+              _openAddLedgerRecordScreen(favorite);
+            }
+          },
+          onLongPress: () {
+            if (_isEditMode) {
+              _toggleSelection(favorite.id);
+            } else {
+              _enterEditMode(initialSelectedId: favorite.id);
+            }
+          },
         );
       },
+    );
+  }
+
+  Widget _buildEditModeActionBar() {
+    final safeAreaBottom = MediaQuery.paddingOf(context).bottom;
+    final canDelete = _selectedIds.isNotEmpty && !_viewModel.isDeleting;
+
+    return Container(
+      padding: EdgeInsets.fromLTRB(16, 12, 16, safeAreaBottom + 12),
+      decoration: BoxDecoration(
+        color: context.appColors.background,
+        border: Border(top: BorderSide(color: context.appColors.border)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: SizedBox(
+              height: 52,
+              child: OutlinedButton(
+                onPressed: canDelete ? _onDeleteSelectedTap : null,
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(
+                    color:
+                        canDelete
+                            ? context.appColors.danger
+                            : context.appColors.border,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                child:
+                    _viewModel.isDeleting
+                        ? SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.4,
+                            color: context.appColors.danger,
+                          ),
+                        )
+                        : Text(
+                          '삭제',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color:
+                                canDelete
+                                    ? context.appColors.danger
+                                    : context.appColors.textTertiary,
+                          ),
+                        ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: SizedBox(
+              height: 52,
+              child: FilledButton(
+                onPressed: _exitEditMode,
+                style: FilledButton.styleFrom(
+                  backgroundColor: context.appColors.primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  elevation: 0,
+                ),
+                child: const Text(
+                  '완료',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -170,15 +366,25 @@ class _FavoriteLedgerRecordsScreenState
 }
 
 class _FavoriteRecordTile extends StatelessWidget {
-  const _FavoriteRecordTile({required this.favorite, required this.onTap});
+  const _FavoriteRecordTile({
+    required this.favorite,
+    required this.isEditMode,
+    required this.isSelected,
+    required this.onTap,
+    required this.onLongPress,
+  });
 
   final FavoriteLedgerEntry favorite;
+  final bool isEditMode;
+  final bool isSelected;
   final VoidCallback onTap;
+  final VoidCallback onLongPress;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
+      onLongPress: onLongPress,
       borderRadius: BorderRadius.circular(16),
       child: Container(
         decoration: BoxDecoration(
@@ -186,17 +392,32 @@ class _FavoriteRecordTile extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
         ),
         padding: const EdgeInsets.all(16),
-        child: LedgerRecordItemContent(
-          item: LedgerEntry(
-            id: favorite.id,
-            type: favorite.type,
-            category: favorite.category,
-            amount: favorite.amount,
-            date: favorite.createdAt,
-            paymentMethod: favorite.paymentMethod,
-            memo: favorite.memo,
-          ),
-          amountStyle: LedgerAmountStyle.signed,
+        child: Row(
+          children: [
+            if (isEditMode) ...[
+              Checkbox(
+                value: isSelected,
+                onChanged: (_) => onTap(),
+                activeColor: context.appColors.primary,
+                checkColor: AppColors.white,
+              ),
+              const SizedBox(width: 4),
+            ],
+            Expanded(
+              child: LedgerRecordItemContent(
+                item: LedgerEntry(
+                  id: favorite.id,
+                  type: favorite.type,
+                  category: favorite.category,
+                  amount: favorite.amount,
+                  date: favorite.createdAt,
+                  paymentMethod: favorite.paymentMethod,
+                  memo: favorite.memo,
+                ),
+                amountStyle: LedgerAmountStyle.signed,
+              ),
+            ),
+          ],
         ),
       ),
     );
