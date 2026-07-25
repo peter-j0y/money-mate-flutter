@@ -119,9 +119,7 @@ class _FavoriteLedgerRecordsScreenState
       builder: (dialogContext) {
         return AlertDialog(
           backgroundColor: context.appColors.surface,
-          content: Text(
-            '선택한 ${_selectedIds.length}개 항목을 삭제할까요? 삭제하면 복구할 수 없어요.',
-          ),
+          content: Text('선택한 ${_selectedIds.length}개 항목을 즐겨찾기에서 삭제할까요?'),
           actions: [
             TextButton(
               style: TextButton.styleFrom(
@@ -155,33 +153,66 @@ class _FavoriteLedgerRecordsScreenState
           children: [
             LedgerScreenHeader(
               title: '즐겨찾기',
-              onCloseTap: () => Navigator.pop(context),
+              onCloseTap:
+                  _isEditMode ? _exitEditMode : () => Navigator.pop(context),
               trailing:
-                  _isEditMode
-                      ? null
-                      : Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            onPressed: () => _enterEditMode(),
-                            icon: Icon(
-                              Icons.edit_outlined,
-                              color: context.appColors.textPrimary,
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: _openAddFavoriteScreen,
-                            icon: Icon(
-                              Icons.add_rounded,
-                              color: context.appColors.textPrimary,
-                            ),
-                          ),
-                        ],
-                      ),
+                  _isEditMode ? _buildDeleteAction() : _buildDefaultActions(),
             ),
-            Expanded(child: _buildBody()),
-            if (_isEditMode) _buildEditModeActionBar(),
+            Expanded(
+              child: Stack(
+                children: [
+                  if (_isEditMode)
+                    Positioned.fill(
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: _exitEditMode,
+                      ),
+                    ),
+                  _buildBody(),
+                ],
+              ),
+            ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDefaultActions() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        IconButton(
+          onPressed: () => _enterEditMode(),
+          icon: Icon(Icons.edit_outlined, color: context.appColors.textPrimary),
+        ),
+        IconButton(
+          onPressed: _openAddFavoriteScreen,
+          icon: Icon(Icons.add_rounded, color: context.appColors.textPrimary),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDeleteAction() {
+    final canDelete = _selectedIds.isNotEmpty && !_viewModel.isDeleting;
+    return TextButton(
+      onPressed: canDelete ? _onDeleteSelectedTap : null,
+      style: TextButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+        minimumSize: Size.zero,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      ),
+      child: Text(
+        '삭제',
+        style: TextStyle(
+          fontSize: 14,
+          height: 20 / 14,
+          fontWeight: FontWeight.w500,
+          color:
+              canDelete
+                  ? context.appColors.danger
+                  : context.appColors.textTertiary,
         ),
       ),
     );
@@ -235,6 +266,7 @@ class _FavoriteLedgerRecordsScreenState
     }
 
     return ListView.separated(
+      shrinkWrap: true,
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
       itemCount: items.length,
       separatorBuilder: (context, index) => const SizedBox(height: 8),
@@ -260,87 +292,6 @@ class _FavoriteLedgerRecordsScreenState
           },
         );
       },
-    );
-  }
-
-  Widget _buildEditModeActionBar() {
-    final safeAreaBottom = MediaQuery.paddingOf(context).bottom;
-    final canDelete = _selectedIds.isNotEmpty && !_viewModel.isDeleting;
-
-    return Container(
-      padding: EdgeInsets.fromLTRB(16, 12, 16, safeAreaBottom + 12),
-      decoration: BoxDecoration(
-        color: context.appColors.background,
-        border: Border(top: BorderSide(color: context.appColors.border)),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: SizedBox(
-              height: 52,
-              child: OutlinedButton(
-                onPressed: canDelete ? _onDeleteSelectedTap : null,
-                style: OutlinedButton.styleFrom(
-                  side: BorderSide(
-                    color:
-                        canDelete
-                            ? context.appColors.danger
-                            : context.appColors.border,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                child:
-                    _viewModel.isDeleting
-                        ? SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.4,
-                            color: context.appColors.danger,
-                          ),
-                        )
-                        : Text(
-                          '삭제',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color:
-                                canDelete
-                                    ? context.appColors.danger
-                                    : context.appColors.textTertiary,
-                          ),
-                        ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: SizedBox(
-              height: 52,
-              child: FilledButton(
-                onPressed: _exitEditMode,
-                style: FilledButton.styleFrom(
-                  backgroundColor: context.appColors.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  elevation: 0,
-                ),
-                child: const Text(
-                  '완료',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.white,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -401,7 +352,6 @@ class _FavoriteRecordTile extends StatelessWidget {
                 activeColor: context.appColors.primary,
                 checkColor: AppColors.white,
               ),
-              const SizedBox(width: 4),
             ],
             Expanded(
               child: LedgerRecordItemContent(
