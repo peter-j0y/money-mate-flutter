@@ -70,6 +70,18 @@ class LedgerRecordLocalDataSource {
     ).map(_mapToLedgerEntries);
   }
 
+  Future<List<LedgerEntry>> fetchRecordsPage({
+    required int limit,
+    required int offset,
+  }) async {
+    final rows = await logDbErrors(
+      'LedgerRecord.fetchPage',
+      () => _database.fetchLedgerRecordsPage(limit: limit, offset: offset),
+      context: {'limit': limit, 'offset': offset},
+    );
+    return _mapToLedgerEntries(rows);
+  }
+
   List<LedgerEntry> _mapToLedgerEntries(List<LedgerRecord> rows) {
     return rows.map(mapRow).toList(growable: false);
   }

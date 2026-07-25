@@ -33,4 +33,12 @@ class LedgerRecordRepositoryImpl implements LedgerRecordRepository {
   Stream<List<LedgerEntry>> watchMonthlyRecords(DateTime month) {
     return _localDataSource.watchMonthlyRecords(month);
   }
+
+  @override
+  Future<List<LedgerEntry>> fetchRecordsPage({
+    required int limit,
+    required int offset,
+  }) {
+    return _localDataSource.fetchRecordsPage(limit: limit, offset: offset);
+  }
 }

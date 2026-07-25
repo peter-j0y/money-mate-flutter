@@ -6,4 +6,8 @@ abstract class LedgerRecordRepository {
   Future<bool> deleteRecord(int id);
   Future<List<LedgerEntry>> fetchMonthlyRecords(DateTime month);
   Stream<List<LedgerEntry>> watchMonthlyRecords(DateTime month);
+  Future<List<LedgerEntry>> fetchRecordsPage({
+    required int limit,
+    required int offset,
+  });
 }

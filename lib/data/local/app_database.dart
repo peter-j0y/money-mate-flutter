@@ -169,6 +169,19 @@ class AppDatabase extends _$AppDatabase {
     return query.get();
   }
 
+  Future<List<LedgerRecord>> fetchLedgerRecordsPage({
+    required int limit,
+    required int offset,
+  }) {
+    return (select(ledgerRecords)
+          ..orderBy([
+            (tbl) => OrderingTerm.desc(tbl.createdAt),
+            (tbl) => OrderingTerm.desc(tbl.id),
+          ])
+          ..limit(limit, offset: offset))
+        .get();
+  }
+
   Stream<List<LedgerRecord>> watchMonthlyRecords(DateTime month) {
     final query = _monthlyRecordsQuery(month);
     return query.watch();
