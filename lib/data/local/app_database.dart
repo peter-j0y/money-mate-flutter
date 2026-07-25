@@ -220,6 +220,11 @@ class AppDatabase extends _$AppDatabase {
     return (select(favoriteLedgerRecords)
       ..orderBy([(tbl) => OrderingTerm.desc(tbl.createdAt)])).watch();
   }
+
+  Future<int> countFavoriteLedgerRecords() async {
+    final rows = await select(favoriteLedgerRecords).get();
+    return rows.length;
+  }
 }
 
 LazyDatabase _openConnection() {

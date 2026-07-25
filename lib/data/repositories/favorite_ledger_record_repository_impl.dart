@@ -13,7 +13,11 @@ class FavoriteLedgerRecordRepositoryImpl
   final FavoriteLedgerRecordLocalDataSource _localDataSource;
 
   @override
-  Future<int> addFavorite(FavoriteLedgerEntryDraft draft) {
+  Future<int> addFavorite(FavoriteLedgerEntryDraft draft) async {
+    final currentCount = await _localDataSource.countFavorites();
+    if (currentCount >= maxFavoriteLedgerRecordCount) {
+      throw const FavoriteLedgerRecordLimitExceededException();
+    }
     return _localDataSource.addFavorite(draft);
   }
 
@@ -25,5 +29,10 @@ class FavoriteLedgerRecordRepositoryImpl
   @override
   Stream<List<FavoriteLedgerEntry>> watchFavoriteRecords() {
     return _localDataSource.watchFavoriteRecords();
+  }
+
+  @override
+  Future<int> countFavorites() {
+    return _localDataSource.countFavorites();
   }
 }

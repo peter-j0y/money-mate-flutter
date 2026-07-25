@@ -22,6 +22,7 @@ class FavoriteLedgerRecordsViewModel extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   List<FavoriteLedgerEntry> get records => _records;
+  bool get isAtLimit => _records.length >= maxFavoriteLedgerRecordCount;
 
   void _subscribe() {
     _subscription = _repository.watchFavoriteRecords().listen(

@@ -41,6 +41,13 @@ class FavoriteLedgerRecordLocalDataSource {
     ).map(_mapToFavoriteEntries);
   }
 
+  Future<int> countFavorites() {
+    return logDbErrors(
+      'FavoriteLedgerRecord.count',
+      () => _database.countFavoriteLedgerRecords(),
+    );
+  }
+
   List<FavoriteLedgerEntry> _mapToFavoriteEntries(
     List<FavoriteLedgerRecord> rows,
   ) {

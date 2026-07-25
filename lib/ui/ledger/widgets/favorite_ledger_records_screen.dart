@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:money_mate/data/model/entities/favorite_ledger_record.dart';
 import 'package:money_mate/data/model/entities/ledger_record.dart';
+import 'package:money_mate/data/repositories/favorite_ledger_record_repository.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:money_mate/ui/ledger/view_models/favorite_ledger_records_view_model.dart';
 import 'package:money_mate/ui/ledger/widgets/add_favorite_ledger_record_screen.dart';
@@ -43,6 +44,17 @@ class _FavoriteLedgerRecordsScreenState
   }
 
   void _openAddFavoriteScreen() {
+    if (_viewModel.isAtLimit) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            '즐겨찾기는 최대 $maxFavoriteLedgerRecordCount개까지 저장할 수 있어요.',
+          ),
+        ),
+      );
+      return;
+    }
+
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (context) => const AddFavoriteLedgerRecordScreen(),

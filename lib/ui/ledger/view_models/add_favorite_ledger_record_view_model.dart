@@ -97,6 +97,10 @@ class AddFavoriteLedgerRecordViewModel extends ChangeNotifier {
         ),
       );
       return true;
+    } on FavoriteLedgerRecordLimitExceededException {
+      _errorMessage =
+          '즐겨찾기는 최대 $maxFavoriteLedgerRecordCount개까지 저장할 수 있어요.';
+      return false;
     } catch (_) {
       _errorMessage = '즐겨찾기 추가 중 오류가 발생했습니다. 다시 시도해 주세요.';
       return false;
