@@ -11,7 +11,9 @@ import 'package:money_mate/ui/ledger/widgets/ledger_screen_header.dart';
 import 'package:money_mate/ui/ledger/widgets/ledger_state_card.dart';
 
 class FavoriteLedgerRecordsScreen extends StatefulWidget {
-  const FavoriteLedgerRecordsScreen({super.key});
+  const FavoriteLedgerRecordsScreen({super.key, this.isSelectMode = false});
+
+  final bool isSelectMode;
 
   @override
   State<FavoriteLedgerRecordsScreen> createState() =>
@@ -297,6 +299,8 @@ class _FavoriteLedgerRecordsScreenState
           onTap: () {
             if (_isEditMode) {
               _toggleSelection(favorite.id);
+            } else if (widget.isSelectMode) {
+              Navigator.of(context).pop(favorite);
             } else {
               _openAddLedgerRecordScreen(favorite);
             }

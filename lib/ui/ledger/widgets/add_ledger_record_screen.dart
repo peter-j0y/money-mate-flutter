@@ -8,8 +8,10 @@ import 'package:money_mate/ui/ledger/widgets/ledger_date_amount_fields.dart';
 import 'package:money_mate/ui/ledger/widgets/ledger_memo_section.dart';
 import 'package:money_mate/ui/ledger/widgets/ledger_record_type_toggle.dart';
 import 'package:money_mate/ui/ledger/widgets/ledger_screen_header.dart';
+import 'package:money_mate/ui/ledger/widgets/favorite_ledger_records_screen.dart';
 import 'package:money_mate/ui/ledger/view_models/add_ledger_record_view_model.dart';
 
+import '../../../data/model/entities/favorite_ledger_record.dart';
 import '../../../data/model/entities/ledger_record.dart';
 
 class AddLedgerRecordScreen extends StatefulWidget {
@@ -222,6 +224,42 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
     ).showSnackBar(SnackBar(content: Text(message)));
   }
 
+  Future<void> _openFavoriteRecordsScreen() async {
+    final selectedFavorite = await Navigator.of(
+      context,
+    ).push<FavoriteLedgerEntry>(
+      MaterialPageRoute<FavoriteLedgerEntry>(
+        builder:
+            (context) => const FavoriteLedgerRecordsScreen(isSelectMode: true),
+      ),
+    );
+
+    if (selectedFavorite == null || !mounted) {
+      return;
+    }
+
+    _applyFavorite(selectedFavorite);
+  }
+
+  void _applyFavorite(FavoriteLedgerEntry favorite) {
+    setState(() {
+      _selectedTypeIndex = favorite.type == LedgerRecordType.income ? 0 : 1;
+      final categoryIndex = _categoryOptions.indexWhere(
+        (option) => option.label == favorite.category,
+      );
+      if (_selectedTypeIndex == 0) {
+        _selectedIncomeCategoryIndex = categoryIndex;
+      } else {
+        _selectedExpenseCategoryIndex = categoryIndex;
+      }
+      _selectedExpensePaymentMethod = favorite.paymentMethod;
+      _memoController.text = favorite.memo ?? '';
+    });
+    _amountController.text = _AmountInputFormatter.formatDigits(
+      favorite.amount.toString(),
+    );
+  }
+
   Future<void> _pickDate() async {
     final pickedDate = await showDatePicker(
       context: context,
@@ -255,6 +293,13 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
                 onCloseTap: () => Navigator.pop(context),
                 closeButtonSize: 40,
                 padding: const EdgeInsets.fromLTRB(0, 16, 0, 8),
+                trailing: IconButton(
+                  onPressed: _openFavoriteRecordsScreen,
+                  icon: Icon(
+                    Icons.bookmark_border_rounded,
+                    color: context.appColors.textPrimary,
+                  ),
+                ),
               ),
             ),
             Expanded(
@@ -344,8 +389,12 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
                                       begin: Alignment.topCenter,
                                       end: Alignment.bottomCenter,
                                       colors: [
-                                        context.appColors.background.withValues(alpha: 0),
-                                        context.appColors.background.withValues(alpha: 0.65),
+                                        context.appColors.background.withValues(
+                                          alpha: 0,
+                                        ),
+                                        context.appColors.background.withValues(
+                                          alpha: 0.65,
+                                        ),
                                         context.appColors.background,
                                       ],
                                       stops: [0, 0.6, 1],
