@@ -155,8 +155,7 @@ class _FavoriteLedgerRecordsScreenState
               title: '즐겨찾기',
               onCloseTap:
                   _isEditMode ? _exitEditMode : () => Navigator.pop(context),
-              trailing:
-                  _isEditMode ? _buildDeleteAction() : _buildDefaultActions(),
+              trailing: _isEditMode ? null : _buildDefaultActions(),
             ),
             Expanded(
               child: Stack(
@@ -172,6 +171,7 @@ class _FavoriteLedgerRecordsScreenState
                 ],
               ),
             ),
+            if (_isEditMode) _buildDeleteBottomBar(),
           ],
         ),
       ),
@@ -194,25 +194,43 @@ class _FavoriteLedgerRecordsScreenState
     );
   }
 
-  Widget _buildDeleteAction() {
+  Widget _buildDeleteBottomBar() {
+    final safeAreaBottom = MediaQuery.paddingOf(context).bottom;
     final canDelete = _selectedIds.isNotEmpty && !_viewModel.isDeleting;
-    return TextButton(
-      onPressed: canDelete ? _onDeleteSelectedTap : null,
-      style: TextButton.styleFrom(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-        minimumSize: Size.zero,
-        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      ),
-      child: Text(
-        '삭제',
-        style: TextStyle(
-          fontSize: 14,
-          height: 20 / 14,
-          fontWeight: FontWeight.w500,
-          color:
-              canDelete
-                  ? context.appColors.danger
-                  : context.appColors.textTertiary,
+
+    return Container(
+      padding: EdgeInsets.fromLTRB(16, 12, 16, safeAreaBottom + 12),
+      child: SizedBox(
+        width: double.infinity,
+        height: 52,
+        child: FilledButton(
+          onPressed: canDelete ? _onDeleteSelectedTap : null,
+          style: FilledButton.styleFrom(
+            backgroundColor:
+                canDelete ? context.appColors.danger : context.appColors.border,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            elevation: 0,
+          ),
+          child:
+              _viewModel.isDeleting
+                  ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.4,
+                      color: AppColors.white,
+                    ),
+                  )
+                  : const Text(
+                    '삭제',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.white,
+                    ),
+                  ),
         ),
       ),
     );
@@ -351,7 +369,10 @@ class _FavoriteRecordTile extends StatelessWidget {
                 onChanged: (_) => onTap(),
                 activeColor: context.appColors.primary,
                 checkColor: AppColors.white,
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                visualDensity: VisualDensity.compact,
               ),
+              const SizedBox(width: 4),
             ],
             Expanded(
               child: LedgerRecordItemContent(
