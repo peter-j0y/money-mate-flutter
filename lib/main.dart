@@ -4,6 +4,8 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:money_mate/data/repositories/app_settings_repository.dart';
+import 'package:money_mate/data/repositories/app_settings_repository_impl.dart';
 import 'package:money_mate/firebase_options.dart';
 import 'package:money_mate/ui/ledger/widgets/add_ledger_record_screen.dart';
 import 'package:money_mate/ui/asset/screen/assets_tab_screen.dart';
@@ -11,8 +13,10 @@ import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:money_mate/ui/ledger/widgets/ledger_tab_screen.dart';
 import 'package:money_mate/ui/core/bottom_navigation_bar.dart';
 import 'package:money_mate/ui/core/keyboard_done_bar.dart';
+import 'package:money_mate/ui/core/notification_permission_dialog.dart';
 import 'package:money_mate/ui/more/screen/more_tab_screen.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -79,6 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   DateTime _selectedLedgerDate = DateTime.now();
   late final List<int> _tabRefreshVersion;
+  final AppSettingsRepository _appSettingsRepository = AppSettingsRepositoryImpl();
 
   final List<BottomNavTabItem> _tabs = const [
     BottomNavTabItem(label: '가계부', icon: Icons.calendar_today_outlined),
@@ -90,6 +95,21 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _tabRefreshVersion = List<int>.filled(_tabs.length, 0);
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _maybeRequestNotificationPermission(),
+    );
+  }
+
+  Future<void> _maybeRequestNotificationPermission() async {
+    final alreadyRequested =
+        await _appSettingsRepository.hasRequestedNotificationPermission();
+    if (alreadyRequested || !mounted) return;
+
+    final agreed = await NotificationPermissionDialog.show(context);
+    if (agreed) {
+      await Permission.notification.request();
+    }
+    await _appSettingsRepository.setNotificationPermissionRequested();
   }
 
   void _onBottomTabTap(int index) {
