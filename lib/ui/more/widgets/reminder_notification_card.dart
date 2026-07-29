@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:money_mate/data/repositories/app_settings_repository.dart';
 import 'package:money_mate/data/repositories/app_settings_repository_impl.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
+import 'package:money_mate/ui/core/notification_permission_dialog.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 enum _DayPreset { daily, weekday, weekend, custom }
 
@@ -18,8 +22,10 @@ class ReminderNotificationCard extends StatefulWidget {
       _ReminderNotificationCardState();
 }
 
-class _ReminderNotificationCardState extends State<ReminderNotificationCard> {
+class _ReminderNotificationCardState extends State<ReminderNotificationCard>
+    with WidgetsBindingObserver {
   bool _enabled = false;
+  bool _awaitingSettingsReturn = false;
   _DayPreset _preset = _DayPreset.daily;
   Set<int> _customWeekdays = {1, 2, 3, 4, 5, 6, 7};
   TimeOfDay _time = const TimeOfDay(hour: 21, minute: 0);
@@ -27,18 +33,80 @@ class _ReminderNotificationCardState extends State<ReminderNotificationCard> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _loadReminderEnabled();
   }
 
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed || !_awaitingSettingsReturn) {
+      return;
+    }
+    _awaitingSettingsReturn = false;
+    _syncAfterSettingsReturn();
+  }
+
+  Future<void> _syncAfterSettingsReturn() async {
+    final status = await Permission.notification.status;
+    if (!mounted) return;
+    // 설정 화면으로 이동해서 권한을 켰다면, 리마인드 알림을 켜려는 의도였던 것이므로
+    // 앱으로 돌아왔을 때 토글도 함께 켜준다.
+    if (status.isGranted) {
+      await _setEnabled(true);
+    }
+  }
+
   Future<void> _loadReminderEnabled() async {
-    final enabled = await widget.repository.isReminderEnabled();
+    final storedEnabled = await widget.repository.isReminderEnabled();
+    final status = await Permission.notification.status;
+    // 토글이 켜져 있으려면 시스템 알림 권한이 항상 허용되어 있어야 하므로,
+    // 앱 밖에서 권한이 취소된 경우를 대비해 저장된 값과 실제 권한 상태를 동기화한다.
+    final enabled = storedEnabled && status.isGranted;
+    if (enabled != storedEnabled) {
+      unawaited(widget.repository.setReminderEnabled(enabled));
+    }
     if (!mounted) return;
     setState(() => _enabled = enabled);
   }
 
-  void _toggleEnabled(bool value) {
-    setState(() => _enabled = value);
-    widget.repository.setReminderEnabled(value);
+  Future<void> _onToggleChanged(bool value) async {
+    if (!value) {
+      setState(() => _enabled = false);
+      await widget.repository.setReminderEnabled(false);
+      return;
+    }
+
+    final currentStatus = await Permission.notification.status;
+    if (currentStatus.isGranted) {
+      await _setEnabled(true);
+      return;
+    }
+
+    if (currentStatus.isPermanentlyDenied || currentStatus.isRestricted) {
+      if (!mounted) return;
+      _awaitingSettingsReturn =
+          await NotificationPermissionDialog.showSettingsRedirect(context);
+      return;
+    }
+
+    final requestedStatus = await Permission.notification.request();
+    if (requestedStatus.isGranted) {
+      await _setEnabled(true);
+    } else if (requestedStatus.isPermanentlyDenied && mounted) {
+      _awaitingSettingsReturn =
+          await NotificationPermissionDialog.showSettingsRedirect(context);
+    }
+  }
+
+  Future<void> _setEnabled(bool enabled) async {
+    setState(() => _enabled = enabled);
+    await widget.repository.setReminderEnabled(enabled);
   }
 
   void _selectPreset(_DayPreset preset) {
@@ -124,7 +192,7 @@ class _ReminderNotificationCardState extends State<ReminderNotificationCard> {
               const SizedBox(width: 8),
               Switch(
                 value: _enabled,
-                onChanged: _toggleEnabled,
+                onChanged: _onToggleChanged,
                 activeColor: context.appColors.inverseText,
                 activeTrackColor: accentColor,
                 inactiveThumbColor: context.appColors.inverseText,
