@@ -4,6 +4,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:money_mate/ui/more/notion_legal_links.dart';
+import 'package:money_mate/ui/more/widgets/reminder_notification_card.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 const String _supportEmail = 'support.peterstudio@gmail.com';
@@ -139,6 +140,11 @@ class MoreTabScreen extends StatelessWidget {
                   onTap: () => _openNotices(context),
                 ),
               ],
+            ),
+            const SizedBox(height: 28),
+            _SettingsSection(
+              title: '알림',
+              rows: const [ReminderNotificationCard()],
             ),
             const SizedBox(height: 28),
             _SettingsSection(
