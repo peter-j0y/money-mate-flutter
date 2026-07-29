@@ -16,14 +16,4 @@ class AppSettingsRepositoryImpl implements AppSettingsRepository {
   Future<void> setNotificationPermissionRequested() {
     return _localDataSource.setNotificationPermissionRequested();
   }
-
-  @override
-  Future<bool> isReminderEnabled() {
-    return _localDataSource.isReminderEnabled();
-  }
-
-  @override
-  Future<void> setReminderEnabled(bool enabled) {
-    return _localDataSource.setReminderEnabled(enabled);
-  }
 }

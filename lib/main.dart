@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:money_mate/data/repositories/app_settings_repository.dart';
 import 'package:money_mate/data/repositories/app_settings_repository_impl.dart';
+import 'package:money_mate/data/repositories/reminder_repository.dart';
+import 'package:money_mate/data/repositories/reminder_repository_impl.dart';
 import 'package:money_mate/firebase_options.dart';
 import 'package:money_mate/ui/ledger/widgets/add_ledger_record_screen.dart';
 import 'package:money_mate/ui/asset/screen/assets_tab_screen.dart';
@@ -87,6 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late final List<int> _tabRefreshVersion;
   final AppSettingsRepository _appSettingsRepository =
       AppSettingsRepositoryImpl();
+  final ReminderRepository _reminderRepository = ReminderRepositoryImpl();
 
   final List<BottomNavTabItem> _tabs = const [
     BottomNavTabItem(label: '가계부', icon: Icons.calendar_today_outlined),
@@ -114,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
       final status = await Permission.notification.request();
       granted = status.isGranted;
     }
-    await _appSettingsRepository.setReminderEnabled(granted);
+    await _reminderRepository.setEnabled(granted);
     await _appSettingsRepository.setNotificationPermissionRequested();
   }
 

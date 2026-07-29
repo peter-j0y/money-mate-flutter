@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:money_mate/data/repositories/app_settings_repository.dart';
-import 'package:money_mate/data/repositories/app_settings_repository_impl.dart';
+import 'package:money_mate/data/repositories/reminder_repository.dart';
+import 'package:money_mate/data/repositories/reminder_repository_impl.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:money_mate/ui/core/notification_permission_dialog.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -10,10 +10,10 @@ import 'package:permission_handler/permission_handler.dart';
 const List<String> _weekdayLabels = ['월', '화', '수', '목', '금', '토', '일'];
 
 class ReminderNotificationCard extends StatefulWidget {
-  ReminderNotificationCard({super.key, AppSettingsRepository? repository})
-    : repository = repository ?? AppSettingsRepositoryImpl();
+  ReminderNotificationCard({super.key, ReminderRepository? repository})
+    : repository = repository ?? ReminderRepositoryImpl();
 
-  final AppSettingsRepository repository;
+  final ReminderRepository repository;
 
   @override
   State<ReminderNotificationCard> createState() =>
@@ -31,7 +31,7 @@ class _ReminderNotificationCardState extends State<ReminderNotificationCard>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _loadReminderEnabled();
+    _loadFromRepository();
   }
 
   @override
@@ -59,23 +59,39 @@ class _ReminderNotificationCardState extends State<ReminderNotificationCard>
     }
   }
 
-  Future<void> _loadReminderEnabled() async {
-    final storedEnabled = await widget.repository.isReminderEnabled();
+  Future<void> _loadFromRepository() async {
+    final storedEnabled = await widget.repository.isEnabled();
+    final weekdays = await widget.repository.getWeekdays();
+    final hour = await widget.repository.getHour();
+    final minute = await widget.repository.getMinute();
     final status = await Permission.notification.status;
     // 토글이 켜져 있으려면 시스템 알림 권한이 항상 허용되어 있어야 하므로,
     // 앱 밖에서 권한이 취소된 경우를 대비해 저장된 값과 실제 권한 상태를 동기화한다.
     final enabled = storedEnabled && status.isGranted;
     if (enabled != storedEnabled) {
-      unawaited(widget.repository.setReminderEnabled(enabled));
+      unawaited(widget.repository.setEnabled(enabled));
+    } else if (enabled) {
+      // 알림 문구가 앱을 열 때마다 새로 뽑히도록, 켜져 있으면 매번 다시 예약한다.
+      unawaited(
+        widget.repository.updateSchedule(
+          weekdays: weekdays,
+          hour: hour,
+          minute: minute,
+        ),
+      );
     }
     if (!mounted) return;
-    setState(() => _enabled = enabled);
+    setState(() {
+      _enabled = enabled;
+      _selectedWeekdays = weekdays;
+      _time = TimeOfDay(hour: hour, minute: minute);
+    });
   }
 
   Future<void> _onToggleChanged(bool value) async {
     if (!value) {
       setState(() => _enabled = false);
-      await widget.repository.setReminderEnabled(false);
+      await widget.repository.setEnabled(false);
       return;
     }
 
@@ -103,26 +119,33 @@ class _ReminderNotificationCardState extends State<ReminderNotificationCard>
 
   Future<void> _setEnabled(bool enabled) async {
     setState(() => _enabled = enabled);
-    await widget.repository.setReminderEnabled(enabled);
+    await widget.repository.setEnabled(enabled);
   }
 
-  void _toggleWeekday(int weekday) {
-    setState(() {
-      final next = Set<int>.of(_selectedWeekdays);
-      if (next.contains(weekday)) {
-        if (next.length > 1) next.remove(weekday);
-      } else {
-        next.add(weekday);
-      }
-      _selectedWeekdays = next;
-    });
+  Future<void> _toggleWeekday(int weekday) async {
+    final next = Set<int>.of(_selectedWeekdays);
+    if (next.contains(weekday)) {
+      if (next.length > 1) next.remove(weekday);
+    } else {
+      next.add(weekday);
+    }
+    setState(() => _selectedWeekdays = next);
+    await widget.repository.updateSchedule(
+      weekdays: next,
+      hour: _time.hour,
+      minute: _time.minute,
+    );
   }
 
   Future<void> _pickTime() async {
     final picked = await showTimePicker(context: context, initialTime: _time);
-    if (picked != null) {
-      setState(() => _time = picked);
-    }
+    if (picked == null) return;
+    setState(() => _time = picked);
+    await widget.repository.updateSchedule(
+      weekdays: _selectedWeekdays,
+      hour: picked.hour,
+      minute: picked.minute,
+    );
   }
 
   @override
