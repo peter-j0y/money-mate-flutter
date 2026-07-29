@@ -11,6 +11,8 @@ class KeyboardDoneBar extends StatelessWidget {
 
   final Widget child;
 
+  static const double _barHeight = 44;
+
   @override
   Widget build(BuildContext context) {
     final tapToDismiss = GestureDetector(
@@ -21,14 +23,33 @@ class KeyboardDoneBar extends StatelessWidget {
 
     if (!Platform.isIOS) return tapToDismiss;
 
-    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    final mediaQuery = MediaQuery.of(context);
+    final keyboardHeight = mediaQuery.viewInsets.bottom;
     final isKeyboardVisible = keyboardHeight > 0;
+
+    // 완료 바 높이만큼 viewInsets.bottom을 늘려서, Scaffold의 자동 리사이즈나
+    // 화면 하단에 고정된 CTA 버튼이 완료 바에 가려지지 않도록 공간을 미리 확보한다.
+    final content = isKeyboardVisible
+        ? MediaQuery(
+            data: mediaQuery.copyWith(
+              viewInsets: mediaQuery.viewInsets.copyWith(
+                bottom: keyboardHeight + _barHeight,
+              ),
+            ),
+            child: tapToDismiss,
+          )
+        : tapToDismiss;
 
     return Stack(
       children: [
-        tapToDismiss,
+        content,
         if (isKeyboardVisible)
-          Positioned(left: 0, right: 0, bottom: keyboardHeight, child: const _DoneBar()),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: keyboardHeight,
+            child: const _DoneBar(),
+          ),
       ],
     );
   }
@@ -45,7 +66,7 @@ class _DoneBar extends StatelessWidget {
         top: false,
         bottom: false,
         child: Container(
-          height: 44,
+          height: KeyboardDoneBar._barHeight,
           decoration: BoxDecoration(
             border: Border(top: BorderSide(color: context.appColors.border)),
           ),
