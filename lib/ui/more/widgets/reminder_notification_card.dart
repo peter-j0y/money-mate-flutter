@@ -7,8 +7,6 @@ import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:money_mate/ui/core/notification_permission_dialog.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-enum _DayPreset { daily, weekday, weekend, custom }
-
 const List<String> _weekdayLabels = ['월', '화', '수', '목', '금', '토', '일'];
 
 class ReminderNotificationCard extends StatefulWidget {
@@ -26,8 +24,7 @@ class _ReminderNotificationCardState extends State<ReminderNotificationCard>
     with WidgetsBindingObserver {
   bool _enabled = false;
   bool _awaitingSettingsReturn = false;
-  _DayPreset _preset = _DayPreset.daily;
-  Set<int> _customWeekdays = {1, 2, 3, 4, 5, 6, 7};
+  Set<int> _selectedWeekdays = {1, 2, 3, 4, 5, 6, 7};
   TimeOfDay _time = const TimeOfDay(hour: 21, minute: 0);
 
   @override
@@ -109,19 +106,15 @@ class _ReminderNotificationCardState extends State<ReminderNotificationCard>
     await widget.repository.setReminderEnabled(enabled);
   }
 
-  void _selectPreset(_DayPreset preset) {
-    setState(() => _preset = preset);
-  }
-
-  void _toggleCustomWeekday(int weekday) {
+  void _toggleWeekday(int weekday) {
     setState(() {
-      final next = Set<int>.of(_customWeekdays);
+      final next = Set<int>.of(_selectedWeekdays);
       if (next.contains(weekday)) {
         if (next.length > 1) next.remove(weekday);
       } else {
         next.add(weekday);
       }
-      _customWeekdays = next;
+      _selectedWeekdays = next;
     });
   }
 
@@ -218,52 +211,19 @@ class _ReminderNotificationCardState extends State<ReminderNotificationCard>
                   ),
                 ),
                 const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    _PresetChip(
-                      label: '매일',
-                      selected: _preset == _DayPreset.daily,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: List.generate(7, (index) {
+                    final weekday = index + 1;
+                    final isSelected = _selectedWeekdays.contains(weekday);
+                    return _WeekdayDot(
+                      label: _weekdayLabels[index],
+                      selected: isSelected,
                       accentColor: accentColor,
-                      onTap: () => _selectPreset(_DayPreset.daily),
-                    ),
-                    _PresetChip(
-                      label: '평일',
-                      selected: _preset == _DayPreset.weekday,
-                      accentColor: accentColor,
-                      onTap: () => _selectPreset(_DayPreset.weekday),
-                    ),
-                    _PresetChip(
-                      label: '주말',
-                      selected: _preset == _DayPreset.weekend,
-                      accentColor: accentColor,
-                      onTap: () => _selectPreset(_DayPreset.weekend),
-                    ),
-                    _PresetChip(
-                      label: '직접 선택',
-                      selected: _preset == _DayPreset.custom,
-                      accentColor: accentColor,
-                      onTap: () => _selectPreset(_DayPreset.custom),
-                    ),
-                  ],
+                      onTap: () => _toggleWeekday(weekday),
+                    );
+                  }),
                 ),
-                if (_preset == _DayPreset.custom) ...[
-                  const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: List.generate(7, (index) {
-                      final weekday = index + 1;
-                      final isSelected = _customWeekdays.contains(weekday);
-                      return _WeekdayDot(
-                        label: _weekdayLabels[index],
-                        selected: isSelected,
-                        accentColor: accentColor,
-                        onTap: () => _toggleCustomWeekday(weekday),
-                      );
-                    }),
-                  ),
-                ],
                 const SizedBox(height: 16),
                 Text(
                   '알림 시간',
@@ -318,47 +278,6 @@ class _ReminderNotificationCardState extends State<ReminderNotificationCard>
             ),
           ],
         ],
-      ),
-    );
-  }
-}
-
-class _PresetChip extends StatelessWidget {
-  const _PresetChip({
-    required this.label,
-    required this.selected,
-    required this.accentColor,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool selected;
-  final Color accentColor;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: selected ? accentColor : context.appColors.surfaceMuted,
-      borderRadius: BorderRadius.circular(999),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(999),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 13,
-              height: 18 / 13,
-              fontWeight: FontWeight.w600,
-              color:
-                  selected
-                      ? context.appColors.inverseText
-                      : context.appColors.textSecondary,
-            ),
-          ),
-        ),
       ),
     );
   }
