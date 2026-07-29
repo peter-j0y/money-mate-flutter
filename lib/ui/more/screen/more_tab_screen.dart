@@ -13,11 +13,17 @@ Future<({String osVersion, String deviceModel})> _getDeviceInfo() async {
   final plugin = DeviceInfoPlugin();
   if (Platform.isAndroid) {
     final info = await plugin.androidInfo;
-    return (osVersion: 'Android ${info.version.release}', deviceModel: info.model);
+    return (
+      osVersion: 'Android ${info.version.release}',
+      deviceModel: info.model,
+    );
   }
   if (Platform.isIOS) {
     final info = await plugin.iosInfo;
-    return (osVersion: 'iOS ${info.systemVersion}', deviceModel: info.utsname.machine);
+    return (
+      osVersion: 'iOS ${info.systemVersion}',
+      deviceModel: info.utsname.machine,
+    );
   }
   return (
     osVersion: Platform.operatingSystemVersion,
@@ -80,16 +86,11 @@ class MoreTabScreen extends StatelessWidget {
         deviceModel: deviceInfo.deviceModel,
       ),
     );
-    final uri = Uri.parse(
-      'mailto:$_supportEmail?subject=$subject&body=$body',
-    );
+    final uri = Uri.parse('mailto:$_supportEmail?subject=$subject&body=$body');
 
     var launched = false;
     try {
-      launched = await launchUrl(
-        uri,
-        mode: LaunchMode.externalApplication,
-      );
+      launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
     } catch (_) {
       launched = false;
     }
@@ -142,10 +143,7 @@ class MoreTabScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 28),
-            _SettingsSection(
-              title: '알림',
-              rows: const [ReminderNotificationCard()],
-            ),
+            _SettingsSection(title: '알림', rows: [ReminderNotificationCard()]),
             const SizedBox(height: 28),
             _SettingsSection(
               title: '고객지원',
@@ -163,8 +161,6 @@ class MoreTabScreen extends StatelessWidget {
             _SettingsSection(
               title: '약관 및 정책',
               rows: [
-
-
                 _SettingsRow(
                   icon: Icons.privacy_tip_outlined,
                   accentColor: context.appColors.primary,

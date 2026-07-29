@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/data/repositories/app_settings_repository.dart';
+import 'package:money_mate/data/repositories/app_settings_repository_impl.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 
 enum _DayPreset { daily, weekday, weekend, custom }
@@ -6,7 +8,10 @@ enum _DayPreset { daily, weekday, weekend, custom }
 const List<String> _weekdayLabels = ['월', '화', '수', '목', '금', '토', '일'];
 
 class ReminderNotificationCard extends StatefulWidget {
-  const ReminderNotificationCard({super.key});
+  ReminderNotificationCard({super.key, AppSettingsRepository? repository})
+    : repository = repository ?? AppSettingsRepositoryImpl();
+
+  final AppSettingsRepository repository;
 
   @override
   State<ReminderNotificationCard> createState() =>
@@ -14,10 +19,27 @@ class ReminderNotificationCard extends StatefulWidget {
 }
 
 class _ReminderNotificationCardState extends State<ReminderNotificationCard> {
-  bool _enabled = true;
+  bool _enabled = false;
   _DayPreset _preset = _DayPreset.daily;
   Set<int> _customWeekdays = {1, 2, 3, 4, 5, 6, 7};
   TimeOfDay _time = const TimeOfDay(hour: 21, minute: 0);
+
+  @override
+  void initState() {
+    super.initState();
+    _loadReminderEnabled();
+  }
+
+  Future<void> _loadReminderEnabled() async {
+    final enabled = await widget.repository.isReminderEnabled();
+    if (!mounted) return;
+    setState(() => _enabled = enabled);
+  }
+
+  void _toggleEnabled(bool value) {
+    setState(() => _enabled = value);
+    widget.repository.setReminderEnabled(value);
+  }
 
   void _selectPreset(_DayPreset preset) {
     setState(() => _preset = preset);
@@ -69,11 +91,7 @@ class _ReminderNotificationCardState extends State<ReminderNotificationCard> {
                   shape: BoxShape.circle,
                 ),
                 alignment: Alignment.center,
-                child: Icon(
-                  Icons.alarm_outlined,
-                  size: 20,
-                  color: accentColor,
-                ),
+                child: Icon(Icons.alarm_outlined, size: 20, color: accentColor),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -106,7 +124,7 @@ class _ReminderNotificationCardState extends State<ReminderNotificationCard> {
               const SizedBox(width: 8),
               Switch(
                 value: _enabled,
-                onChanged: (value) => setState(() => _enabled = value),
+                onChanged: _toggleEnabled,
                 activeColor: context.appColors.inverseText,
                 activeTrackColor: accentColor,
                 inactiveThumbColor: context.appColors.inverseText,
@@ -115,126 +133,122 @@ class _ReminderNotificationCardState extends State<ReminderNotificationCard> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          Divider(height: 1, color: context.appColors.border),
-          const SizedBox(height: 16),
-          Opacity(
-            opacity: _enabled ? 1.0 : 0.5,
-            child: IgnorePointer(
-              ignoring: !_enabled,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '알림 요일',
-                    style: TextStyle(
-                      fontSize: 12,
-                      height: 16 / 12,
-                      fontWeight: FontWeight.w600,
-                      color: context.appColors.textTertiary,
+          if (_enabled) ...[
+            const SizedBox(height: 16),
+            Divider(height: 1, color: context.appColors.border),
+            const SizedBox(height: 16),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '알림 요일',
+                  style: TextStyle(
+                    fontSize: 12,
+                    height: 16 / 12,
+                    fontWeight: FontWeight.w600,
+                    color: context.appColors.textTertiary,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    _PresetChip(
+                      label: '매일',
+                      selected: _preset == _DayPreset.daily,
+                      accentColor: accentColor,
+                      onTap: () => _selectPreset(_DayPreset.daily),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      _PresetChip(
-                        label: '매일',
-                        selected: _preset == _DayPreset.daily,
-                        accentColor: accentColor,
-                        onTap: () => _selectPreset(_DayPreset.daily),
-                      ),
-                      _PresetChip(
-                        label: '평일',
-                        selected: _preset == _DayPreset.weekday,
-                        accentColor: accentColor,
-                        onTap: () => _selectPreset(_DayPreset.weekday),
-                      ),
-                      _PresetChip(
-                        label: '주말',
-                        selected: _preset == _DayPreset.weekend,
-                        accentColor: accentColor,
-                        onTap: () => _selectPreset(_DayPreset.weekend),
-                      ),
-                      _PresetChip(
-                        label: '직접 선택',
-                        selected: _preset == _DayPreset.custom,
-                        accentColor: accentColor,
-                        onTap: () => _selectPreset(_DayPreset.custom),
-                      ),
-                    ],
-                  ),
-                  if (_preset == _DayPreset.custom) ...[
-                    const SizedBox(height: 12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: List.generate(7, (index) {
-                        final weekday = index + 1;
-                        final isSelected = _customWeekdays.contains(weekday);
-                        return _WeekdayDot(
-                          label: _weekdayLabels[index],
-                          selected: isSelected,
-                          accentColor: accentColor,
-                          onTap: () => _toggleCustomWeekday(weekday),
-                        );
-                      }),
+                    _PresetChip(
+                      label: '평일',
+                      selected: _preset == _DayPreset.weekday,
+                      accentColor: accentColor,
+                      onTap: () => _selectPreset(_DayPreset.weekday),
+                    ),
+                    _PresetChip(
+                      label: '주말',
+                      selected: _preset == _DayPreset.weekend,
+                      accentColor: accentColor,
+                      onTap: () => _selectPreset(_DayPreset.weekend),
+                    ),
+                    _PresetChip(
+                      label: '직접 선택',
+                      selected: _preset == _DayPreset.custom,
+                      accentColor: accentColor,
+                      onTap: () => _selectPreset(_DayPreset.custom),
                     ),
                   ],
-                  const SizedBox(height: 16),
-                  Text(
-                    '알림 시간',
-                    style: TextStyle(
-                      fontSize: 12,
-                      height: 16 / 12,
-                      fontWeight: FontWeight.w600,
-                      color: context.appColors.textTertiary,
-                    ),
+                ),
+                if (_preset == _DayPreset.custom) ...[
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: List.generate(7, (index) {
+                      final weekday = index + 1;
+                      final isSelected = _customWeekdays.contains(weekday);
+                      return _WeekdayDot(
+                        label: _weekdayLabels[index],
+                        selected: isSelected,
+                        accentColor: accentColor,
+                        onTap: () => _toggleCustomWeekday(weekday),
+                      );
+                    }),
                   ),
-                  const SizedBox(height: 8),
-                  Material(
-                    color: context.appColors.surfaceMuted,
+                ],
+                const SizedBox(height: 16),
+                Text(
+                  '알림 시간',
+                  style: TextStyle(
+                    fontSize: 12,
+                    height: 16 / 12,
+                    fontWeight: FontWeight.w600,
+                    color: context.appColors.textTertiary,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Material(
+                  color: context.appColors.surfaceMuted,
+                  borderRadius: BorderRadius.circular(12),
+                  child: InkWell(
                     borderRadius: BorderRadius.circular(12),
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(12),
-                      onTap: _pickTime,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 12,
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.schedule_rounded,
-                              size: 18,
-                              color: context.appColors.textSecondary,
+                    onTap: _pickTime,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 12,
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.schedule_rounded,
+                            size: 18,
+                            color: context.appColors.textSecondary,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            _time.format(context),
+                            style: TextStyle(
+                              fontSize: 14,
+                              height: 20 / 14,
+                              fontWeight: FontWeight.w600,
+                              color: context.appColors.textPrimary,
                             ),
-                            const SizedBox(width: 8),
-                            Text(
-                              _time.format(context),
-                              style: TextStyle(
-                                fontSize: 14,
-                                height: 20 / 14,
-                                fontWeight: FontWeight.w600,
-                                color: context.appColors.textPrimary,
-                              ),
-                            ),
-                            const Spacer(),
-                            Icon(
-                              Icons.chevron_right_rounded,
-                              size: 20,
-                              color: context.appColors.textTertiary,
-                            ),
-                          ],
-                        ),
+                          ),
+                          const Spacer(),
+                          Icon(
+                            Icons.chevron_right_rounded,
+                            size: 20,
+                            color: context.appColors.textTertiary,
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ),
+          ],
         ],
       ),
     );
@@ -270,9 +284,10 @@ class _PresetChip extends StatelessWidget {
               fontSize: 13,
               height: 18 / 13,
               fontWeight: FontWeight.w600,
-              color: selected
-                  ? context.appColors.inverseText
-                  : context.appColors.textSecondary,
+              color:
+                  selected
+                      ? context.appColors.inverseText
+                      : context.appColors.textSecondary,
             ),
           ),
         ),
@@ -312,9 +327,10 @@ class _WeekdayDot extends StatelessWidget {
                 fontSize: 13,
                 height: 18 / 13,
                 fontWeight: FontWeight.w600,
-                color: selected
-                    ? context.appColors.inverseText
-                    : context.appColors.textSecondary,
+                color:
+                    selected
+                        ? context.appColors.inverseText
+                        : context.appColors.textSecondary,
               ),
             ),
           ),

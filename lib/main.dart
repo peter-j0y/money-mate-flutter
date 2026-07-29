@@ -21,7 +21,9 @@ import 'package:permission_handler/permission_handler.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(!kDebugMode);
+  await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
+    !kDebugMode,
+  );
   await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(!kDebugMode);
 
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
@@ -83,7 +85,8 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   DateTime _selectedLedgerDate = DateTime.now();
   late final List<int> _tabRefreshVersion;
-  final AppSettingsRepository _appSettingsRepository = AppSettingsRepositoryImpl();
+  final AppSettingsRepository _appSettingsRepository =
+      AppSettingsRepositoryImpl();
 
   final List<BottomNavTabItem> _tabs = const [
     BottomNavTabItem(label: '가계부', icon: Icons.calendar_today_outlined),
@@ -106,9 +109,12 @@ class _HomeScreenState extends State<HomeScreen> {
     if (alreadyRequested || !mounted) return;
 
     final agreed = await NotificationPermissionDialog.show(context);
+    var granted = false;
     if (agreed) {
-      await Permission.notification.request();
+      final status = await Permission.notification.request();
+      granted = status.isGranted;
     }
+    await _appSettingsRepository.setReminderEnabled(granted);
     await _appSettingsRepository.setNotificationPermissionRequested();
   }
 
@@ -164,7 +170,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 highlightElevation: 0,
                 disabledElevation: 0,
                 shape: const CircleBorder(),
-                child: Icon(Icons.add, color: context.appColors.inverseText, size: 28),
+                child: Icon(
+                  Icons.add,
+                  color: context.appColors.inverseText,
+                  size: 28,
+                ),
               )
               : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
