@@ -217,89 +217,97 @@ class _ReminderNotificationCardState extends State<ReminderNotificationCard>
               ),
             ],
           ),
-          if (_enabled) ...[
-            const SizedBox(height: 16),
-            Divider(height: 1, color: context.appColors.border),
-            const SizedBox(height: 16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '알림 요일',
-                  style: TextStyle(
-                    fontSize: 12,
-                    height: 16 / 12,
-                    fontWeight: FontWeight.w600,
-                    color: context.appColors.textTertiary,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: List.generate(7, (index) {
-                    final weekday = index + 1;
-                    final isSelected = _selectedWeekdays.contains(weekday);
-                    return _WeekdayDot(
-                      label: _weekdayLabels[index],
-                      selected: isSelected,
-                      accentColor: accentColor,
-                      onTap: () => _toggleWeekday(weekday),
-                    );
-                  }),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  '알림 시간',
-                  style: TextStyle(
-                    fontSize: 12,
-                    height: 16 / 12,
-                    fontWeight: FontWeight.w600,
-                    color: context.appColors.textTertiary,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Material(
-                  color: context.appColors.surfaceMuted,
-                  borderRadius: BorderRadius.circular(12),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(12),
-                    onTap: _pickTime,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 12,
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.schedule_rounded,
-                            size: 18,
-                            color: context.appColors.textSecondary,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            _time.format(context),
-                            style: TextStyle(
-                              fontSize: 14,
-                              height: 20 / 14,
-                              fontWeight: FontWeight.w600,
-                              color: context.appColors.textPrimary,
-                            ),
-                          ),
-                          const Spacer(),
-                          Icon(
-                            Icons.chevron_right_rounded,
-                            size: 20,
+          AnimatedSize(
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeInOut,
+            alignment: Alignment.topCenter,
+            child:
+                _enabled
+                    ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 16),
+                        Divider(height: 1, color: context.appColors.border),
+                        const SizedBox(height: 16),
+                        Text(
+                          '알림 요일',
+                          style: TextStyle(
+                            fontSize: 12,
+                            height: 16 / 12,
+                            fontWeight: FontWeight.w600,
                             color: context.appColors.textTertiary,
                           ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: List.generate(7, (index) {
+                            final weekday = index + 1;
+                            final isSelected = _selectedWeekdays.contains(
+                              weekday,
+                            );
+                            return _WeekdayDot(
+                              label: _weekdayLabels[index],
+                              selected: isSelected,
+                              accentColor: accentColor,
+                              onTap: () => _toggleWeekday(weekday),
+                            );
+                          }),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          '알림 시간',
+                          style: TextStyle(
+                            fontSize: 12,
+                            height: 16 / 12,
+                            fontWeight: FontWeight.w600,
+                            color: context.appColors.textTertiary,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Material(
+                          color: context.appColors.surfaceMuted,
+                          borderRadius: BorderRadius.circular(12),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(12),
+                            onTap: _pickTime,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 12,
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.schedule_rounded,
+                                    size: 18,
+                                    color: context.appColors.textSecondary,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    _time.format(context),
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      height: 20 / 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: context.appColors.textPrimary,
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  Icon(
+                                    Icons.chevron_right_rounded,
+                                    size: 20,
+                                    color: context.appColors.textTertiary,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                    : const SizedBox(width: double.infinity),
+          ),
         ],
       ),
     );
