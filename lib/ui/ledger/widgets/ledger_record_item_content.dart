@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/data/model/entities/currency.dart';
 import 'package:money_mate/data/model/entities/ledger_record.dart';
 import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
@@ -98,7 +99,7 @@ class LedgerRecordItemContent extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  '$amountPrefix${item.amount.toCommaWon()}',
+                  '$amountPrefix${item.amount.toFormattedCurrency(CurrencyCode.fromCode(item.currencyCode))}',
                   style: TextStyle(
                     fontSize: 16,
                     height: 24 / 16,

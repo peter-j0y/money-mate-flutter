@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:money_mate/l10n/app_localizations.dart';
+import 'package:money_mate/ui/core/currency/current_currency.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
-import 'package:flutter/services.dart';
 import 'package:money_mate/ui/ledger/widgets/ledger_category_grid.dart';
 import 'package:money_mate/ui/ledger/widgets/expense_payment_method_selector.dart';
 import 'package:money_mate/ui/ledger/widgets/ledger_category_options.dart';
@@ -100,8 +100,9 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
     }
     final initialAmount = widget.initialAmount;
     if (initialAmount != null && initialAmount > 0) {
-      _amountController.text = _AmountInputFormatter.formatDigits(
-        initialAmount.toString(),
+      _amountController.text = CurrencyAmountInputFormatter.formatMinorUnits(
+        initialAmount,
+        CurrentCurrency.code,
       );
     }
     _selectedExpensePaymentMethod = widget.initialPaymentMethod;
@@ -135,8 +136,10 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
   }
 
   int get _amountValue {
-    final digits = _amountController.text.replaceAll(RegExp(r'[^0-9]'), '');
-    return int.tryParse(digits) ?? 0;
+    return CurrencyAmountInputFormatter.parseToMinorUnits(
+      _amountController.text,
+      CurrentCurrency.code,
+    );
   }
 
   bool get _isTypeSelected {
@@ -257,8 +260,9 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
       _selectedExpensePaymentMethod = favorite.paymentMethod;
       _memoController.text = favorite.memo ?? '';
     });
-    _amountController.text = _AmountInputFormatter.formatDigits(
-      favorite.amount.toString(),
+    _amountController.text = CurrencyAmountInputFormatter.formatMinorUnits(
+      favorite.amount,
+      CurrentCurrency.code,
     );
   }
 
@@ -331,7 +335,12 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
                         LedgerAmountField.editable(
                           controller: _amountController,
                           focusNode: _amountFocusNode,
-                          inputFormatters: const [_AmountInputFormatter()],
+                          currency: CurrentCurrency.code,
+                          inputFormatters: [
+                            CurrencyAmountInputFormatter(
+                              currency: CurrentCurrency.code,
+                            ),
+                          ],
                         ),
                         Divider(
                           height: 2,
@@ -499,53 +508,5 @@ class _SectionLabel extends StatelessWidget {
         color: context.appColors.textSecondary,
       ),
     );
-  }
-}
-
-class _AmountInputFormatter extends TextInputFormatter {
-  const _AmountInputFormatter();
-
-  @override
-  TextEditingValue formatEditUpdate(
-    TextEditingValue oldValue,
-    TextEditingValue newValue,
-  ) {
-    final digitsOnly = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
-
-    if (digitsOnly.isEmpty) {
-      return const TextEditingValue(
-        text: '0',
-        selection: TextSelection.collapsed(offset: 1),
-      );
-    }
-
-    final formatted = formatDigits(digitsOnly);
-
-    return TextEditingValue(
-      text: formatted,
-      selection: TextSelection.collapsed(offset: formatted.length),
-      composing: TextRange.empty,
-    );
-  }
-
-  static String formatDigits(String digits) {
-    final trimmedLeadingZero = digits.replaceFirst(RegExp(r'^0+'), '');
-    final normalizedDigits =
-        trimmedLeadingZero.isEmpty ? '0' : trimmedLeadingZero;
-    return _formatWithComma(normalizedDigits);
-  }
-
-  static String _formatWithComma(String digits) {
-    final buffer = StringBuffer();
-
-    for (var i = 0; i < digits.length; i++) {
-      final reverseIndex = digits.length - i;
-      buffer.write(digits[i]);
-      if (reverseIndex > 1 && reverseIndex % 3 == 1) {
-        buffer.write(',');
-      }
-    }
-
-    return buffer.toString();
   }
 }

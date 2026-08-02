@@ -32,6 +32,7 @@ class AssetEntryDraft {
     required this.assetType,
     required this.assetName,
     required this.amount,
+    required this.currencyCode,
     this.shares,
     required this.includeInPortfolio,
   });
@@ -39,6 +40,7 @@ class AssetEntryDraft {
   final AssetType assetType;
   final String assetName;
   final int amount;
+  final String currencyCode;
   final double? shares;
   final bool includeInPortfolio;
 }

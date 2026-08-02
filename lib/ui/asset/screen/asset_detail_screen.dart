@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:money_mate/data/local/app_database.dart';
+import 'package:money_mate/data/model/entities/currency.dart';
 import 'package:money_mate/data/repositories/asset_repository.dart';
 import 'package:money_mate/data/repositories/asset_repository_impl.dart';
 import 'package:money_mate/l10n/app_localizations.dart';
@@ -146,7 +147,12 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _AmountCard(amount: asset.amount),
+                          _AmountCard(
+                            amount: asset.amount,
+                            currency: CurrencyCode.fromCode(
+                              asset.currencyCode,
+                            ),
+                          ),
                           const SizedBox(height: 12),
                           Row(
                             children: [
@@ -342,9 +348,10 @@ class _DetailHero extends StatelessWidget {
 }
 
 class _AmountCard extends StatelessWidget {
-  const _AmountCard({required this.amount});
+  const _AmountCard({required this.amount, required this.currency});
 
   final int amount;
+  final CurrencyCode currency;
 
   @override
   Widget build(BuildContext context) {
@@ -376,7 +383,7 @@ class _AmountCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            amount.toCommaWon(),
+            amount.toFormattedCurrency(currency),
             style: TextStyle(
               fontSize: 24,
               height: 36 / 24,

@@ -5,6 +5,7 @@ import 'package:money_mate/data/repositories/ledger_record_repository.dart';
 import 'package:money_mate/data/repositories/ledger_record_repository_impl.dart';
 import 'package:money_mate/l10n/app_localizations.dart';
 
+import '../../../data/model/entities/currency.dart';
 import '../../../data/model/entities/ledger_record.dart';
 
 class LedgerTabViewModel extends ChangeNotifier {
@@ -40,6 +41,37 @@ class LedgerTabViewModel extends ChangeNotifier {
       .where((record) => record.type == LedgerRecordType.expense)
       .fold(0, (sum, record) => sum + record.amount);
   int get monthlySavableTotal => monthlyIncomeTotal - monthlyExpenseTotal;
+
+  /// 통화별 이번 달 수입/지출/저축가능액. 여러 통화가 섞여도
+  /// "₩1,000,000 · $200"처럼 통화별로 정확히 표시하기 위한 값이다.
+  Map<CurrencyCode, int> get monthlyIncomeTotalsByCurrency =>
+      _groupByCurrency(
+        _monthlyRecords.where((r) => r.type == LedgerRecordType.income),
+      );
+
+  Map<CurrencyCode, int> get monthlyExpenseTotalsByCurrency =>
+      _groupByCurrency(
+        _monthlyRecords.where((r) => r.type == LedgerRecordType.expense),
+      );
+
+  Map<CurrencyCode, int> get monthlySavableTotalsByCurrency {
+    final result = <CurrencyCode, int>{
+      ...monthlyIncomeTotalsByCurrency,
+    };
+    monthlyExpenseTotalsByCurrency.forEach((currency, expense) {
+      result[currency] = (result[currency] ?? 0) - expense;
+    });
+    return result;
+  }
+
+  Map<CurrencyCode, int> _groupByCurrency(Iterable<LedgerEntry> records) {
+    final result = <CurrencyCode, int>{};
+    for (final record in records) {
+      final currency = CurrencyCode.fromCode(record.currencyCode);
+      result[currency] = (result[currency] ?? 0) + record.amount;
+    }
+    return result;
+  }
 
   Map<DateTime, int> get dailyIncomeTotalsByDate =>
       _dailyIncomeTotalsByMonth[_currentMonth] ?? const {};

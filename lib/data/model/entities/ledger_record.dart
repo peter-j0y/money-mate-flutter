@@ -53,6 +53,7 @@ class LedgerEntry {
     required this.type,
     required this.category,
     required this.amount,
+    required this.currencyCode,
     required this.date,
     this.paymentMethod,
     this.memo,
@@ -63,6 +64,7 @@ class LedgerEntry {
   final LedgerRecordType type;
   final String category;
   final int amount;
+  final String currencyCode;
   final DateTime date;
   final ExpensePaymentMethod? paymentMethod;
   final String? memo;
@@ -74,6 +76,7 @@ class LedgerEntryDraft {
     required this.type,
     required this.category,
     required this.amount,
+    required this.currencyCode,
     required this.date,
     this.paymentMethod,
     this.memo,
@@ -82,6 +85,7 @@ class LedgerEntryDraft {
   final LedgerRecordType type;
   final String category;
   final int amount;
+  final String currencyCode;
   final DateTime date;
   final ExpensePaymentMethod? paymentMethod;
   final String? memo;

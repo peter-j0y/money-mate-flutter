@@ -683,11 +683,11 @@ abstract class AppLocalizations {
   /// **'공지사항'**
   String get notices;
 
-  /// No description provided for @sectionNotification.
+  /// No description provided for @sectionSettings.
   ///
   /// In ko, this message translates to:
-  /// **'알림'**
-  String get sectionNotification;
+  /// **'설정'**
+  String get sectionSettings;
 
   /// No description provided for @sectionSupport.
   ///
@@ -1030,6 +1030,66 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'원'**
   String get currencyUnitSuffix;
+
+  /// No description provided for @mainCurrencySettingTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'주 통화'**
+  String get mainCurrencySettingTitle;
+
+  /// No description provided for @currencySettingScreenTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'주 통화 설정'**
+  String get currencySettingScreenTitle;
+
+  /// No description provided for @currencySettingDescription.
+  ///
+  /// In ko, this message translates to:
+  /// **'새로 입력하는 항목부터 선택한 통화로 기록됩니다. 이미 저장된 기록은 원래 통화 그대로 유지됩니다.'**
+  String get currencySettingDescription;
+
+  /// No description provided for @currencyNameKrw.
+  ///
+  /// In ko, this message translates to:
+  /// **'대한민국 원'**
+  String get currencyNameKrw;
+
+  /// No description provided for @currencyNameUsd.
+  ///
+  /// In ko, this message translates to:
+  /// **'미국 달러'**
+  String get currencyNameUsd;
+
+  /// No description provided for @currencyNameJpy.
+  ///
+  /// In ko, this message translates to:
+  /// **'일본 엔'**
+  String get currencyNameJpy;
+
+  /// No description provided for @currencyNameEur.
+  ///
+  /// In ko, this message translates to:
+  /// **'유로'**
+  String get currencyNameEur;
+
+  /// No description provided for @currencyNameCny.
+  ///
+  /// In ko, this message translates to:
+  /// **'중국 위안'**
+  String get currencyNameCny;
+
+  /// No description provided for @currencyNameGbp.
+  ///
+  /// In ko, this message translates to:
+  /// **'영국 파운드'**
+  String get currencyNameGbp;
+
+  /// No description provided for @currencyNameHkd.
+  ///
+  /// In ko, this message translates to:
+  /// **'홍콩 달러'**
+  String get currencyNameHkd;
 
   /// No description provided for @sharesWithUnit.
   ///

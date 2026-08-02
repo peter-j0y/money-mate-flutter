@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/data/model/entities/currency.dart';
 import 'package:money_mate/data/model/entities/ledger_record.dart';
 import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
@@ -25,7 +26,11 @@ class LedgerMonthlyRecordSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final totalAmount = items.fold<int>(0, (sum, item) => sum + item.amount);
+    final totalsByCurrency = <CurrencyCode, int>{};
+    for (final item in items) {
+      final currency = CurrencyCode.fromCode(item.currencyCode);
+      totalsByCurrency[currency] = (totalsByCurrency[currency] ?? 0) + item.amount;
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -125,7 +130,7 @@ class LedgerMonthlyRecordSection extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      totalAmount.toCommaWon(),
+                      formatGroupedCurrencyAmounts(totalsByCurrency),
                       style: TextStyle(
                         fontSize: 14,
                         height: 20 / 14,

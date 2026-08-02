@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
+import 'package:money_mate/data/model/entities/currency.dart';
 import 'package:money_mate/data/model/entities/ledger_record.dart';
 import 'package:money_mate/ui/ledger/widgets/ledger_record_item_content.dart';
 import 'package:money_mate/ui/ledger/widgets/ledger_state_card.dart';
@@ -33,12 +34,14 @@ class SelectedDateLedgerSection extends StatelessWidget {
     }
     final l10n = AppLocalizations.of(context)!;
 
-    final totalAmount = items.fold<int>(
-      0,
-      (sum, item) =>
-          sum +
-          (item.type == LedgerRecordType.income ? item.amount : -item.amount),
-    );
+    final totalsByCurrency = <CurrencyCode, int>{};
+    for (final item in items) {
+      final currency = CurrencyCode.fromCode(item.currencyCode);
+      final signedAmount =
+          item.type == LedgerRecordType.income ? item.amount : -item.amount;
+      totalsByCurrency[currency] =
+          (totalsByCurrency[currency] ?? 0) + signedAmount;
+    }
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -58,7 +61,9 @@ class SelectedDateLedgerSection extends StatelessWidget {
                 ),
               ),
               Text(
-                l10n.totalWithAmount(totalAmount.toCommaWon()),
+                l10n.totalWithAmount(
+                  formatGroupedCurrencyAmounts(totalsByCurrency),
+                ),
                 style: TextStyle(
                   fontSize: 12,
                   height: 16 / 12,

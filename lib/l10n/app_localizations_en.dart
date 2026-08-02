@@ -319,7 +319,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notices => 'Notices';
 
   @override
-  String get sectionNotification => 'Notifications';
+  String get sectionSettings => 'Settings';
 
   @override
   String get sectionSupport => 'Support';
@@ -493,6 +493,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get currencyUnitSuffix => 'KRW';
+
+  @override
+  String get mainCurrencySettingTitle => 'Main Currency';
+
+  @override
+  String get currencySettingScreenTitle => 'Main Currency Setting';
+
+  @override
+  String get currencySettingDescription => 'New entries will be recorded in the currency you select. Existing entries keep the currency they were originally saved in.';
+
+  @override
+  String get currencyNameKrw => 'South Korean Won';
+
+  @override
+  String get currencyNameUsd => 'US Dollar';
+
+  @override
+  String get currencyNameJpy => 'Japanese Yen';
+
+  @override
+  String get currencyNameEur => 'Euro';
+
+  @override
+  String get currencyNameCny => 'Chinese Yuan';
+
+  @override
+  String get currencyNameGbp => 'British Pound';
+
+  @override
+  String get currencyNameHkd => 'Hong Kong Dollar';
 
   @override
   String sharesWithUnit(String shares) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/data/model/entities/currency.dart';
 import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/asset/asset_category_card.dart';
 import 'package:money_mate/ui/asset/asset_total_header.dart';
@@ -7,6 +8,7 @@ import 'package:money_mate/ui/asset/screen/add_asset_screen.dart';
 import 'package:money_mate/ui/asset/screen/asset_detail_screen.dart';
 import 'package:money_mate/ui/asset/screen/portfolio_target_setting_screen.dart';
 import 'package:money_mate/ui/asset/view_models/assets_tab_view_model.dart';
+import 'package:money_mate/ui/core/currency/current_currency.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 
 class AssetsTabScreen extends StatefulWidget {
@@ -92,7 +94,10 @@ class _AssetContentView extends StatelessWidget {
             return AssetCategoryItemData(
               asset: item.asset,
               name: item.asset.assetName,
-              amountText: item.asset.amount.toKoreanWon(),
+              amountText: item.asset.amount.toFormattedCurrency(
+                CurrencyCode.fromCode(item.asset.currencyCode),
+                useKoreanUnitGrouping: true,
+              ),
               innerRatio: item.innerRatio,
               innerRatioText: l10n.innerRatioWithValue(
                 meta.label(l10n),
@@ -112,7 +117,10 @@ class _AssetContentView extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: AssetCategoryCard(
             categoryName: meta.label(l10n),
-            totalAmountText: category.totalAmount.toKoreanWon(),
+            totalAmountText: formatGroupedCurrencyAmounts(
+              category.subtotalsByCurrency,
+              useKoreanUnitGrouping: true,
+            ),
             actualRatio: category.actualRatio,
             targetRatio: category.targetRatio,
             accentColor: meta.accentColor,
@@ -147,7 +155,10 @@ class _AssetContentView extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(0, 0, 0, 48),
         children: [
           AssetTotalHeader(
-            totalAssetText: viewModel.totalAmount.toKoreanWon(),
+            totalAssetText: formatGroupedCurrencyAmounts(
+              viewModel.totalAmountsByCurrency,
+              useKoreanUnitGrouping: true,
+            ),
             onAddAssetTap: onAddAssetTap,
           ),
           const SizedBox(height: 16),
@@ -310,7 +321,10 @@ class _EmptyAssetsView extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            0.toKoreanWon(),
+            0.toFormattedCurrency(
+              CurrentCurrency.code,
+              useKoreanUnitGrouping: true,
+            ),
             style: TextStyle(
               fontSize: 30,
               height: 36 / 30,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
-import 'package:flutter/services.dart';
+import 'package:money_mate/data/model/entities/currency.dart';
 import 'package:money_mate/data/model/entities/ledger_record.dart';
 import 'package:money_mate/data/repositories/ledger_record_repository.dart';
 import 'package:money_mate/data/repositories/ledger_record_repository_impl.dart';
@@ -58,6 +58,10 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
     return initialMemo == null || initialMemo.isEmpty;
   }
 
+  /// 수정 시에는 기록 원래의 통화를 그대로 유지한다.
+  CurrencyCode get _entryCurrency =>
+      CurrencyCode.fromCode(widget.entry.currencyCode);
+
   List<LedgerCategoryOption> get _categoryOptions {
     return _selectedTypeIndex == 0
         ? ledgerIncomeCategoryOptions
@@ -74,7 +78,10 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
     _selectedDate = widget.entry.date;
     _amountFocusNode = FocusNode();
     _amountController = TextEditingController(
-      text: _formatDigitsWithComma(widget.entry.amount),
+      text: CurrencyAmountInputFormatter.formatMinorUnits(
+        widget.entry.amount,
+        _entryCurrency,
+      ),
     );
     _memoController = TextEditingController(text: widget.entry.memo ?? '');
   }
@@ -95,18 +102,6 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
       date.day,
       weekdays[date.weekday - 1],
     );
-  }
-
-  String _formatDigitsWithComma(int amount) {
-    final reversed = amount.toString().split('').reversed.toList();
-    final buffer = StringBuffer();
-    for (var i = 0; i < reversed.length; i++) {
-      if (i > 0 && i % 3 == 0) {
-        buffer.write(',');
-      }
-      buffer.write(reversed[i]);
-    }
-    return buffer.toString().split('').reversed.join();
   }
 
   int _findInitialCategoryIndex(int typeIndex) {
@@ -168,8 +163,10 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
   }
 
   int get _amountValue {
-    final digits = _amountController.text.replaceAll(RegExp(r'[^0-9]'), '');
-    return int.tryParse(digits) ?? 0;
+    return CurrencyAmountInputFormatter.parseToMinorUnits(
+      _amountController.text,
+      _entryCurrency,
+    );
   }
 
   Future<void> _onSaveTap() async {
@@ -203,6 +200,7 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
       type: isExpense ? LedgerRecordType.expense : LedgerRecordType.income,
       category: _categoryOptions[_selectedCategoryIndex].code,
       amount: _amountValue,
+      currencyCode: widget.entry.currencyCode,
       date: _selectedDate,
       paymentMethod: isExpense ? _selectedExpensePaymentMethod : null,
       memo:
@@ -367,7 +365,12 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
                         LedgerAmountField.editable(
                           controller: _amountController,
                           focusNode: _amountFocusNode,
-                          inputFormatters: const [_AmountInputFormatter()],
+                          currency: _entryCurrency,
+                          inputFormatters: [
+                            CurrencyAmountInputFormatter(
+                              currency: _entryCurrency,
+                            ),
+                          ],
                           onTap: _markTapped,
                         ),
                         Divider(
@@ -519,50 +522,6 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
         ),
       ),
     );
-  }
-}
-
-class _AmountInputFormatter extends TextInputFormatter {
-  const _AmountInputFormatter();
-
-  @override
-  TextEditingValue formatEditUpdate(
-    TextEditingValue oldValue,
-    TextEditingValue newValue,
-  ) {
-    final digitsOnly = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
-
-    if (digitsOnly.isEmpty) {
-      return const TextEditingValue(
-        text: '0',
-        selection: TextSelection.collapsed(offset: 1),
-      );
-    }
-
-    final trimmedLeadingZero = digitsOnly.replaceFirst(RegExp(r'^0+'), '');
-    final normalizedDigits =
-        trimmedLeadingZero.isEmpty ? '0' : trimmedLeadingZero;
-    final formatted = _formatWithComma(normalizedDigits);
-
-    return TextEditingValue(
-      text: formatted,
-      selection: TextSelection.collapsed(offset: formatted.length),
-      composing: TextRange.empty,
-    );
-  }
-
-  String _formatWithComma(String digits) {
-    final buffer = StringBuffer();
-
-    for (var i = 0; i < digits.length; i++) {
-      final reverseIndex = digits.length - i;
-      buffer.write(digits[i]);
-      if (reverseIndex > 1 && reverseIndex % 3 == 1) {
-        buffer.write(',');
-      }
-    }
-
-    return buffer.toString();
   }
 }
 

@@ -3,10 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:money_mate/data/local/app_database.dart';
 import 'package:money_mate/data/model/entities/asset_entry.dart';
+import 'package:money_mate/data/model/entities/currency.dart';
 import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/asset/screen/portfolio_target_setting_screen.dart';
 import 'package:money_mate/ui/asset/view_models/add_asset_view_model.dart';
+import 'package:money_mate/ui/core/currency/current_currency.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
+import 'package:money_mate/ui/ledger/widgets/ledger_date_amount_fields.dart';
 
 class AddAssetScreen extends StatefulWidget {
   const AddAssetScreen({super.key, this.initialAsset});
@@ -115,6 +118,12 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
   bool get _isStockAsset => _selectedAssetTypeCode == AssetType.stock;
   bool get _isEditMode => widget.initialAsset != null;
 
+  /// 신규 자산은 현재 주 통화를, 수정 시에는 그 자산이 저장된 원래 통화를 사용한다.
+  CurrencyCode get _activeCurrency =>
+      widget.initialAsset != null
+          ? CurrencyCode.fromCode(widget.initialAsset!.currencyCode)
+          : CurrentCurrency.code;
+
   bool get _isSubmitEnabled =>
       _assetNameController.text.trim().isNotEmpty &&
       _amount > 0 &&
@@ -135,13 +144,18 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
     final index = _assetTypeOrder.indexWhere((t) => t == type);
     _selectedIndex = index >= 0 ? index : 0;
     _assetNameController.text = initial.assetName;
+    // 저장된 amount는 통화의 최소단위(minor unit) 기준이며, 이 화면도
+    // 이제 minor unit을 그대로 다루므로 변환 없이 바로 사용한다.
     _setAmount(initial.amount);
     _includeInPortfolio = initial.includeInPortfolio;
     if (_isStockAsset && initial.shares != null && initial.shares! > 0) {
       _shares = initial.shares;
       _sharesController.text = _formatShares(_shares);
       _unitPrice = (initial.amount / initial.shares!).round();
-      _unitPriceController.text = _formatWithComma(_unitPrice);
+      _unitPriceController.text = CurrencyAmountInputFormatter.formatMinorUnits(
+        _unitPrice,
+        _activeCurrency,
+      );
     }
   }
 
@@ -224,6 +238,7 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
     }
 
     final initial = widget.initialAsset;
+    // _amount는 이미 통화의 최소단위(minor unit) 기준이므로 그대로 저장한다.
     final isSuccess =
         initial == null
             ? await _viewModel.saveAsset(
@@ -238,6 +253,7 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
               assetType: _selectedAssetTypeCode,
               assetName: _assetNameController.text.trim(),
               amount: _amount,
+              currencyCode: initial.currencyCode,
               shares: _isStockAsset ? _shares : null,
               includeInPortfolio: _includeInPortfolio,
             );
@@ -274,8 +290,11 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
     setState(() {
       _selectedIndex = index;
       _assetNameController.clear();
-      _unitPriceController.text = '0';
       _unitPrice = 0;
+      _unitPriceController.text = CurrencyAmountInputFormatter.formatMinorUnits(
+        0,
+        _activeCurrency,
+      );
     });
   }
 
@@ -291,7 +310,10 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
 
   void _setAmount(int value) {
     _amount = value;
-    _amountController.text = _formatWithComma(value);
+    _amountController.text = CurrencyAmountInputFormatter.formatMinorUnits(
+      value,
+      _activeCurrency,
+    );
   }
 
   Widget _buildStepOneContent(
@@ -403,6 +425,7 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
             unitPriceController: _unitPriceController,
             shares: _shares,
             evaluatedAmount: _amount,
+            currency: _activeCurrency,
             onNameChanged: (_) => setState(() {}),
             onSharesChanged: _onSharesChanged,
             onUnitPriceChanged: (value) {
@@ -420,6 +443,7 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
           const SizedBox(height: 8),
           _AmountInputField(
             controller: _amountController,
+            currency: _activeCurrency,
             onChanged: (value) {
               _amount = value;
               setState(() {});
@@ -428,24 +452,24 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
             textInputAction: TextInputAction.done,
             onSubmitted: (_) => FocusScope.of(context).unfocus(),
           ),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children:
-                _quickAmounts
-                    .map(
-                      (amount) => _QuickAmountButton(
-                        label: '+${_quickAmountLabel(amount)}',
-                        onTap: () {
-                          _amount += amount;
-                          _amountController.text = _formatWithComma(_amount);
-                          setState(() {});
-                        },
-                      ),
-                    )
-                    .toList(),
-          ),
+          // 빠른 금액 버튼은 원화 물가/평균 자산 기준으로 만들어진 값이라
+          // 다른 통화의 물가 수준을 알 수 없으므로 KRW를 선택했을 때만 보여준다.
+          if (_activeCurrency == CurrencyCode.krw) ...[
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children:
+                  _quickAmounts
+                      .map(
+                        (amount) => _QuickAmountButton(
+                          label: '+${_quickAmountLabel(amount)}',
+                          onTap: () => setState(() => _setAmount(_amount + amount)),
+                        ),
+                      )
+                      .toList(),
+            ),
+          ],
         ],
         const SizedBox(height: 20),
         _SectionLabel(text: l10n.portfolioManagementLabel),
@@ -959,6 +983,7 @@ class _AmountInputField extends StatelessWidget {
   const _AmountInputField({
     required this.controller,
     required this.onChanged,
+    required this.currency,
     this.focusNode,
     this.textInputAction,
     this.onSubmitted,
@@ -966,6 +991,7 @@ class _AmountInputField extends StatelessWidget {
 
   final TextEditingController controller;
   final ValueChanged<int> onChanged;
+  final CurrencyCode currency;
   final FocusNode? focusNode;
   final TextInputAction? textInputAction;
   final ValueChanged<String>? onSubmitted;
@@ -989,21 +1015,24 @@ class _AmountInputField extends StatelessWidget {
               focusNode: focusNode,
               textInputAction: textInputAction,
               onSubmitted: onSubmitted,
-              keyboardType: TextInputType.number,
+              keyboardType: TextInputType.numberWithOptions(
+                decimal: currency.supportsDecimalInput,
+              ),
+              inputFormatters: [
+                CurrencyAmountInputFormatter(currency: currency),
+              ],
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
                 color: context.appColors.textPrimary,
               ),
               onChanged: (value) {
-                final digitsOnly = value.replaceAll(RegExp(r'[^0-9]'), '');
-                final parsed = digitsOnly.isEmpty ? 0 : int.parse(digitsOnly);
-                final formatted = _formatWithComma(parsed);
-                controller.value = TextEditingValue(
-                  text: formatted,
-                  selection: TextSelection.collapsed(offset: formatted.length),
+                onChanged(
+                  CurrencyAmountInputFormatter.parseToMinorUnits(
+                    value,
+                    currency,
+                  ),
                 );
-                onChanged(parsed);
               },
               decoration: InputDecoration(
                 border: InputBorder.none,
@@ -1018,7 +1047,7 @@ class _AmountInputField extends StatelessWidget {
             ),
           ),
           Text(
-            l10n.currencyUnitSuffix,
+            currencyInputSuffixLabel(currency, l10n),
             style: TextStyle(
               fontSize: 14,
               height: 20 / 14,
@@ -1039,6 +1068,7 @@ class _StockHoldingSection extends StatelessWidget {
     required this.unitPriceController,
     required this.shares,
     required this.evaluatedAmount,
+    required this.currency,
     required this.onNameChanged,
     required this.onSharesChanged,
     required this.onUnitPriceChanged,
@@ -1052,6 +1082,7 @@ class _StockHoldingSection extends StatelessWidget {
   final TextEditingController unitPriceController;
   final double? shares;
   final int evaluatedAmount;
+  final CurrencyCode currency;
   final ValueChanged<String> onNameChanged;
   final ValueChanged<String> onSharesChanged;
   final ValueChanged<int> onUnitPriceChanged;
@@ -1066,7 +1097,10 @@ class _StockHoldingSection extends StatelessWidget {
     final summaryPrimary = context.appColors.primary;
     final summarySecondary = context.appColors.primary.withValues(alpha: 0.55);
     final sharesText = _formatShares(shares);
-    final evaluatedText = evaluatedAmount.toKoreanWon();
+    final evaluatedText = evaluatedAmount.toFormattedCurrency(
+      currency,
+      useKoreanUnitGrouping: true,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1087,6 +1121,7 @@ class _StockHoldingSection extends StatelessWidget {
         const SizedBox(height: 8),
         _AmountInputField(
           controller: unitPriceController,
+          currency: currency,
           onChanged: onUnitPriceChanged,
           focusNode: unitPriceFocusNode,
           textInputAction: TextInputAction.next,
@@ -1200,7 +1235,7 @@ class _StockHoldingSection extends StatelessWidget {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    l10n.amountWithWonSuffix(unitPriceController.text),
+                    '${unitPriceController.text}${currencyInputSuffixLabel(currency, l10n)}',
                     style: TextStyle(
                       fontSize: 12,
                       height: 16 / 12,
@@ -1475,26 +1510,14 @@ class _AssetTypeOption {
   final String nameHint;
 }
 
-String _formatWithComma(int value) {
-  final raw = value.toString();
-  final buffer = StringBuffer();
-  for (var i = 0; i < raw.length; i++) {
-    final reverseIndex = raw.length - i;
-    buffer.write(raw[i]);
-    if (reverseIndex > 1 && reverseIndex % 3 == 1) {
-      buffer.write(',');
-    }
-  }
-  return buffer.toString();
-}
-
-/// 빠른 금액 버튼용 축약 표기. 한국어 로케일에서는 억/만 단위, 그 외에는 콤마 포맷을 사용한다.
+/// 빠른 금액 버튼용 축약 표기. 이 버튼은 KRW를 선택했을 때만 노출되므로
+/// 한국어 로케일이면 억/만 단위, 그 외 언어(영어 등)에서는 콤마 포맷을 사용한다.
 String _quickAmountLabel(int amount) {
   if (Intl.getCurrentLocale().startsWith('ko')) {
     if (amount >= 100000000) return '1억';
     return '${amount ~/ 10000}만';
   }
-  return amount.toCommaWon();
+  return amount.toFormattedCurrency(CurrencyCode.krw);
 }
 
 String _formatShares(double? value) {

@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
+import 'package:money_mate/data/model/entities/currency.dart';
 import 'package:money_mate/data/repositories/ledger_record_repository_impl.dart';
 import 'package:money_mate/data/repositories/ledger_record_repository.dart';
 import 'package:money_mate/l10n/app_localizations.dart';
+import 'package:money_mate/ui/core/currency/current_currency.dart';
 
 import '../../../data/model/entities/ledger_record.dart';
 
@@ -53,6 +55,7 @@ class AddLedgerRecordViewModel extends ChangeNotifier {
           type: type,
           category: category,
           amount: amount,
+          currencyCode: CurrentCurrency.code.isoCode,
           date: date,
           paymentMethod: paymentMethod,
           memo: memo,

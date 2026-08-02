@@ -5,6 +5,7 @@ import 'package:money_mate/data/local/app_database.dart';
 import 'package:money_mate/data/local/asset_local_data_source.dart';
 import 'package:money_mate/data/local/portfolio_target_local_data_source.dart';
 import 'package:money_mate/data/model/entities/asset_entry.dart';
+import 'package:money_mate/data/model/entities/currency.dart';
 import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/core/design_system/app_colors.dart';
 
@@ -37,6 +38,19 @@ class AssetsTabViewModel extends ChangeNotifier {
   bool get isEmpty => _assets.isEmpty;
 
   int get totalAmount => _assets.fold<int>(0, (sum, a) => sum + a.amount);
+
+  /// 통화별 자산 합계. 표시용으로는 이 값을 사용해 통화가 섞여도
+  /// "₩1,000,000 · $200"처럼 정확하게 보여준다.
+  /// (참고: [totalAmount]와 아래 비율 계산은 환율 연동 전이라 통화가 섞이면
+  /// 부정확할 수 있다 — Phase 2에서 환율 적용 후 개선 예정)
+  Map<CurrencyCode, int> get totalAmountsByCurrency {
+    final result = <CurrencyCode, int>{};
+    for (final asset in _assets) {
+      final currency = CurrencyCode.fromCode(asset.currencyCode);
+      result[currency] = (result[currency] ?? 0) + asset.amount;
+    }
+    return result;
+  }
 
   int get portfolioTotal {
     var total = 0;
@@ -71,6 +85,12 @@ class AssetsTabViewModel extends ChangeNotifier {
         0,
         (sum, a) => sum + a.amount,
       );
+      final categorySubtotalsByCurrency = <CurrencyCode, int>{};
+      for (final a in assetsInCategory) {
+        final currency = CurrencyCode.fromCode(a.currencyCode);
+        categorySubtotalsByCurrency[currency] =
+            (categorySubtotalsByCurrency[currency] ?? 0) + a.amount;
+      }
 
       final portfolioCategoryTotal =
           isCategoryEnabled
@@ -95,6 +115,7 @@ class AssetsTabViewModel extends ChangeNotifier {
         AssetCategoryData(
           type: type,
           totalAmount: categoryTotal,
+          subtotalsByCurrency: categorySubtotalsByCurrency,
           actualRatio: actualRatio,
           targetRatio: targetRatio.toDouble(),
           isCategoryEnabled: isCategoryEnabled,
@@ -129,6 +150,7 @@ class AssetCategoryData {
   const AssetCategoryData({
     required this.type,
     required this.totalAmount,
+    required this.subtotalsByCurrency,
     required this.actualRatio,
     required this.targetRatio,
     required this.isCategoryEnabled,
@@ -137,6 +159,7 @@ class AssetCategoryData {
 
   final AssetType type;
   final int totalAmount;
+  final Map<CurrencyCode, int> subtotalsByCurrency;
   final double actualRatio;
   final double targetRatio;
   final bool isCategoryEnabled;

@@ -319,7 +319,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get notices => '공지사항';
 
   @override
-  String get sectionNotification => '알림';
+  String get sectionSettings => '설정';
 
   @override
   String get sectionSupport => '고객지원';
@@ -493,6 +493,36 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get currencyUnitSuffix => '원';
+
+  @override
+  String get mainCurrencySettingTitle => '주 통화';
+
+  @override
+  String get currencySettingScreenTitle => '주 통화 설정';
+
+  @override
+  String get currencySettingDescription => '새로 입력하는 항목부터 선택한 통화로 기록됩니다. 이미 저장된 기록은 원래 통화 그대로 유지됩니다.';
+
+  @override
+  String get currencyNameKrw => '대한민국 원';
+
+  @override
+  String get currencyNameUsd => '미국 달러';
+
+  @override
+  String get currencyNameJpy => '일본 엔';
+
+  @override
+  String get currencyNameEur => '유로';
+
+  @override
+  String get currencyNameCny => '중국 위안';
+
+  @override
+  String get currencyNameGbp => '영국 파운드';
+
+  @override
+  String get currencyNameHkd => '홍콩 달러';
 
   @override
   String sharesWithUnit(String shares) {

@@ -1,10 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:money_mate/data/model/entities/asset_entry.dart';
+import 'package:money_mate/data/model/entities/currency.dart';
 import 'package:money_mate/data/repositories/asset_repository.dart';
 import 'package:money_mate/data/repositories/asset_repository_impl.dart';
 import 'package:money_mate/data/repositories/portfolio_target_repository.dart';
 import 'package:money_mate/data/repositories/portfolio_target_repository_impl.dart';
 import 'package:money_mate/l10n/app_localizations.dart';
+import 'package:money_mate/ui/core/currency/current_currency.dart';
 
 enum _AddAssetError {
   emptyName,
@@ -89,6 +91,7 @@ class AddAssetViewModel extends ChangeNotifier {
           assetType: assetType,
           assetName: assetName.trim(),
           amount: amount,
+          currencyCode: CurrentCurrency.code.isoCode,
           shares: shares,
           includeInPortfolio: includeInPortfolio,
         ),
@@ -108,6 +111,7 @@ class AddAssetViewModel extends ChangeNotifier {
     required AssetType assetType,
     required String assetName,
     required int amount,
+    required String currencyCode,
     double? shares,
     required bool includeInPortfolio,
   }) async {
@@ -126,6 +130,7 @@ class AddAssetViewModel extends ChangeNotifier {
           assetType: assetType,
           assetName: assetName.trim(),
           amount: amount,
+          currencyCode: currencyCode,
           shares: shares,
           includeInPortfolio: includeInPortfolio,
         ),

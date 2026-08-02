@@ -51,6 +51,18 @@ class $LedgerRecordsTable extends LedgerRecords
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _currencyCodeMeta = const VerificationMeta(
+    'currencyCode',
+  );
+  @override
+  late final GeneratedColumn<String> currencyCode = GeneratedColumn<String>(
+    'currency_code',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('KRW'),
+  );
   static const VerificationMeta _dateMeta = const VerificationMeta('date');
   @override
   late final GeneratedColumn<DateTime> date = GeneratedColumn<DateTime>(
@@ -98,6 +110,7 @@ class $LedgerRecordsTable extends LedgerRecords
     type,
     category,
     amount,
+    currencyCode,
     date,
     paymentMethod,
     memo,
@@ -141,6 +154,15 @@ class $LedgerRecordsTable extends LedgerRecords
       );
     } else if (isInserting) {
       context.missing(_amountMeta);
+    }
+    if (data.containsKey('currency_code')) {
+      context.handle(
+        _currencyCodeMeta,
+        currencyCode.isAcceptableOrUnknown(
+          data['currency_code']!,
+          _currencyCodeMeta,
+        ),
+      );
     }
     if (data.containsKey('date')) {
       context.handle(
@@ -200,6 +222,11 @@ class $LedgerRecordsTable extends LedgerRecords
             DriftSqlType.int,
             data['${effectivePrefix}amount'],
           )!,
+      currencyCode:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}currency_code'],
+          )!,
       date:
           attachedDatabase.typeMapping.read(
             DriftSqlType.dateTime,
@@ -232,6 +259,7 @@ class LedgerRecord extends DataClass implements Insertable<LedgerRecord> {
   final String type;
   final String category;
   final int amount;
+  final String currencyCode;
   final DateTime date;
   final String? paymentMethod;
   final String? memo;
@@ -241,6 +269,7 @@ class LedgerRecord extends DataClass implements Insertable<LedgerRecord> {
     required this.type,
     required this.category,
     required this.amount,
+    required this.currencyCode,
     required this.date,
     this.paymentMethod,
     this.memo,
@@ -253,6 +282,7 @@ class LedgerRecord extends DataClass implements Insertable<LedgerRecord> {
     map['type'] = Variable<String>(type);
     map['category'] = Variable<String>(category);
     map['amount'] = Variable<int>(amount);
+    map['currency_code'] = Variable<String>(currencyCode);
     map['date'] = Variable<DateTime>(date);
     if (!nullToAbsent || paymentMethod != null) {
       map['payment_method'] = Variable<String>(paymentMethod);
@@ -270,6 +300,7 @@ class LedgerRecord extends DataClass implements Insertable<LedgerRecord> {
       type: Value(type),
       category: Value(category),
       amount: Value(amount),
+      currencyCode: Value(currencyCode),
       date: Value(date),
       paymentMethod:
           paymentMethod == null && nullToAbsent
@@ -290,6 +321,7 @@ class LedgerRecord extends DataClass implements Insertable<LedgerRecord> {
       type: serializer.fromJson<String>(json['type']),
       category: serializer.fromJson<String>(json['category']),
       amount: serializer.fromJson<int>(json['amount']),
+      currencyCode: serializer.fromJson<String>(json['currencyCode']),
       date: serializer.fromJson<DateTime>(json['date']),
       paymentMethod: serializer.fromJson<String?>(json['paymentMethod']),
       memo: serializer.fromJson<String?>(json['memo']),
@@ -304,6 +336,7 @@ class LedgerRecord extends DataClass implements Insertable<LedgerRecord> {
       'type': serializer.toJson<String>(type),
       'category': serializer.toJson<String>(category),
       'amount': serializer.toJson<int>(amount),
+      'currencyCode': serializer.toJson<String>(currencyCode),
       'date': serializer.toJson<DateTime>(date),
       'paymentMethod': serializer.toJson<String?>(paymentMethod),
       'memo': serializer.toJson<String?>(memo),
@@ -316,6 +349,7 @@ class LedgerRecord extends DataClass implements Insertable<LedgerRecord> {
     String? type,
     String? category,
     int? amount,
+    String? currencyCode,
     DateTime? date,
     Value<String?> paymentMethod = const Value.absent(),
     Value<String?> memo = const Value.absent(),
@@ -325,6 +359,7 @@ class LedgerRecord extends DataClass implements Insertable<LedgerRecord> {
     type: type ?? this.type,
     category: category ?? this.category,
     amount: amount ?? this.amount,
+    currencyCode: currencyCode ?? this.currencyCode,
     date: date ?? this.date,
     paymentMethod:
         paymentMethod.present ? paymentMethod.value : this.paymentMethod,
@@ -337,6 +372,10 @@ class LedgerRecord extends DataClass implements Insertable<LedgerRecord> {
       type: data.type.present ? data.type.value : this.type,
       category: data.category.present ? data.category.value : this.category,
       amount: data.amount.present ? data.amount.value : this.amount,
+      currencyCode:
+          data.currencyCode.present
+              ? data.currencyCode.value
+              : this.currencyCode,
       date: data.date.present ? data.date.value : this.date,
       paymentMethod:
           data.paymentMethod.present
@@ -354,6 +393,7 @@ class LedgerRecord extends DataClass implements Insertable<LedgerRecord> {
           ..write('type: $type, ')
           ..write('category: $category, ')
           ..write('amount: $amount, ')
+          ..write('currencyCode: $currencyCode, ')
           ..write('date: $date, ')
           ..write('paymentMethod: $paymentMethod, ')
           ..write('memo: $memo, ')
@@ -368,6 +408,7 @@ class LedgerRecord extends DataClass implements Insertable<LedgerRecord> {
     type,
     category,
     amount,
+    currencyCode,
     date,
     paymentMethod,
     memo,
@@ -381,6 +422,7 @@ class LedgerRecord extends DataClass implements Insertable<LedgerRecord> {
           other.type == this.type &&
           other.category == this.category &&
           other.amount == this.amount &&
+          other.currencyCode == this.currencyCode &&
           other.date == this.date &&
           other.paymentMethod == this.paymentMethod &&
           other.memo == this.memo &&
@@ -392,6 +434,7 @@ class LedgerRecordsCompanion extends UpdateCompanion<LedgerRecord> {
   final Value<String> type;
   final Value<String> category;
   final Value<int> amount;
+  final Value<String> currencyCode;
   final Value<DateTime> date;
   final Value<String?> paymentMethod;
   final Value<String?> memo;
@@ -401,6 +444,7 @@ class LedgerRecordsCompanion extends UpdateCompanion<LedgerRecord> {
     this.type = const Value.absent(),
     this.category = const Value.absent(),
     this.amount = const Value.absent(),
+    this.currencyCode = const Value.absent(),
     this.date = const Value.absent(),
     this.paymentMethod = const Value.absent(),
     this.memo = const Value.absent(),
@@ -411,6 +455,7 @@ class LedgerRecordsCompanion extends UpdateCompanion<LedgerRecord> {
     required String type,
     required String category,
     required int amount,
+    this.currencyCode = const Value.absent(),
     required DateTime date,
     this.paymentMethod = const Value.absent(),
     this.memo = const Value.absent(),
@@ -424,6 +469,7 @@ class LedgerRecordsCompanion extends UpdateCompanion<LedgerRecord> {
     Expression<String>? type,
     Expression<String>? category,
     Expression<int>? amount,
+    Expression<String>? currencyCode,
     Expression<DateTime>? date,
     Expression<String>? paymentMethod,
     Expression<String>? memo,
@@ -434,6 +480,7 @@ class LedgerRecordsCompanion extends UpdateCompanion<LedgerRecord> {
       if (type != null) 'type': type,
       if (category != null) 'category': category,
       if (amount != null) 'amount': amount,
+      if (currencyCode != null) 'currency_code': currencyCode,
       if (date != null) 'date': date,
       if (paymentMethod != null) 'payment_method': paymentMethod,
       if (memo != null) 'memo': memo,
@@ -446,6 +493,7 @@ class LedgerRecordsCompanion extends UpdateCompanion<LedgerRecord> {
     Value<String>? type,
     Value<String>? category,
     Value<int>? amount,
+    Value<String>? currencyCode,
     Value<DateTime>? date,
     Value<String?>? paymentMethod,
     Value<String?>? memo,
@@ -456,6 +504,7 @@ class LedgerRecordsCompanion extends UpdateCompanion<LedgerRecord> {
       type: type ?? this.type,
       category: category ?? this.category,
       amount: amount ?? this.amount,
+      currencyCode: currencyCode ?? this.currencyCode,
       date: date ?? this.date,
       paymentMethod: paymentMethod ?? this.paymentMethod,
       memo: memo ?? this.memo,
@@ -477,6 +526,9 @@ class LedgerRecordsCompanion extends UpdateCompanion<LedgerRecord> {
     }
     if (amount.present) {
       map['amount'] = Variable<int>(amount.value);
+    }
+    if (currencyCode.present) {
+      map['currency_code'] = Variable<String>(currencyCode.value);
     }
     if (date.present) {
       map['date'] = Variable<DateTime>(date.value);
@@ -500,6 +552,7 @@ class LedgerRecordsCompanion extends UpdateCompanion<LedgerRecord> {
           ..write('type: $type, ')
           ..write('category: $category, ')
           ..write('amount: $amount, ')
+          ..write('currencyCode: $currencyCode, ')
           ..write('date: $date, ')
           ..write('paymentMethod: $paymentMethod, ')
           ..write('memo: $memo, ')
@@ -558,6 +611,18 @@ class $AssetsTable extends Assets with TableInfo<$AssetsTable, Asset> {
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _currencyCodeMeta = const VerificationMeta(
+    'currencyCode',
+  );
+  @override
+  late final GeneratedColumn<String> currencyCode = GeneratedColumn<String>(
+    'currency_code',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('KRW'),
+  );
   static const VerificationMeta _sharesMeta = const VerificationMeta('shares');
   @override
   late final GeneratedColumn<double> shares = GeneratedColumn<double>(
@@ -599,6 +664,7 @@ class $AssetsTable extends Assets with TableInfo<$AssetsTable, Asset> {
     assetType,
     assetName,
     amount,
+    currencyCode,
     shares,
     includeInPortfolio,
     createdAt,
@@ -641,6 +707,15 @@ class $AssetsTable extends Assets with TableInfo<$AssetsTable, Asset> {
       );
     } else if (isInserting) {
       context.missing(_amountMeta);
+    }
+    if (data.containsKey('currency_code')) {
+      context.handle(
+        _currencyCodeMeta,
+        currencyCode.isAcceptableOrUnknown(
+          data['currency_code']!,
+          _currencyCodeMeta,
+        ),
+      );
     }
     if (data.containsKey('shares')) {
       context.handle(
@@ -692,6 +767,11 @@ class $AssetsTable extends Assets with TableInfo<$AssetsTable, Asset> {
             DriftSqlType.int,
             data['${effectivePrefix}amount'],
           )!,
+      currencyCode:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}currency_code'],
+          )!,
       shares: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
         data['${effectivePrefix}shares'],
@@ -720,6 +800,7 @@ class Asset extends DataClass implements Insertable<Asset> {
   final String assetType;
   final String assetName;
   final int amount;
+  final String currencyCode;
   final double? shares;
   final bool includeInPortfolio;
   final DateTime createdAt;
@@ -728,6 +809,7 @@ class Asset extends DataClass implements Insertable<Asset> {
     required this.assetType,
     required this.assetName,
     required this.amount,
+    required this.currencyCode,
     this.shares,
     required this.includeInPortfolio,
     required this.createdAt,
@@ -739,6 +821,7 @@ class Asset extends DataClass implements Insertable<Asset> {
     map['asset_type'] = Variable<String>(assetType);
     map['asset_name'] = Variable<String>(assetName);
     map['amount'] = Variable<int>(amount);
+    map['currency_code'] = Variable<String>(currencyCode);
     if (!nullToAbsent || shares != null) {
       map['shares'] = Variable<double>(shares);
     }
@@ -753,6 +836,7 @@ class Asset extends DataClass implements Insertable<Asset> {
       assetType: Value(assetType),
       assetName: Value(assetName),
       amount: Value(amount),
+      currencyCode: Value(currencyCode),
       shares:
           shares == null && nullToAbsent ? const Value.absent() : Value(shares),
       includeInPortfolio: Value(includeInPortfolio),
@@ -770,6 +854,7 @@ class Asset extends DataClass implements Insertable<Asset> {
       assetType: serializer.fromJson<String>(json['assetType']),
       assetName: serializer.fromJson<String>(json['assetName']),
       amount: serializer.fromJson<int>(json['amount']),
+      currencyCode: serializer.fromJson<String>(json['currencyCode']),
       shares: serializer.fromJson<double?>(json['shares']),
       includeInPortfolio: serializer.fromJson<bool>(json['includeInPortfolio']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -783,6 +868,7 @@ class Asset extends DataClass implements Insertable<Asset> {
       'assetType': serializer.toJson<String>(assetType),
       'assetName': serializer.toJson<String>(assetName),
       'amount': serializer.toJson<int>(amount),
+      'currencyCode': serializer.toJson<String>(currencyCode),
       'shares': serializer.toJson<double?>(shares),
       'includeInPortfolio': serializer.toJson<bool>(includeInPortfolio),
       'createdAt': serializer.toJson<DateTime>(createdAt),
@@ -794,6 +880,7 @@ class Asset extends DataClass implements Insertable<Asset> {
     String? assetType,
     String? assetName,
     int? amount,
+    String? currencyCode,
     Value<double?> shares = const Value.absent(),
     bool? includeInPortfolio,
     DateTime? createdAt,
@@ -802,6 +889,7 @@ class Asset extends DataClass implements Insertable<Asset> {
     assetType: assetType ?? this.assetType,
     assetName: assetName ?? this.assetName,
     amount: amount ?? this.amount,
+    currencyCode: currencyCode ?? this.currencyCode,
     shares: shares.present ? shares.value : this.shares,
     includeInPortfolio: includeInPortfolio ?? this.includeInPortfolio,
     createdAt: createdAt ?? this.createdAt,
@@ -812,6 +900,10 @@ class Asset extends DataClass implements Insertable<Asset> {
       assetType: data.assetType.present ? data.assetType.value : this.assetType,
       assetName: data.assetName.present ? data.assetName.value : this.assetName,
       amount: data.amount.present ? data.amount.value : this.amount,
+      currencyCode:
+          data.currencyCode.present
+              ? data.currencyCode.value
+              : this.currencyCode,
       shares: data.shares.present ? data.shares.value : this.shares,
       includeInPortfolio:
           data.includeInPortfolio.present
@@ -828,6 +920,7 @@ class Asset extends DataClass implements Insertable<Asset> {
           ..write('assetType: $assetType, ')
           ..write('assetName: $assetName, ')
           ..write('amount: $amount, ')
+          ..write('currencyCode: $currencyCode, ')
           ..write('shares: $shares, ')
           ..write('includeInPortfolio: $includeInPortfolio, ')
           ..write('createdAt: $createdAt')
@@ -841,6 +934,7 @@ class Asset extends DataClass implements Insertable<Asset> {
     assetType,
     assetName,
     amount,
+    currencyCode,
     shares,
     includeInPortfolio,
     createdAt,
@@ -853,6 +947,7 @@ class Asset extends DataClass implements Insertable<Asset> {
           other.assetType == this.assetType &&
           other.assetName == this.assetName &&
           other.amount == this.amount &&
+          other.currencyCode == this.currencyCode &&
           other.shares == this.shares &&
           other.includeInPortfolio == this.includeInPortfolio &&
           other.createdAt == this.createdAt);
@@ -863,6 +958,7 @@ class AssetsCompanion extends UpdateCompanion<Asset> {
   final Value<String> assetType;
   final Value<String> assetName;
   final Value<int> amount;
+  final Value<String> currencyCode;
   final Value<double?> shares;
   final Value<bool> includeInPortfolio;
   final Value<DateTime> createdAt;
@@ -871,6 +967,7 @@ class AssetsCompanion extends UpdateCompanion<Asset> {
     this.assetType = const Value.absent(),
     this.assetName = const Value.absent(),
     this.amount = const Value.absent(),
+    this.currencyCode = const Value.absent(),
     this.shares = const Value.absent(),
     this.includeInPortfolio = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -880,6 +977,7 @@ class AssetsCompanion extends UpdateCompanion<Asset> {
     required String assetType,
     required String assetName,
     required int amount,
+    this.currencyCode = const Value.absent(),
     this.shares = const Value.absent(),
     this.includeInPortfolio = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -891,6 +989,7 @@ class AssetsCompanion extends UpdateCompanion<Asset> {
     Expression<String>? assetType,
     Expression<String>? assetName,
     Expression<int>? amount,
+    Expression<String>? currencyCode,
     Expression<double>? shares,
     Expression<bool>? includeInPortfolio,
     Expression<DateTime>? createdAt,
@@ -900,6 +999,7 @@ class AssetsCompanion extends UpdateCompanion<Asset> {
       if (assetType != null) 'asset_type': assetType,
       if (assetName != null) 'asset_name': assetName,
       if (amount != null) 'amount': amount,
+      if (currencyCode != null) 'currency_code': currencyCode,
       if (shares != null) 'shares': shares,
       if (includeInPortfolio != null)
         'include_in_portfolio': includeInPortfolio,
@@ -912,6 +1012,7 @@ class AssetsCompanion extends UpdateCompanion<Asset> {
     Value<String>? assetType,
     Value<String>? assetName,
     Value<int>? amount,
+    Value<String>? currencyCode,
     Value<double?>? shares,
     Value<bool>? includeInPortfolio,
     Value<DateTime>? createdAt,
@@ -921,6 +1022,7 @@ class AssetsCompanion extends UpdateCompanion<Asset> {
       assetType: assetType ?? this.assetType,
       assetName: assetName ?? this.assetName,
       amount: amount ?? this.amount,
+      currencyCode: currencyCode ?? this.currencyCode,
       shares: shares ?? this.shares,
       includeInPortfolio: includeInPortfolio ?? this.includeInPortfolio,
       createdAt: createdAt ?? this.createdAt,
@@ -942,6 +1044,9 @@ class AssetsCompanion extends UpdateCompanion<Asset> {
     if (amount.present) {
       map['amount'] = Variable<int>(amount.value);
     }
+    if (currencyCode.present) {
+      map['currency_code'] = Variable<String>(currencyCode.value);
+    }
     if (shares.present) {
       map['shares'] = Variable<double>(shares.value);
     }
@@ -961,6 +1066,7 @@ class AssetsCompanion extends UpdateCompanion<Asset> {
           ..write('assetType: $assetType, ')
           ..write('assetName: $assetName, ')
           ..write('amount: $amount, ')
+          ..write('currencyCode: $currencyCode, ')
           ..write('shares: $shares, ')
           ..write('includeInPortfolio: $includeInPortfolio, ')
           ..write('createdAt: $createdAt')
@@ -1811,6 +1917,7 @@ typedef $$LedgerRecordsTableCreateCompanionBuilder =
       required String type,
       required String category,
       required int amount,
+      Value<String> currencyCode,
       required DateTime date,
       Value<String?> paymentMethod,
       Value<String?> memo,
@@ -1822,6 +1929,7 @@ typedef $$LedgerRecordsTableUpdateCompanionBuilder =
       Value<String> type,
       Value<String> category,
       Value<int> amount,
+      Value<String> currencyCode,
       Value<DateTime> date,
       Value<String?> paymentMethod,
       Value<String?> memo,
@@ -1854,6 +1962,11 @@ class $$LedgerRecordsTableFilterComposer
 
   ColumnFilters<int> get amount => $composableBuilder(
     column: $table.amount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get currencyCode => $composableBuilder(
+    column: $table.currencyCode,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1907,6 +2020,11 @@ class $$LedgerRecordsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get currencyCode => $composableBuilder(
+    column: $table.currencyCode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get date => $composableBuilder(
     column: $table.date,
     builder: (column) => ColumnOrderings(column),
@@ -1948,6 +2066,11 @@ class $$LedgerRecordsTableAnnotationComposer
 
   GeneratedColumn<int> get amount =>
       $composableBuilder(column: $table.amount, builder: (column) => column);
+
+  GeneratedColumn<String> get currencyCode => $composableBuilder(
+    column: $table.currencyCode,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get date =>
       $composableBuilder(column: $table.date, builder: (column) => column);
@@ -2003,6 +2126,7 @@ class $$LedgerRecordsTableTableManager
                 Value<String> type = const Value.absent(),
                 Value<String> category = const Value.absent(),
                 Value<int> amount = const Value.absent(),
+                Value<String> currencyCode = const Value.absent(),
                 Value<DateTime> date = const Value.absent(),
                 Value<String?> paymentMethod = const Value.absent(),
                 Value<String?> memo = const Value.absent(),
@@ -2012,6 +2136,7 @@ class $$LedgerRecordsTableTableManager
                 type: type,
                 category: category,
                 amount: amount,
+                currencyCode: currencyCode,
                 date: date,
                 paymentMethod: paymentMethod,
                 memo: memo,
@@ -2023,6 +2148,7 @@ class $$LedgerRecordsTableTableManager
                 required String type,
                 required String category,
                 required int amount,
+                Value<String> currencyCode = const Value.absent(),
                 required DateTime date,
                 Value<String?> paymentMethod = const Value.absent(),
                 Value<String?> memo = const Value.absent(),
@@ -2032,6 +2158,7 @@ class $$LedgerRecordsTableTableManager
                 type: type,
                 category: category,
                 amount: amount,
+                currencyCode: currencyCode,
                 date: date,
                 paymentMethod: paymentMethod,
                 memo: memo,
@@ -2075,6 +2202,7 @@ typedef $$AssetsTableCreateCompanionBuilder =
       required String assetType,
       required String assetName,
       required int amount,
+      Value<String> currencyCode,
       Value<double?> shares,
       Value<bool> includeInPortfolio,
       Value<DateTime> createdAt,
@@ -2085,6 +2213,7 @@ typedef $$AssetsTableUpdateCompanionBuilder =
       Value<String> assetType,
       Value<String> assetName,
       Value<int> amount,
+      Value<String> currencyCode,
       Value<double?> shares,
       Value<bool> includeInPortfolio,
       Value<DateTime> createdAt,
@@ -2116,6 +2245,11 @@ class $$AssetsTableFilterComposer
 
   ColumnFilters<int> get amount => $composableBuilder(
     column: $table.amount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get currencyCode => $composableBuilder(
+    column: $table.currencyCode,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2164,6 +2298,11 @@ class $$AssetsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get currencyCode => $composableBuilder(
+    column: $table.currencyCode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<double> get shares => $composableBuilder(
     column: $table.shares,
     builder: (column) => ColumnOrderings(column),
@@ -2200,6 +2339,11 @@ class $$AssetsTableAnnotationComposer
 
   GeneratedColumn<int> get amount =>
       $composableBuilder(column: $table.amount, builder: (column) => column);
+
+  GeneratedColumn<String> get currencyCode => $composableBuilder(
+    column: $table.currencyCode,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<double> get shares =>
       $composableBuilder(column: $table.shares, builder: (column) => column);
@@ -2245,6 +2389,7 @@ class $$AssetsTableTableManager
                 Value<String> assetType = const Value.absent(),
                 Value<String> assetName = const Value.absent(),
                 Value<int> amount = const Value.absent(),
+                Value<String> currencyCode = const Value.absent(),
                 Value<double?> shares = const Value.absent(),
                 Value<bool> includeInPortfolio = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
@@ -2253,6 +2398,7 @@ class $$AssetsTableTableManager
                 assetType: assetType,
                 assetName: assetName,
                 amount: amount,
+                currencyCode: currencyCode,
                 shares: shares,
                 includeInPortfolio: includeInPortfolio,
                 createdAt: createdAt,
@@ -2263,6 +2409,7 @@ class $$AssetsTableTableManager
                 required String assetType,
                 required String assetName,
                 required int amount,
+                Value<String> currencyCode = const Value.absent(),
                 Value<double?> shares = const Value.absent(),
                 Value<bool> includeInPortfolio = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
@@ -2271,6 +2418,7 @@ class $$AssetsTableTableManager
                 assetType: assetType,
                 assetName: assetName,
                 amount: amount,
+                currencyCode: currencyCode,
                 shares: shares,
                 includeInPortfolio: includeInPortfolio,
                 createdAt: createdAt,

@@ -16,6 +16,9 @@ class LedgerRecords extends Table {
 
   IntColumn get amount => integer()();
 
+  TextColumn get currencyCode =>
+      text().withDefault(const Constant('KRW'))();
+
   DateTimeColumn get date => dateTime()();
 
   TextColumn get paymentMethod => text().nullable()();
@@ -33,6 +36,9 @@ class Assets extends Table {
   TextColumn get assetName => text()();
 
   IntColumn get amount => integer()();
+
+  TextColumn get currencyCode =>
+      text().withDefault(const Constant('KRW'))();
 
   RealColumn get shares => real().nullable()();
 
@@ -81,7 +87,7 @@ class AppDatabase extends _$AppDatabase {
   factory AppDatabase() => _instance;
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -101,8 +107,20 @@ class AppDatabase extends _$AppDatabase {
       if (from < 6) {
         await m.createTable(favoriteLedgerRecords);
       }
+      if (from < 7) {
+        await m.addColumn(ledgerRecords, ledgerRecords.currencyCode);
+        await m.addColumn(assets, assets.currencyCode);
+      }
     },
   );
+
+  /// 기기 지역 기반 주 통화 추론 시, 기존 기록이 있는 사용자는 KRW를 유지하기 위한 판별용.
+  Future<bool> hasAnyLedgerOrAssetRecords() async {
+    final ledgerRows = await (select(ledgerRecords)..limit(1)).get();
+    if (ledgerRows.isNotEmpty) return true;
+    final assetRows = await (select(assets)..limit(1)).get();
+    return assetRows.isNotEmpty;
+  }
 
   Future<int> insertLedgerRecord(LedgerRecordsCompanion entry) {
     return into(ledgerRecords).insert(entry);

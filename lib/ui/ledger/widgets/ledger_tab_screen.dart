@@ -205,9 +205,15 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: LedgerIncomeSummaryCard(
-          incomeText: _viewModel.monthlyIncomeTotal.toCommaWon(),
-          expenseText: _viewModel.monthlyExpenseTotal.toCommaWon(),
-          savableText: _viewModel.monthlySavableTotal.toCommaWon(),
+          incomeText: formatGroupedCurrencyAmounts(
+            _viewModel.monthlyIncomeTotalsByCurrency,
+          ),
+          expenseText: formatGroupedCurrencyAmounts(
+            _viewModel.monthlyExpenseTotalsByCurrency,
+          ),
+          savableText: formatGroupedCurrencyAmounts(
+            _viewModel.monthlySavableTotalsByCurrency,
+          ),
         ),
       ),
     ];

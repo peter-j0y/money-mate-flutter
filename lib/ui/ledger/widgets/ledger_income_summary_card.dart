@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:money_mate/l10n/app_localizations.dart';
+import 'package:money_mate/ui/core/currency/current_currency.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 
 class LedgerIncomeSummaryCard extends StatelessWidget {
@@ -17,7 +18,7 @@ class LedgerIncomeSummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final zeroText = 0.toKoreanWon();
+    final zeroText = 0.toFormattedCurrency(CurrentCurrency.code);
     return Container(
       padding: const EdgeInsets.fromLTRB(4, 8, 4, 8),
       decoration: BoxDecoration(
@@ -95,6 +96,7 @@ class _SummaryValueColumn extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             value,
+            textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,
               height: 20 / 14,

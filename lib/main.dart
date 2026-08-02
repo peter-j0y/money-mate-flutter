@@ -5,12 +5,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart';
+import 'package:money_mate/data/local/app_database.dart';
+import 'package:money_mate/data/model/entities/currency.dart';
 import 'package:money_mate/data/repositories/app_settings_repository.dart';
 import 'package:money_mate/data/repositories/app_settings_repository_impl.dart';
 import 'package:money_mate/data/repositories/reminder_repository.dart';
 import 'package:money_mate/data/repositories/reminder_repository_impl.dart';
 import 'package:money_mate/firebase_options.dart';
 import 'package:money_mate/l10n/app_localizations.dart';
+import 'package:money_mate/ui/core/currency/current_currency.dart';
 import 'package:money_mate/ui/ledger/widgets/add_ledger_record_screen.dart';
 import 'package:money_mate/ui/asset/screen/assets_tab_screen.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
@@ -27,6 +30,29 @@ Locale _resolveAppLocale(Locale? deviceLocale) {
   return deviceLocale?.languageCode == 'ko'
       ? const Locale('ko', 'KR')
       : const Locale('en', 'US');
+}
+
+/// 저장된 주 통화가 없는 경우(최초 실행)의 기본값을 정한다.
+/// 기존 기록이 있는 사용자는 전부 KRW로 쌓인 데이터이므로 지역과 무관하게 KRW를 유지하고,
+/// 기록이 전혀 없는 신규 설치에서만 기기 지역을 바탕으로 통화를 추론한다.
+Future<CurrencyCode> _resolveInitialMainCurrency(
+  AppSettingsRepository settingsRepository,
+) async {
+  final stored = await settingsRepository.getMainCurrency();
+  if (stored != null) {
+    return stored;
+  }
+
+  final hasExistingData = await AppDatabase().hasAnyLedgerOrAssetRecords();
+  final inferred =
+      hasExistingData
+          ? CurrencyCode.krw
+          : defaultCurrencyForCountryCode(
+            PlatformDispatcher.instance.locale.countryCode,
+          );
+
+  await settingsRepository.setMainCurrency(inferred);
+  return inferred;
 }
 
 Future<void> main() async {
@@ -46,6 +72,9 @@ Future<void> main() async {
   final packageInfo = await PackageInfo.fromPlatform();
   Intl.defaultLocale =
       _resolveAppLocale(PlatformDispatcher.instance.locale).toString();
+  CurrentCurrency.code = await _resolveInitialMainCurrency(
+    AppSettingsRepositoryImpl(),
+  );
   final app = MoneyMateApp(appVersion: packageInfo.version);
 
   runApp(app);

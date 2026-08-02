@@ -2,9 +2,12 @@ import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:money_mate/data/model/entities/currency.dart';
 import 'package:money_mate/l10n/app_localizations.dart';
+import 'package:money_mate/ui/core/currency/current_currency.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:money_mate/ui/more/notion_legal_links.dart';
+import 'package:money_mate/ui/more/screen/currency_setting_screen.dart';
 import 'package:money_mate/ui/more/widgets/reminder_notification_card.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -142,8 +145,8 @@ class MoreTabScreen extends StatelessWidget {
             ),
             const SizedBox(height: 28),
             _SettingsSection(
-              title: l10n.sectionNotification,
-              rows: [ReminderNotificationCard()],
+              title: l10n.sectionSettings,
+              rows: [const _MainCurrencyRow(), ReminderNotificationCard()],
             ),
             const SizedBox(height: 28),
             _SettingsSection(
@@ -331,6 +334,52 @@ class _SettingsRow extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _MainCurrencyRow extends StatefulWidget {
+  const _MainCurrencyRow();
+
+  @override
+  State<_MainCurrencyRow> createState() => _MainCurrencyRowState();
+}
+
+class _MainCurrencyRowState extends State<_MainCurrencyRow> {
+  Future<void> _openCurrencySetting(BuildContext context) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => const CurrencySettingScreen(),
+      ),
+    );
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return _SettingsRow(
+      icon: Icons.attach_money_rounded,
+      accentColor: AppColors.hexFF8B5CF6,
+      title: l10n.mainCurrencySettingTitle,
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            CurrentCurrency.code.isoCode,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: context.appColors.textTertiary,
+            ),
+          ),
+          const SizedBox(width: 4),
+          const _RowChevron(),
+        ],
+      ),
+      onTap: () => _openCurrencySetting(context),
     );
   }
 }
