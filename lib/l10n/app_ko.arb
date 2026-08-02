@@ -156,7 +156,8 @@
     }
   },
   "cannotOpenPageRetry": "페이지를 열 수 없어요. 잠시 후 다시 시도해주세요.",
-  "inquirySubject": "[머니메이트] 문의하기",
+  "appDisplayName": "내돈어디 가계부",
+  "inquirySubject": "[내돈어디 가계부] 문의하기",
   "cannotOpenMailApp": "메일 앱을 열 수 없어요. {email} 으로 문의해주세요.",
   "@cannotOpenMailApp": {
     "placeholders": {

@@ -305,7 +305,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get cannotOpenPageRetry => '페이지를 열 수 없어요. 잠시 후 다시 시도해주세요.';
 
   @override
-  String get inquirySubject => '[머니메이트] 문의하기';
+  String get appDisplayName => '내돈어디 가계부';
+
+  @override
+  String get inquirySubject => '[내돈어디 가계부] 문의하기';
 
   @override
   String cannotOpenMailApp(String email) {

@@ -659,10 +659,16 @@ abstract class AppLocalizations {
   /// **'페이지를 열 수 없어요. 잠시 후 다시 시도해주세요.'**
   String get cannotOpenPageRetry;
 
+  /// No description provided for @appDisplayName.
+  ///
+  /// In ko, this message translates to:
+  /// **'내돈어디 가계부'**
+  String get appDisplayName;
+
   /// No description provided for @inquirySubject.
   ///
   /// In ko, this message translates to:
-  /// **'[머니메이트] 문의하기'**
+  /// **'[내돈어디 가계부] 문의하기'**
   String get inquirySubject;
 
   /// No description provided for @cannotOpenMailApp.

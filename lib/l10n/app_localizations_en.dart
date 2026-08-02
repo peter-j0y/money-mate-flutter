@@ -305,7 +305,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cannotOpenPageRetry => 'Couldn\'t open the page. Please try again shortly.';
 
   @override
-  String get inquirySubject => '[Money Mate] Inquiry';
+  String get appDisplayName => 'Where is My Money';
+
+  @override
+  String get inquirySubject => '[Where is My Money] Inquiry';
 
   @override
   String cannotOpenMailApp(String email) {

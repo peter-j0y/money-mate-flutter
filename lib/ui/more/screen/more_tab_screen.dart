@@ -113,7 +113,7 @@ class MoreTabScreen extends StatelessWidget {
   void _openOpenSourceLicenses(BuildContext context) {
     showLicensePage(
       context: context,
-      applicationName: 'Money Mate',
+      applicationName: AppLocalizations.of(context)!.appDisplayName,
       applicationVersion: appVersion,
     );
   }

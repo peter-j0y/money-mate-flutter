@@ -113,7 +113,8 @@
 
   "supportEmailBody": "✍️ Issue report / inquiry:\n\n\n\n----------------------------------\n💡 The information below is technical data used only to help resolve the issue.\n• App version: {appVersion}\n• OS version: {osVersion}\n• Device: {deviceModel}\n----------------------------------",
   "cannotOpenPageRetry": "Couldn't open the page. Please try again shortly.",
-  "inquirySubject": "[Money Mate] Inquiry",
+  "appDisplayName": "Where is My Money",
+  "inquirySubject": "[Where is My Money] Inquiry",
   "cannotOpenMailApp": "Couldn't open the mail app. Please contact {email}.",
   "sectionGeneral": "General",
   "notices": "Notices",
