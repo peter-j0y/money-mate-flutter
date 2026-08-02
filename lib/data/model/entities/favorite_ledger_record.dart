@@ -6,6 +6,7 @@ class FavoriteLedgerEntry {
     required this.type,
     required this.category,
     required this.amount,
+    required this.currencyCode,
     this.paymentMethod,
     this.memo,
     required this.createdAt,
@@ -15,6 +16,7 @@ class FavoriteLedgerEntry {
   final LedgerRecordType type;
   final String category;
   final int amount;
+  final String currencyCode;
   final ExpensePaymentMethod? paymentMethod;
   final String? memo;
   final DateTime createdAt;
@@ -25,6 +27,7 @@ class FavoriteLedgerEntryDraft {
     required this.type,
     required this.category,
     required this.amount,
+    required this.currencyCode,
     this.paymentMethod,
     this.memo,
   });
@@ -32,6 +35,7 @@ class FavoriteLedgerEntryDraft {
   final LedgerRecordType type;
   final String category;
   final int amount;
+  final String currencyCode;
   final ExpensePaymentMethod? paymentMethod;
   final String? memo;
 }

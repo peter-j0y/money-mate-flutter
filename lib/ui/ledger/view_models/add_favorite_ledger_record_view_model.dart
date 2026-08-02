@@ -107,6 +107,7 @@ class AddFavoriteLedgerRecordViewModel extends ChangeNotifier {
           type: entry.type,
           category: entry.category,
           amount: entry.amount,
+          currencyCode: entry.currencyCode,
           paymentMethod: entry.paymentMethod,
           memo: entry.memo,
         ),

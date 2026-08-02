@@ -1483,6 +1483,18 @@ class $FavoriteLedgerRecordsTable extends FavoriteLedgerRecords
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _currencyCodeMeta = const VerificationMeta(
+    'currencyCode',
+  );
+  @override
+  late final GeneratedColumn<String> currencyCode = GeneratedColumn<String>(
+    'currency_code',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('KRW'),
+  );
   static const VerificationMeta _paymentMethodMeta = const VerificationMeta(
     'paymentMethod',
   );
@@ -1521,6 +1533,7 @@ class $FavoriteLedgerRecordsTable extends FavoriteLedgerRecords
     type,
     category,
     amount,
+    currencyCode,
     paymentMethod,
     memo,
     createdAt,
@@ -1563,6 +1576,15 @@ class $FavoriteLedgerRecordsTable extends FavoriteLedgerRecords
       );
     } else if (isInserting) {
       context.missing(_amountMeta);
+    }
+    if (data.containsKey('currency_code')) {
+      context.handle(
+        _currencyCodeMeta,
+        currencyCode.isAcceptableOrUnknown(
+          data['currency_code']!,
+          _currencyCodeMeta,
+        ),
+      );
     }
     if (data.containsKey('payment_method')) {
       context.handle(
@@ -1614,6 +1636,11 @@ class $FavoriteLedgerRecordsTable extends FavoriteLedgerRecords
             DriftSqlType.int,
             data['${effectivePrefix}amount'],
           )!,
+      currencyCode:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}currency_code'],
+          )!,
       paymentMethod: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}payment_method'],
@@ -1642,6 +1669,7 @@ class FavoriteLedgerRecord extends DataClass
   final String type;
   final String category;
   final int amount;
+  final String currencyCode;
   final String? paymentMethod;
   final String? memo;
   final DateTime createdAt;
@@ -1650,6 +1678,7 @@ class FavoriteLedgerRecord extends DataClass
     required this.type,
     required this.category,
     required this.amount,
+    required this.currencyCode,
     this.paymentMethod,
     this.memo,
     required this.createdAt,
@@ -1661,6 +1690,7 @@ class FavoriteLedgerRecord extends DataClass
     map['type'] = Variable<String>(type);
     map['category'] = Variable<String>(category);
     map['amount'] = Variable<int>(amount);
+    map['currency_code'] = Variable<String>(currencyCode);
     if (!nullToAbsent || paymentMethod != null) {
       map['payment_method'] = Variable<String>(paymentMethod);
     }
@@ -1677,6 +1707,7 @@ class FavoriteLedgerRecord extends DataClass
       type: Value(type),
       category: Value(category),
       amount: Value(amount),
+      currencyCode: Value(currencyCode),
       paymentMethod:
           paymentMethod == null && nullToAbsent
               ? const Value.absent()
@@ -1696,6 +1727,7 @@ class FavoriteLedgerRecord extends DataClass
       type: serializer.fromJson<String>(json['type']),
       category: serializer.fromJson<String>(json['category']),
       amount: serializer.fromJson<int>(json['amount']),
+      currencyCode: serializer.fromJson<String>(json['currencyCode']),
       paymentMethod: serializer.fromJson<String?>(json['paymentMethod']),
       memo: serializer.fromJson<String?>(json['memo']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -1709,6 +1741,7 @@ class FavoriteLedgerRecord extends DataClass
       'type': serializer.toJson<String>(type),
       'category': serializer.toJson<String>(category),
       'amount': serializer.toJson<int>(amount),
+      'currencyCode': serializer.toJson<String>(currencyCode),
       'paymentMethod': serializer.toJson<String?>(paymentMethod),
       'memo': serializer.toJson<String?>(memo),
       'createdAt': serializer.toJson<DateTime>(createdAt),
@@ -1720,6 +1753,7 @@ class FavoriteLedgerRecord extends DataClass
     String? type,
     String? category,
     int? amount,
+    String? currencyCode,
     Value<String?> paymentMethod = const Value.absent(),
     Value<String?> memo = const Value.absent(),
     DateTime? createdAt,
@@ -1728,6 +1762,7 @@ class FavoriteLedgerRecord extends DataClass
     type: type ?? this.type,
     category: category ?? this.category,
     amount: amount ?? this.amount,
+    currencyCode: currencyCode ?? this.currencyCode,
     paymentMethod:
         paymentMethod.present ? paymentMethod.value : this.paymentMethod,
     memo: memo.present ? memo.value : this.memo,
@@ -1739,6 +1774,10 @@ class FavoriteLedgerRecord extends DataClass
       type: data.type.present ? data.type.value : this.type,
       category: data.category.present ? data.category.value : this.category,
       amount: data.amount.present ? data.amount.value : this.amount,
+      currencyCode:
+          data.currencyCode.present
+              ? data.currencyCode.value
+              : this.currencyCode,
       paymentMethod:
           data.paymentMethod.present
               ? data.paymentMethod.value
@@ -1755,6 +1794,7 @@ class FavoriteLedgerRecord extends DataClass
           ..write('type: $type, ')
           ..write('category: $category, ')
           ..write('amount: $amount, ')
+          ..write('currencyCode: $currencyCode, ')
           ..write('paymentMethod: $paymentMethod, ')
           ..write('memo: $memo, ')
           ..write('createdAt: $createdAt')
@@ -1763,8 +1803,16 @@ class FavoriteLedgerRecord extends DataClass
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, type, category, amount, paymentMethod, memo, createdAt);
+  int get hashCode => Object.hash(
+    id,
+    type,
+    category,
+    amount,
+    currencyCode,
+    paymentMethod,
+    memo,
+    createdAt,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1773,6 +1821,7 @@ class FavoriteLedgerRecord extends DataClass
           other.type == this.type &&
           other.category == this.category &&
           other.amount == this.amount &&
+          other.currencyCode == this.currencyCode &&
           other.paymentMethod == this.paymentMethod &&
           other.memo == this.memo &&
           other.createdAt == this.createdAt);
@@ -1784,6 +1833,7 @@ class FavoriteLedgerRecordsCompanion
   final Value<String> type;
   final Value<String> category;
   final Value<int> amount;
+  final Value<String> currencyCode;
   final Value<String?> paymentMethod;
   final Value<String?> memo;
   final Value<DateTime> createdAt;
@@ -1792,6 +1842,7 @@ class FavoriteLedgerRecordsCompanion
     this.type = const Value.absent(),
     this.category = const Value.absent(),
     this.amount = const Value.absent(),
+    this.currencyCode = const Value.absent(),
     this.paymentMethod = const Value.absent(),
     this.memo = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -1801,6 +1852,7 @@ class FavoriteLedgerRecordsCompanion
     required String type,
     required String category,
     required int amount,
+    this.currencyCode = const Value.absent(),
     this.paymentMethod = const Value.absent(),
     this.memo = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -1812,6 +1864,7 @@ class FavoriteLedgerRecordsCompanion
     Expression<String>? type,
     Expression<String>? category,
     Expression<int>? amount,
+    Expression<String>? currencyCode,
     Expression<String>? paymentMethod,
     Expression<String>? memo,
     Expression<DateTime>? createdAt,
@@ -1821,6 +1874,7 @@ class FavoriteLedgerRecordsCompanion
       if (type != null) 'type': type,
       if (category != null) 'category': category,
       if (amount != null) 'amount': amount,
+      if (currencyCode != null) 'currency_code': currencyCode,
       if (paymentMethod != null) 'payment_method': paymentMethod,
       if (memo != null) 'memo': memo,
       if (createdAt != null) 'created_at': createdAt,
@@ -1832,6 +1886,7 @@ class FavoriteLedgerRecordsCompanion
     Value<String>? type,
     Value<String>? category,
     Value<int>? amount,
+    Value<String>? currencyCode,
     Value<String?>? paymentMethod,
     Value<String?>? memo,
     Value<DateTime>? createdAt,
@@ -1841,6 +1896,7 @@ class FavoriteLedgerRecordsCompanion
       type: type ?? this.type,
       category: category ?? this.category,
       amount: amount ?? this.amount,
+      currencyCode: currencyCode ?? this.currencyCode,
       paymentMethod: paymentMethod ?? this.paymentMethod,
       memo: memo ?? this.memo,
       createdAt: createdAt ?? this.createdAt,
@@ -1862,6 +1918,9 @@ class FavoriteLedgerRecordsCompanion
     if (amount.present) {
       map['amount'] = Variable<int>(amount.value);
     }
+    if (currencyCode.present) {
+      map['currency_code'] = Variable<String>(currencyCode.value);
+    }
     if (paymentMethod.present) {
       map['payment_method'] = Variable<String>(paymentMethod.value);
     }
@@ -1881,6 +1940,7 @@ class FavoriteLedgerRecordsCompanion
           ..write('type: $type, ')
           ..write('category: $category, ')
           ..write('amount: $amount, ')
+          ..write('currencyCode: $currencyCode, ')
           ..write('paymentMethod: $paymentMethod, ')
           ..write('memo: $memo, ')
           ..write('createdAt: $createdAt')
@@ -2674,6 +2734,7 @@ typedef $$FavoriteLedgerRecordsTableCreateCompanionBuilder =
       required String type,
       required String category,
       required int amount,
+      Value<String> currencyCode,
       Value<String?> paymentMethod,
       Value<String?> memo,
       Value<DateTime> createdAt,
@@ -2684,6 +2745,7 @@ typedef $$FavoriteLedgerRecordsTableUpdateCompanionBuilder =
       Value<String> type,
       Value<String> category,
       Value<int> amount,
+      Value<String> currencyCode,
       Value<String?> paymentMethod,
       Value<String?> memo,
       Value<DateTime> createdAt,
@@ -2715,6 +2777,11 @@ class $$FavoriteLedgerRecordsTableFilterComposer
 
   ColumnFilters<int> get amount => $composableBuilder(
     column: $table.amount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get currencyCode => $composableBuilder(
+    column: $table.currencyCode,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2763,6 +2830,11 @@ class $$FavoriteLedgerRecordsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get currencyCode => $composableBuilder(
+    column: $table.currencyCode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get paymentMethod => $composableBuilder(
     column: $table.paymentMethod,
     builder: (column) => ColumnOrderings(column),
@@ -2799,6 +2871,11 @@ class $$FavoriteLedgerRecordsTableAnnotationComposer
 
   GeneratedColumn<int> get amount =>
       $composableBuilder(column: $table.amount, builder: (column) => column);
+
+  GeneratedColumn<String> get currencyCode => $composableBuilder(
+    column: $table.currencyCode,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<String> get paymentMethod => $composableBuilder(
     column: $table.paymentMethod,
@@ -2862,6 +2939,7 @@ class $$FavoriteLedgerRecordsTableTableManager
                 Value<String> type = const Value.absent(),
                 Value<String> category = const Value.absent(),
                 Value<int> amount = const Value.absent(),
+                Value<String> currencyCode = const Value.absent(),
                 Value<String?> paymentMethod = const Value.absent(),
                 Value<String?> memo = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
@@ -2870,6 +2948,7 @@ class $$FavoriteLedgerRecordsTableTableManager
                 type: type,
                 category: category,
                 amount: amount,
+                currencyCode: currencyCode,
                 paymentMethod: paymentMethod,
                 memo: memo,
                 createdAt: createdAt,
@@ -2880,6 +2959,7 @@ class $$FavoriteLedgerRecordsTableTableManager
                 required String type,
                 required String category,
                 required int amount,
+                Value<String> currencyCode = const Value.absent(),
                 Value<String?> paymentMethod = const Value.absent(),
                 Value<String?> memo = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
@@ -2888,6 +2968,7 @@ class $$FavoriteLedgerRecordsTableTableManager
                 type: type,
                 category: category,
                 amount: amount,
+                currencyCode: currencyCode,
                 paymentMethod: paymentMethod,
                 memo: memo,
                 createdAt: createdAt,

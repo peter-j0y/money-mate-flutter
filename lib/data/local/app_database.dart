@@ -69,6 +69,9 @@ class FavoriteLedgerRecords extends Table {
 
   IntColumn get amount => integer()();
 
+  TextColumn get currencyCode =>
+      text().withDefault(const Constant('KRW'))();
+
   TextColumn get paymentMethod => text().nullable()();
 
   TextColumn get memo => text().nullable()();
@@ -87,7 +90,7 @@ class AppDatabase extends _$AppDatabase {
   factory AppDatabase() => _instance;
 
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -110,6 +113,12 @@ class AppDatabase extends _$AppDatabase {
       if (from < 7) {
         await m.addColumn(ledgerRecords, ledgerRecords.currencyCode);
         await m.addColumn(assets, assets.currencyCode);
+      }
+      if (from < 8) {
+        await m.addColumn(
+          favoriteLedgerRecords,
+          favoriteLedgerRecords.currencyCode,
+        );
       }
     },
   );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/data/model/entities/currency.dart';
 import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/core/currency/current_currency.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
@@ -22,6 +23,7 @@ class AddLedgerRecordScreen extends StatefulWidget {
     this.initialType = LedgerRecordType.expense,
     this.initialCategory,
     this.initialAmount,
+    this.initialCurrencyCode,
     this.initialPaymentMethod,
     this.initialMemo,
   });
@@ -30,6 +32,9 @@ class AddLedgerRecordScreen extends StatefulWidget {
   final LedgerRecordType initialType;
   final String? initialCategory;
   final int? initialAmount;
+  // 즐겨찾기에서 바로 이동해 초기값을 채우는 경우, 즐겨찾기가 저장될 당시의
+  // 통화를 그대로 유지하기 위해 사용한다. 없으면 현재 주 통화를 사용한다.
+  final String? initialCurrencyCode;
   final ExpensePaymentMethod? initialPaymentMethod;
   final String? initialMemo;
 
@@ -50,6 +55,7 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
   final TextEditingController _memoController = TextEditingController();
 
   DateTime _selectedDate = DateTime.now();
+  late CurrencyCode _activeCurrency;
 
   static const List<ExpensePaymentMethod> _expensePaymentMethods = [
     ExpensePaymentMethod.cash,
@@ -85,6 +91,10 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
   @override
   void initState() {
     super.initState();
+    _activeCurrency =
+        widget.initialCurrencyCode != null
+            ? CurrencyCode.fromCode(widget.initialCurrencyCode)
+            : CurrentCurrency.code;
     _selectedTypeIndex = widget.initialType == LedgerRecordType.income ? 0 : 1;
     _selectedDate = widget.initialDate ?? DateTime.now();
     final initialCategory = widget.initialCategory;
@@ -102,7 +112,7 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
     if (initialAmount != null && initialAmount > 0) {
       _amountController.text = CurrencyAmountInputFormatter.formatMinorUnits(
         initialAmount,
-        CurrentCurrency.code,
+        _activeCurrency,
       );
     }
     _selectedExpensePaymentMethod = widget.initialPaymentMethod;
@@ -138,7 +148,7 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
   int get _amountValue {
     return CurrencyAmountInputFormatter.parseToMinorUnits(
       _amountController.text,
-      CurrentCurrency.code,
+      _activeCurrency,
     );
   }
 
@@ -206,6 +216,7 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
       type: isExpense ? LedgerRecordType.expense : LedgerRecordType.income,
       category: selectedCategory,
       amount: _amountValue,
+      currencyCode: _activeCurrency.isoCode,
       date: _selectedDate,
       paymentMethod: selectedPaymentMethod,
       memo:
@@ -248,6 +259,9 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
 
   void _applyFavorite(FavoriteLedgerEntry favorite) {
     setState(() {
+      // 즐겨찾기는 과거 기록 기반이라 저장 당시의 통화를 그대로 따른다.
+      // (현재 주 통화가 바뀌었더라도 즐겨찾기 금액이 재해석되면 안 된다)
+      _activeCurrency = CurrencyCode.fromCode(favorite.currencyCode);
       _selectedTypeIndex = favorite.type == LedgerRecordType.income ? 0 : 1;
       final categoryIndex = _categoryOptions.indexWhere(
         (option) => option.code == favorite.category,
@@ -262,7 +276,7 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
     });
     _amountController.text = CurrencyAmountInputFormatter.formatMinorUnits(
       favorite.amount,
-      CurrentCurrency.code,
+      _activeCurrency,
     );
   }
 
@@ -335,10 +349,10 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
                         LedgerAmountField.editable(
                           controller: _amountController,
                           focusNode: _amountFocusNode,
-                          currency: CurrentCurrency.code,
+                          currency: _activeCurrency,
                           inputFormatters: [
                             CurrencyAmountInputFormatter(
-                              currency: CurrentCurrency.code,
+                              currency: _activeCurrency,
                             ),
                           ],
                         ),
