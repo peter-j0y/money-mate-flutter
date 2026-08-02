@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:money_mate/data/model/entities/ledger_record.dart';
+import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:money_mate/ui/ledger/widgets/ledger_record_item_content.dart';
 import 'package:money_mate/ui/ledger/widgets/ledger_state_card.dart';
@@ -52,7 +53,7 @@ class LedgerMonthlyRecordSection extends StatelessWidget {
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     child: Text(
-                      '+ 추가',
+                      AppLocalizations.of(context)!.addShort,
                       style: TextStyle(
                         fontSize: 12,
                         height: 16 / 12,
@@ -124,7 +125,7 @@ class LedgerMonthlyRecordSection extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      _wonText(totalAmount),
+                      totalAmount.toCommaWon(),
                       style: TextStyle(
                         fontSize: 14,
                         height: 20 / 14,
@@ -140,18 +141,6 @@ class LedgerMonthlyRecordSection extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  static String _wonText(int amount) {
-    final reversed = amount.toString().split('').reversed.toList();
-    final buffer = StringBuffer();
-    for (var i = 0; i < reversed.length; i++) {
-      if (i > 0 && i % 3 == 0) {
-        buffer.write(',');
-      }
-      buffer.write(reversed[i]);
-    }
-    return '${buffer.toString().split('').reversed.join()}원';
   }
 }
 
@@ -193,7 +182,10 @@ class _RecordItemTile extends StatelessWidget {
             border:
                 hasTopBorder
                     ? Border(
-                      top: BorderSide(color: context.appColors.background, width: 1),
+                      top: BorderSide(
+                        color: context.appColors.background,
+                        width: 1,
+                      ),
                     )
                     : null,
           ),

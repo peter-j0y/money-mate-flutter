@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:money_mate/data/local/app_database.dart';
+import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 
 class AssetCategoryCard extends StatefulWidget {
@@ -55,9 +56,11 @@ class _AssetCategoryCardState extends State<AssetCategoryCard> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final ratioDiff = widget.actualRatio - widget.targetRatio;
     final ratioDiffText = _ratioDiffLabel(ratioDiff);
-    final ratioDiffColor = ratioDiff >= 0 ? context.appColors.danger : context.appColors.success;
+    final ratioDiffColor =
+        ratioDiff >= 0 ? context.appColors.danger : context.appColors.success;
 
     return Container(
       decoration: BoxDecoration(
@@ -86,7 +89,11 @@ class _AssetCategoryCardState extends State<AssetCategoryCard> {
                       color: widget.leadingBackgroundColor,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(widget.leadingIcon, size: 18, color: widget.accentColor),
+                    child: Icon(
+                      widget.leadingIcon,
+                      size: 18,
+                      color: widget.accentColor,
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -130,9 +137,10 @@ class _AssetCategoryCardState extends State<AssetCategoryCard> {
                                     color: context.appColors.textTertiary,
                                   ),
                                   children: [
-                                    const TextSpan(text: '실제 '),
+                                    TextSpan(text: l10n.ratioActualPrefix),
                                     TextSpan(
-                                      text: '${widget.actualRatio.toStringAsFixed(1)}%',
+                                      text:
+                                          '${widget.actualRatio.toStringAsFixed(1)}%',
                                       style: TextStyle(
                                         color: widget.accentColor,
                                         fontWeight: FontWeight.w600,
@@ -151,9 +159,10 @@ class _AssetCategoryCardState extends State<AssetCategoryCard> {
                                     color: context.appColors.textTertiary,
                                   ),
                                   children: [
-                                    const TextSpan(text: '목표 '),
+                                    TextSpan(text: l10n.ratioTargetPrefix),
                                     TextSpan(
-                                      text: '${widget.targetRatio.toStringAsFixed(0)}%',
+                                      text:
+                                          '${widget.targetRatio.toStringAsFixed(0)}%',
                                       style: TextStyle(
                                         color: context.appColors.textSecondary,
                                       ),
@@ -187,7 +196,9 @@ class _AssetCategoryCardState extends State<AssetCategoryCard> {
           if (_isExpanded && widget.items.isNotEmpty)
             Container(
               decoration: BoxDecoration(
-                border: Border(top: BorderSide(color: context.appColors.border)),
+                border: Border(
+                  top: BorderSide(color: context.appColors.border),
+                ),
               ),
               child: Column(
                 children: List.generate(widget.items.length, (index) {

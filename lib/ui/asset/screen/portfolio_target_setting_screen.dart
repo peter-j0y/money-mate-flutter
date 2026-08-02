@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/asset/view_models/assets_tab_view_model.dart';
 import 'package:money_mate/ui/asset/view_models/portfolio_target_setting_view_model.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
@@ -34,20 +35,21 @@ class _PortfolioTargetSettingScreenState
   }
 
   Future<void> _onSave() async {
+    final l10n = AppLocalizations.of(context)!;
     if (!_viewModel.isBalanced) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('목표 합계를 100%로 맞춰주세요.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.balanceTargetTo100)));
       return;
     }
 
     final success = await _viewModel.save();
     if (!mounted) return;
 
-    final message = success ? '포트폴리오 목표 비율을 저장했습니다.' : '저장에 실패했습니다.';
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    final message = success ? l10n.portfolioSaveSuccess : l10n.errorSaveFailed;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
 
     if (success) {
       Navigator.of(context).pop(true);
@@ -89,32 +91,37 @@ class _PortfolioTargetSettingScreenState
                       final item = items[index];
                       return _TargetSettingCard(
                         item: item,
-                        onToggle: (value) =>
-                            _viewModel.toggleEnabled(item.type, value),
-                        onDecrease: item.isEnabled
-                            ? () => _viewModel.updateTargetRatio(
+                        onToggle:
+                            (value) =>
+                                _viewModel.toggleEnabled(item.type, value),
+                        onDecrease:
+                            item.isEnabled
+                                ? () => _viewModel.updateTargetRatio(
                                   item.type,
                                   item.targetRatio - 1,
                                 )
-                            : null,
-                        onIncrease: item.isEnabled
-                            ? () => _viewModel.updateTargetRatio(
+                                : null,
+                        onIncrease:
+                            item.isEnabled
+                                ? () => _viewModel.updateTargetRatio(
                                   item.type,
                                   item.targetRatio + 1,
                                 )
-                            : null,
-                        onSliderChanged: item.isEnabled
-                            ? (value) => _viewModel.updateTargetRatio(
+                                : null,
+                        onSliderChanged:
+                            item.isEnabled
+                                ? (value) => _viewModel.updateTargetRatio(
                                   item.type,
                                   value.round(),
                                 )
-                            : null,
-                        onValueChanged: item.isEnabled
-                            ? (value) => _viewModel.updateTargetRatio(
+                                : null,
+                        onValueChanged:
+                            item.isEnabled
+                                ? (value) => _viewModel.updateTargetRatio(
                                   item.type,
                                   value,
                                 )
-                            : null,
+                                : null,
                       );
                     },
                     separatorBuilder: (_, __) => const SizedBox(height: 12),
@@ -169,7 +176,7 @@ class _TopBar extends StatelessWidget {
             ),
             Center(
               child: Text(
-                '포트폴리오 설정',
+                AppLocalizations.of(context)!.portfolioSettingsLabel,
                 style: TextStyle(
                   fontSize: 18,
                   height: 24 / 18,
@@ -198,6 +205,7 @@ class _SummarySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isBalanced = includedTotal == 100;
     final guideColor =
@@ -214,7 +222,7 @@ class _SummarySection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '포함 유형 목표 합계',
+            l10n.includedTargetTotalLabel,
             style: TextStyle(
               fontSize: 12,
               height: 16 / 12,
@@ -269,7 +277,7 @@ class _SummarySection extends StatelessWidget {
                       ),
                       const SizedBox(width: 3),
                       Text(
-                        '조정 필요',
+                        l10n.adjustmentNeeded,
                         style: TextStyle(
                           fontSize: 11,
                           height: 15 / 11,
@@ -296,8 +304,8 @@ class _SummarySection extends StatelessWidget {
                     elevation: 0,
                   ),
                   icon: const Icon(Icons.auto_awesome_rounded, size: 14),
-                  label: const Text(
-                    '균등 배분',
+                  label: Text(
+                    l10n.equalDistributionButton,
                     style: TextStyle(
                       fontSize: 13,
                       height: 18 / 13,
@@ -363,6 +371,7 @@ class _TargetSettingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final meta = assetTypeMeta[item.type]!;
     final isEnabled = item.isEnabled;
@@ -412,7 +421,7 @@ class _TargetSettingCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        meta.label,
+                        meta.label(l10n),
                         style: TextStyle(
                           fontSize: 15,
                           height: 20 / 15,
@@ -423,7 +432,7 @@ class _TargetSettingCard extends StatelessWidget {
                       if (!isEnabled) ...[
                         const SizedBox(height: 2),
                         Text(
-                          '포트폴리오 제외',
+                          l10n.excludedFromPortfolio,
                           style: TextStyle(
                             fontSize: 12,
                             height: 16 / 12,
@@ -462,7 +471,9 @@ class _TargetSettingCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(999),
                     ),
                     child: Text(
-                      '실제 ${item.actualRatio.toStringAsFixed(1)}%',
+                      l10n.actualRatioWithValue(
+                        item.actualRatio.toStringAsFixed(1),
+                      ),
                       style: TextStyle(
                         fontSize: 12,
                         height: 16 / 12,
@@ -648,39 +659,40 @@ class _RatioStepperState extends State<_RatioStepper> {
         children: [
           _StepButton(symbol: '−', onTap: widget.onDecrease),
           Expanded(
-            child: _isEditing
-                ? TextField(
-                    controller: _controller,
-                    focusNode: _focusNode,
-                    keyboardType: TextInputType.number,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14,
-                      height: 20 / 14,
-                      fontWeight: FontWeight.w700,
-                      color: widget.color,
-                    ),
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.zero,
-                      isDense: true,
-                    ),
-                    onSubmitted: (_) => _submitValue(),
-                  )
-                : GestureDetector(
-                    onTap: _startEditing,
-                    child: Center(
-                      child: Text(
-                        '${widget.value}',
-                        style: TextStyle(
-                          fontSize: 14,
-                          height: 20 / 14,
-                          fontWeight: FontWeight.w700,
-                          color: widget.color,
+            child:
+                _isEditing
+                    ? TextField(
+                      controller: _controller,
+                      focusNode: _focusNode,
+                      keyboardType: TextInputType.number,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 14,
+                        height: 20 / 14,
+                        fontWeight: FontWeight.w700,
+                        color: widget.color,
+                      ),
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.zero,
+                        isDense: true,
+                      ),
+                      onSubmitted: (_) => _submitValue(),
+                    )
+                    : GestureDetector(
+                      onTap: _startEditing,
+                      child: Center(
+                        child: Text(
+                          '${widget.value}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            height: 20 / 14,
+                            fontWeight: FontWeight.w700,
+                            color: widget.color,
+                          ),
                         ),
                       ),
                     ),
-                  ),
           ),
           _StepButton(symbol: '+', onTap: widget.onIncrease),
         ],
@@ -765,25 +777,33 @@ class _BottomButtonBar extends StatelessWidget {
               style: FilledButton.styleFrom(
                 backgroundColor: context.appColors.primary,
                 foregroundColor: context.appColors.inverseText,
-                disabledBackgroundColor: context.appColors.primary.withValues(alpha: 0.6),
+                disabledBackgroundColor: context.appColors.primary.withValues(
+                  alpha: 0.6,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(24),
                 ),
                 elevation: 0,
               ),
-              child: isSaving
-                  ? SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.5,
-                        color: context.appColors.inverseText,
+              child:
+                  isSaving
+                      ? SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          color: context.appColors.inverseText,
+                        ),
+                      )
+                      : Text(
+                        AppLocalizations.of(
+                          context,
+                        )!.savePortfolioSettingsButton,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    )
-                  : const Text(
-                      '포트폴리오 설정 저장',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                    ),
             ),
           ),
         ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/asset/asset_category_card.dart';
 import 'package:money_mate/ui/asset/asset_total_header.dart';
 import 'package:money_mate/ui/asset/portfolio_allocation_card.dart';
@@ -52,9 +53,7 @@ class _AssetsTabScreenState extends State<AssetsTabScreen> {
   @override
   Widget build(BuildContext context) {
     if (_viewModel.isLoading) {
-      return const SafeArea(
-        child: Center(child: CircularProgressIndicator()),
-      );
+      return const SafeArea(child: Center(child: CircularProgressIndicator()));
     }
 
     if (_viewModel.isEmpty) {
@@ -82,30 +81,37 @@ class _AssetContentView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final categoryCards = <Widget>[];
 
     for (final category in viewModel.categoryDataList) {
       final meta = assetTypeMeta[category.type]!;
-      final items = category.items.map((item) {
-        return AssetCategoryItemData(
-          asset: item.asset,
-          name: item.asset.assetName,
-          amountText: item.asset.amount.toKoreanWon(),
-          innerRatio: item.innerRatio,
-          innerRatioText:
-              '${meta.label} 내 비중 ${item.innerRatio.toStringAsFixed(1)}%',
-          isExcludedFromPortfolio: !item.asset.includeInPortfolio,
-          ticker: item.asset.includeInPortfolio ? null : '포트폴리오 제외',
-        );
-      }).toList();
+      final items =
+          category.items.map((item) {
+            return AssetCategoryItemData(
+              asset: item.asset,
+              name: item.asset.assetName,
+              amountText: item.asset.amount.toKoreanWon(),
+              innerRatio: item.innerRatio,
+              innerRatioText: l10n.innerRatioWithValue(
+                meta.label(l10n),
+                item.innerRatio.toStringAsFixed(1),
+              ),
+              isExcludedFromPortfolio: !item.asset.includeInPortfolio,
+              ticker:
+                  item.asset.includeInPortfolio
+                      ? null
+                      : l10n.excludedFromPortfolio,
+            );
+          }).toList();
 
       categoryCards.add(const SizedBox(height: 12));
       categoryCards.add(
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: AssetCategoryCard(
-            categoryName: meta.label,
+            categoryName: meta.label(l10n),
             totalAmountText: category.totalAmount.toKoreanWon(),
             actualRatio: category.actualRatio,
             targetRatio: category.targetRatio,
@@ -153,7 +159,7 @@ class _AssetContentView extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
-              '자산 목록',
+              l10n.assetListLabel,
               style: TextStyle(
                 fontSize: 14,
                 height: 20 / 14,
@@ -170,26 +176,26 @@ class _AssetContentView extends StatelessWidget {
   }
 
   Widget _buildPortfolioSection(BuildContext context) {
-    final hasEnabledCategory =
-        viewModel.categoryDataList.any((c) => c.isCategoryEnabled);
+    final l10n = AppLocalizations.of(context)!;
+    final hasEnabledCategory = viewModel.categoryDataList.any(
+      (c) => c.isCategoryEnabled,
+    );
 
     if (!hasEnabledCategory) {
       return _PortfolioSetupGuideCard(onSetupTap: onSetTargetTap);
     }
 
     return PortfolioAllocationCard(
-      rows: viewModel.categoryDataList
-          .where((c) => c.actualRatio > 0)
-          .map((c) {
+      rows:
+          viewModel.categoryDataList.where((c) => c.actualRatio > 0).map((c) {
             final meta = assetTypeMeta[c.type]!;
             return PortfolioRowData(
-              label: meta.label,
+              label: meta.label(l10n),
               actual: c.actualRatio,
               target: c.targetRatio,
               color: meta.accentColor,
             );
-          })
-          .toList(),
+          }).toList(),
       onSetTargetTap: onSetTargetTap,
     );
   }
@@ -202,6 +208,7 @@ class _PortfolioSetupGuideCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
@@ -230,7 +237,7 @@ class _PortfolioSetupGuideCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            '포트폴리오를 설정해보세요',
+            l10n.setupPortfolioTitle,
             style: TextStyle(
               fontSize: 16,
               height: 22 / 16,
@@ -240,7 +247,7 @@ class _PortfolioSetupGuideCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            '목표 비율을 설정하면 자산 배분 현황을\n한눈에 확인할 수 있어요',
+            l10n.setupPortfolioBody,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 13,
@@ -263,8 +270,8 @@ class _PortfolioSetupGuideCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: const Text(
-                '포트폴리오 설정하기',
+              child: Text(
+                l10n.setupPortfolioButton,
                 style: TextStyle(
                   fontSize: 14,
                   height: 20 / 14,
@@ -286,12 +293,13 @@ class _EmptyAssetsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SafeArea(
       child: ListView(
         padding: const EdgeInsets.fromLTRB(20, 24, 20, 140),
         children: [
           Text(
-            '총 자산',
+            l10n.totalAssetsLabel,
             style: TextStyle(
               fontSize: 14,
               height: 20 / 14,
@@ -302,7 +310,7 @@ class _EmptyAssetsView extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            '0원',
+            0.toKoreanWon(),
             style: TextStyle(
               fontSize: 30,
               height: 36 / 30,
@@ -326,6 +334,7 @@ class _EmptyAssetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Column(
@@ -347,7 +356,7 @@ class _EmptyAssetCard extends StatelessWidget {
         ),
         const SizedBox(height: 24),
         Text(
-          '아직 등록된 자산이 없어요',
+          l10n.noAssetsYet,
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 20,
@@ -358,7 +367,7 @@ class _EmptyAssetCard extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          '첫 자산을 추가하고\n포트폴리오를 한눈에 확인해 보세요',
+          l10n.addFirstAssetBody,
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 14,
@@ -381,14 +390,14 @@ class _EmptyAssetCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
               ),
             ),
-            child: const Row(
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.add_rounded, size: 20),
-                SizedBox(width: 6),
+                const Icon(Icons.add_rounded, size: 20),
+                const SizedBox(width: 6),
                 Text(
-                  '자산 추가하기',
+                  l10n.addAssetButton,
                   style: TextStyle(
                     fontSize: 16,
                     height: 24 / 16,

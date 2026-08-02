@@ -1,6 +1,7 @@
 import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
+import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 
 /// iOS 숫자 키패드에는 키보드를 내릴 수 있는 완료 버튼이 없어서,
@@ -29,16 +30,17 @@ class KeyboardDoneBar extends StatelessWidget {
 
     // 완료 바 높이만큼 viewInsets.bottom을 늘려서, Scaffold의 자동 리사이즈나
     // 화면 하단에 고정된 CTA 버튼이 완료 바에 가려지지 않도록 공간을 미리 확보한다.
-    final content = isKeyboardVisible
-        ? MediaQuery(
-            data: mediaQuery.copyWith(
-              viewInsets: mediaQuery.viewInsets.copyWith(
-                bottom: keyboardHeight + _barHeight,
+    final content =
+        isKeyboardVisible
+            ? MediaQuery(
+              data: mediaQuery.copyWith(
+                viewInsets: mediaQuery.viewInsets.copyWith(
+                  bottom: keyboardHeight + _barHeight,
+                ),
               ),
-            ),
-            child: tapToDismiss,
-          )
-        : tapToDismiss;
+              child: tapToDismiss,
+            )
+            : tapToDismiss;
 
     return Stack(
       children: [
@@ -74,8 +76,11 @@ class _DoneBar extends StatelessWidget {
           child: TextButton(
             onPressed: () => FocusManager.instance.primaryFocus?.unfocus(),
             child: Text(
-              '완료',
-              style: TextStyle(color: context.appColors.primary, fontWeight: FontWeight.w600),
+              AppLocalizations.of(context)!.commonDone,
+              style: TextStyle(
+                color: context.appColors.primary,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ),

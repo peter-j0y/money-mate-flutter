@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 
 class AssetTotalHeader extends StatelessWidget {
@@ -13,20 +14,19 @@ class AssetTotalHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
-      decoration: BoxDecoration(
-        color: context.appColors.background,
-      ),
+      decoration: BoxDecoration(color: context.appColors.background),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               Text(
-                '총 자산',
+                l10n.totalAssetsLabel,
                 style: TextStyle(
                   fontSize: 14,
                   height: 20 / 14,
@@ -51,14 +51,14 @@ class AssetTotalHeader extends StatelessWidget {
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.add, size: 14),
-                      SizedBox(width: 4),
+                      const Icon(Icons.add, size: 14),
+                      const SizedBox(width: 4),
                       Text(
-                        '자산 추가',
-                        style: TextStyle(
+                        l10n.addAssetTitle,
+                        style: const TextStyle(
                           fontSize: 12,
                           height: 16 / 12,
                           fontWeight: FontWeight.w600,

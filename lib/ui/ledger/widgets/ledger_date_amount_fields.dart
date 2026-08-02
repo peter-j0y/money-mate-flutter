@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:flutter/services.dart';
 
@@ -120,7 +121,7 @@ class LedgerAmountField extends StatelessWidget {
         Padding(
           padding: EdgeInsets.only(bottom: 10),
           child: Text(
-            '원',
+            AppLocalizations.of(context)!.currencyUnitSuffix,
             style: TextStyle(
               fontSize: 20,
               height: 28 / 20,

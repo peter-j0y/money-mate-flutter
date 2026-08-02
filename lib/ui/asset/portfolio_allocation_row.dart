@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 
 class PortfolioAllocationRow extends StatelessWidget {
@@ -22,7 +23,8 @@ class PortfolioAllocationRow extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final diff = actualRatio - targetRatio;
     final isUp = diff >= 0;
-    final badgeColor = isUp ? context.appColors.danger : context.appColors.success;
+    final badgeColor =
+        isUp ? context.appColors.danger : context.appColors.success;
     final badgeBg = badgeColor.withValues(alpha: isDark ? 0.2 : 0.1);
 
     return Container(
@@ -68,7 +70,9 @@ class PortfolioAllocationRow extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           Text(
-            '목표 ${targetRatio.toStringAsFixed(0)}%',
+            AppLocalizations.of(
+              context,
+            )!.targetRatioWithValue(targetRatio.toStringAsFixed(0)),
             style: TextStyle(
               fontSize: 12,
               height: 16 / 12,

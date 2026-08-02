@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 
 class LedgerMemoSection extends StatelessWidget {
@@ -24,11 +25,10 @@ class LedgerMemoSection extends StatelessWidget {
   final VoidCallback? onTap;
   final String? placeholder;
 
-  static const String _defaultPlaceholder = '내용을 입력해주세요 (예: 퇴근길 버스비)';
-
   @override
   Widget build(BuildContext context) {
-    final placeholderText = placeholder ?? _defaultPlaceholder;
+    final placeholderText =
+        placeholder ?? AppLocalizations.of(context)!.memoInputPlaceholder;
     final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
     final safeAreaBottom = MediaQuery.paddingOf(context).bottom;
 
@@ -88,7 +88,10 @@ class LedgerMemoSection extends StatelessWidget {
           fontSize: 16,
           height: 24 / 16,
           fontWeight: FontWeight.w500,
-          color: hasMemo ? context.appColors.textPrimary : context.appColors.textTertiary,
+          color:
+              hasMemo
+                  ? context.appColors.textPrimary
+                  : context.appColors.textTertiary,
         ),
       ),
     );

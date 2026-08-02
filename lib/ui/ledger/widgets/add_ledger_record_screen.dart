@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:flutter/services.dart';
 import 'package:money_mate/ui/ledger/widgets/ledger_category_grid.dart';
@@ -89,7 +90,7 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
     final initialCategory = widget.initialCategory;
     if (initialCategory != null) {
       final categoryIndex = _categoryOptions.indexWhere(
-        (option) => option.label == initialCategory,
+        (option) => option.code == initialCategory,
       );
       if (_selectedTypeIndex == 0) {
         _selectedIncomeCategoryIndex = categoryIndex;
@@ -152,21 +153,21 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
         (_selectedTypeIndex != 1 || _selectedExpensePaymentMethod != null);
   }
 
-  String? get _validationMessage {
+  String? _validationMessage(AppLocalizations l10n) {
     if (!_isDateSelected) {
-      return '날짜를 선택해 주세요.';
+      return l10n.errorDateRequired;
     }
     if (_amountValue <= 0) {
-      return '금액은 0원보다 커야 합니다.';
+      return l10n.errorAmountMustBePositive;
     }
     if (!_isTypeSelected) {
-      return '유형을 선택해 주세요.';
+      return l10n.errorTypeRequired;
     }
     if (_selectedCategoryIndex < 0) {
-      return '카테고리를 선택해 주세요.';
+      return l10n.errorCategoryRequired;
     }
     if (_selectedTypeIndex == 1 && _selectedExpensePaymentMethod == null) {
-      return '지출 수단을 선택해 주세요.';
+      return l10n.errorPaymentMethodRequired;
     }
     return null;
   }
@@ -178,7 +179,7 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
   }
 
   Future<void> _onSubmitTap() async {
-    final validationMessage = _validationMessage;
+    final validationMessage = _validationMessage(AppLocalizations.of(context)!);
     if (validationMessage != null) {
       _showValidationToast(validationMessage);
       return;
@@ -187,13 +188,14 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
   }
 
   Future<void> _saveRecord() async {
-    final validationMessage = _validationMessage;
+    final l10n = AppLocalizations.of(context)!;
+    final validationMessage = _validationMessage(l10n);
     if (validationMessage != null) {
       _showValidationToast(validationMessage);
       return;
     }
 
-    final selectedCategory = _categoryOptions[_selectedCategoryIndex].label;
+    final selectedCategory = _categoryOptions[_selectedCategoryIndex].code;
     final isExpense = _selectedTypeIndex == 1;
     final selectedPaymentMethod =
         isExpense ? _selectedExpensePaymentMethod : null;
@@ -218,7 +220,7 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
       return;
     }
 
-    final message = _viewModel.errorMessage ?? '저장에 실패했습니다.';
+    final message = _viewModel.errorMessage(l10n) ?? l10n.errorSaveFailed;
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text(message)));
@@ -245,7 +247,7 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
     setState(() {
       _selectedTypeIndex = favorite.type == LedgerRecordType.income ? 0 : 1;
       final categoryIndex = _categoryOptions.indexWhere(
-        (option) => option.label == favorite.category,
+        (option) => option.code == favorite.category,
       );
       if (_selectedTypeIndex == 0) {
         _selectedIncomeCategoryIndex = categoryIndex;
@@ -266,7 +268,7 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
       initialDate: _selectedDate,
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
-      locale: const Locale('ko', 'KR'),
+      locale: Localizations.localeOf(context),
     );
 
     if (pickedDate != null) {
@@ -276,6 +278,7 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final safeAreaBottom = MediaQuery.paddingOf(context).bottom;
     final contentBottomPadding = safeAreaBottom + 120;
     final isSubmitEnabledUi = _isFormValid;
@@ -289,7 +292,7 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
             Padding(
               padding: EdgeInsets.zero,
               child: LedgerScreenHeader(
-                title: '기록 추가',
+                title: l10n.addRecordTitle,
                 onCloseTap: () => Navigator.pop(context),
                 closeButtonSize: 40,
                 padding: const EdgeInsets.fromLTRB(0, 16, 0, 8),
@@ -315,15 +318,15 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const _SectionLabel(text: '날짜'),
+                        _SectionLabel(text: l10n.fieldDate),
                         const SizedBox(height: 8),
                         LedgerDateCard(
                           date: _selectedDate,
-                          dateTextBuilder: _koreanDateText,
+                          dateTextBuilder: (date) => _dateText(date, l10n),
                           onTap: _pickDate,
                         ),
                         const SizedBox(height: 24),
-                        const _SectionLabel(text: '금액'),
+                        _SectionLabel(text: l10n.fieldAmount),
                         const SizedBox(height: 8),
                         LedgerAmountField.editable(
                           controller: _amountController,
@@ -336,7 +339,7 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
                           color: context.appColors.surfaceMuted,
                         ),
                         const SizedBox(height: 24),
-                        const _SectionLabel(text: '유형'),
+                        _SectionLabel(text: l10n.fieldType),
                         const SizedBox(height: 8),
                         LedgerRecordTypeToggle(
                           selectedIndex: _selectedTypeIndex,
@@ -345,7 +348,7 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
                                   setState(() => _selectedTypeIndex = index),
                         ),
                         const SizedBox(height: 24),
-                        const _SectionLabel(text: '카테고리'),
+                        _SectionLabel(text: l10n.fieldCategory),
                         const SizedBox(height: 8),
                         LedgerCategoryGrid(
                           options: _categoryOptions,
@@ -364,7 +367,7 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
                           ),
                         ],
                         const SizedBox(height: 24),
-                        const _SectionLabel(text: '메모'),
+                        _SectionLabel(text: l10n.fieldMemo),
                         const SizedBox(height: 8),
                         LedgerMemoSection.editable(controller: _memoController),
                       ],
@@ -442,9 +445,9 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
                                                 color: AppColors.white,
                                               ),
                                             )
-                                            : const Text(
-                                              '추가하기',
-                                              style: TextStyle(
+                                            : Text(
+                                              l10n.actionAdd,
+                                              style: const TextStyle(
                                                 fontSize: 18,
                                                 height: 28 / 18,
                                                 fontWeight: FontWeight.w500,
@@ -469,9 +472,14 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
     );
   }
 
-  String _koreanDateText(DateTime date) {
-    const weekdays = ['월', '화', '수', '목', '금', '토', '일'];
-    return '${date.year}년 ${date.month}월 ${date.day}일 (${weekdays[date.weekday - 1]})';
+  String _dateText(DateTime date, AppLocalizations l10n) {
+    final weekdays = weekdayShortLabels(l10n);
+    return l10n.dateWithWeekday(
+      date.year,
+      date.month,
+      date.day,
+      weekdays[date.weekday - 1],
+    );
   }
 }
 

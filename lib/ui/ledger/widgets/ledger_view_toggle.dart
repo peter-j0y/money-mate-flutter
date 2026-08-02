@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 
 enum LedgerViewType { calendar, monthly }
@@ -15,8 +16,9 @@ class LedgerViewToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SegmentedToggle(
-      options: const ['달력', '목록'],
+      options: [l10n.viewCalendar, l10n.viewList],
       selectedIndex: selectedView == LedgerViewType.calendar ? 0 : 1,
       onChanged: (index) {
         onChanged?.call(
@@ -86,7 +88,10 @@ class _ToggleButton extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 6),
           decoration: BoxDecoration(
-            color: isSelected ? context.appColors.surface : context.appColors.overlay,
+            color:
+                isSelected
+                    ? context.appColors.surface
+                    : context.appColors.overlay,
             borderRadius: BorderRadius.circular(16),
             boxShadow:
                 isSelected
@@ -106,7 +111,10 @@ class _ToggleButton extends StatelessWidget {
               fontSize: 16,
               height: 20 / 14,
               fontWeight: FontWeight.w500,
-              color: isSelected ? context.appColors.primary : context.appColors.textSecondary,
+              color:
+                  isSelected
+                      ? context.appColors.primary
+                      : context.appColors.textSecondary,
             ),
           ),
         ),

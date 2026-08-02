@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:money_mate/data/repositories/favorite_ledger_record_repository.dart';
 import 'package:money_mate/data/repositories/favorite_ledger_record_repository_impl.dart';
+import 'package:money_mate/l10n/app_localizations.dart';
 
 import '../../../data/model/entities/favorite_ledger_record.dart';
 
@@ -16,21 +17,23 @@ class FavoriteLedgerRecordsViewModel extends ChangeNotifier {
   StreamSubscription<List<FavoriteLedgerEntry>>? _subscription;
 
   bool _isLoading = true;
-  String? _errorMessage;
+  bool _hasLoadError = false;
   List<FavoriteLedgerEntry> _records = const [];
   bool _isDeleting = false;
-  String? _actionErrorMessage;
+  bool _hasActionError = false;
 
   bool get isLoading => _isLoading;
-  String? get errorMessage => _errorMessage;
+  String? errorMessage(AppLocalizations l10n) =>
+      _hasLoadError ? l10n.errorFavoriteListLoadFailed : null;
   List<FavoriteLedgerEntry> get records => _records;
   bool get isAtLimit => _records.length >= maxFavoriteLedgerRecordCount;
   bool get isDeleting => _isDeleting;
-  String? get actionErrorMessage => _actionErrorMessage;
+  String? actionErrorMessage(AppLocalizations l10n) =>
+      _hasActionError ? l10n.errorDeleteFailedRetry : null;
 
   Future<bool> deleteFavorites(Set<int> ids) async {
     _isDeleting = true;
-    _actionErrorMessage = null;
+    _hasActionError = false;
     notifyListeners();
 
     try {
@@ -39,7 +42,7 @@ class FavoriteLedgerRecordsViewModel extends ChangeNotifier {
       }
       return true;
     } catch (_) {
-      _actionErrorMessage = '삭제 중 오류가 발생했습니다. 다시 시도해 주세요.';
+      _hasActionError = true;
       return false;
     } finally {
       _isDeleting = false;
@@ -52,12 +55,12 @@ class FavoriteLedgerRecordsViewModel extends ChangeNotifier {
       (records) {
         _records = records;
         _isLoading = false;
-        _errorMessage = null;
+        _hasLoadError = false;
         notifyListeners();
       },
       onError: (_) {
         _isLoading = false;
-        _errorMessage = '즐겨찾기 목록을 불러오는 중 오류가 발생했습니다.';
+        _hasLoadError = true;
         notifyListeners();
       },
     );

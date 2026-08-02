@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:money_mate/ui/ledger/view_models/add_favorite_ledger_record_view_model.dart';
 import 'package:money_mate/ui/ledger/widgets/ledger_record_item_content.dart';
@@ -58,6 +59,7 @@ class _AddFavoriteLedgerRecordScreenState
   }
 
   Future<void> _onRecordTap(LedgerEntry entry) async {
+    final l10n = AppLocalizations.of(context)!;
     final isSuccess = await _viewModel.addToFavorite(entry);
     if (!mounted) {
       return;
@@ -68,7 +70,7 @@ class _AddFavoriteLedgerRecordScreenState
       return;
     }
 
-    final message = _viewModel.errorMessage ?? '즐겨찾기 추가에 실패했습니다.';
+    final message = _viewModel.errorMessage(l10n) ?? l10n.favoriteAddFailed;
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text(message)));
@@ -83,7 +85,7 @@ class _AddFavoriteLedgerRecordScreenState
         child: Column(
           children: [
             LedgerScreenHeader(
-              title: '즐겨찾기에 추가할 내역 선택',
+              title: AppLocalizations.of(context)!.selectFavoriteRecordTitle,
               onCloseTap: () => Navigator.pop(context),
               closeButtonSize: 40,
               padding: const EdgeInsets.fromLTRB(0, 16, 0, 8),
@@ -96,6 +98,7 @@ class _AddFavoriteLedgerRecordScreenState
   }
 
   Widget _buildBody() {
+    final l10n = AppLocalizations.of(context)!;
     if (_viewModel.isLoadingInitial) {
       return const Padding(
         padding: EdgeInsets.symmetric(horizontal: 16),
@@ -108,7 +111,7 @@ class _AddFavoriteLedgerRecordScreenState
     final records = _viewModel.records;
 
     if (records.isEmpty) {
-      final errorMessage = _viewModel.errorMessage;
+      final errorMessage = _viewModel.errorMessage(l10n);
       if (errorMessage != null) {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -131,7 +134,7 @@ class _AddFavoriteLedgerRecordScreenState
 
       return Center(
         child: Text(
-          '저장된 가계부 기록이 없어요',
+          l10n.noSavedLedgerRecords,
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 14,

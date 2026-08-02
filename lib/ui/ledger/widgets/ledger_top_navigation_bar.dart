@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:money_mate/ui/ledger/widgets/ledger_view_toggle.dart';
 
@@ -14,19 +15,20 @@ class LedgerTopNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       height: 46,
       decoration: BoxDecoration(color: context.appColors.background),
       child: Row(
         children: [
           _TopNavItem(
-            label: '달력',
+            label: l10n.viewCalendar,
             isSelected: selectedView == LedgerViewType.calendar,
             onTap: () => onChanged(LedgerViewType.calendar),
           ),
           const SizedBox(width: 8),
           _TopNavItem(
-            label: '목록',
+            label: l10n.viewList,
             isSelected: selectedView == LedgerViewType.monthly,
             onTap: () => onChanged(LedgerViewType.monthly),
           ),
@@ -63,7 +65,9 @@ class _TopNavItem extends StatelessWidget {
                 height: 28 / 18,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 color:
-                    isSelected ? context.appColors.textPrimary : context.appColors.textTertiary,
+                    isSelected
+                        ? context.appColors.textPrimary
+                        : context.appColors.textTertiary,
               ),
             ),
           ),

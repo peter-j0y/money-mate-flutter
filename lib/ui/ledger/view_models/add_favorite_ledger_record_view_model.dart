@@ -3,9 +3,12 @@ import 'package:money_mate/data/repositories/favorite_ledger_record_repository.d
 import 'package:money_mate/data/repositories/favorite_ledger_record_repository_impl.dart';
 import 'package:money_mate/data/repositories/ledger_record_repository.dart';
 import 'package:money_mate/data/repositories/ledger_record_repository_impl.dart';
+import 'package:money_mate/l10n/app_localizations.dart';
 
 import '../../../data/model/entities/favorite_ledger_record.dart';
 import '../../../data/model/entities/ledger_record.dart';
+
+enum _AddFavoriteError { loadFailed, limitExceeded, addFailed }
 
 class AddFavoriteLedgerRecordViewModel extends ChangeNotifier {
   AddFavoriteLedgerRecordViewModel({
@@ -27,18 +30,30 @@ class AddFavoriteLedgerRecordViewModel extends ChangeNotifier {
   bool _isLoadingMore = false;
   bool _hasMore = true;
   bool _isAdding = false;
-  String? _errorMessage;
+  _AddFavoriteError? _errorKind;
 
   List<LedgerEntry> get records => List.unmodifiable(_records);
   bool get isLoadingInitial => _isLoadingInitial;
   bool get isLoadingMore => _isLoadingMore;
   bool get hasMore => _hasMore;
   bool get isAdding => _isAdding;
-  String? get errorMessage => _errorMessage;
+
+  String? errorMessage(AppLocalizations l10n) {
+    switch (_errorKind) {
+      case _AddFavoriteError.loadFailed:
+        return l10n.errorLoadLedgerRecordsFailed;
+      case _AddFavoriteError.limitExceeded:
+        return l10n.errorFavoriteLimitExceeded(maxFavoriteLedgerRecordCount);
+      case _AddFavoriteError.addFailed:
+        return l10n.errorAddFavoriteFailed;
+      case null:
+        return null;
+    }
+  }
 
   Future<void> loadInitial() async {
     _isLoadingInitial = true;
-    _errorMessage = null;
+    _errorKind = null;
     notifyListeners();
 
     try {
@@ -51,7 +66,7 @@ class AddFavoriteLedgerRecordViewModel extends ChangeNotifier {
         ..addAll(page);
       _hasMore = page.length == _pageSize;
     } catch (_) {
-      _errorMessage = '가계부 기록을 불러오지 못했습니다. 다시 시도해 주세요.';
+      _errorKind = _AddFavoriteError.loadFailed;
     } finally {
       _isLoadingInitial = false;
       notifyListeners();
@@ -74,7 +89,7 @@ class AddFavoriteLedgerRecordViewModel extends ChangeNotifier {
       _records.addAll(page);
       _hasMore = page.length == _pageSize;
     } catch (_) {
-      _errorMessage = '가계부 기록을 불러오지 못했습니다. 다시 시도해 주세요.';
+      _errorKind = _AddFavoriteError.loadFailed;
     } finally {
       _isLoadingMore = false;
       notifyListeners();
@@ -83,7 +98,7 @@ class AddFavoriteLedgerRecordViewModel extends ChangeNotifier {
 
   Future<bool> addToFavorite(LedgerEntry entry) async {
     _isAdding = true;
-    _errorMessage = null;
+    _errorKind = null;
     notifyListeners();
 
     try {
@@ -98,11 +113,10 @@ class AddFavoriteLedgerRecordViewModel extends ChangeNotifier {
       );
       return true;
     } on FavoriteLedgerRecordLimitExceededException {
-      _errorMessage =
-          '즐겨찾기는 최대 $maxFavoriteLedgerRecordCount개까지 저장할 수 있어요.';
+      _errorKind = _AddFavoriteError.limitExceeded;
       return false;
     } catch (_) {
-      _errorMessage = '즐겨찾기 추가 중 오류가 발생했습니다. 다시 시도해 주세요.';
+      _errorKind = _AddFavoriteError.addFailed;
       return false;
     } finally {
       _isAdding = false;

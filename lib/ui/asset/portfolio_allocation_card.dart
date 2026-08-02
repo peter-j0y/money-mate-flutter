@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/asset/portfolio_allocation_chart.dart';
 import 'package:money_mate/ui/asset/portfolio_allocation_row.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
@@ -15,16 +16,14 @@ class PortfolioAllocationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final buttonBg = context.appColors.surfaceMuted;
     return Container(
       decoration: BoxDecoration(
         color: context.appColors.surface,
         borderRadius: BorderRadius.circular(16),
-        border:
-            isDark
-                ? Border.all(color: context.appColors.border)
-                : null,
+        border: isDark ? Border.all(color: context.appColors.border) : null,
       ),
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Column(
@@ -33,7 +32,7 @@ class PortfolioAllocationCard extends StatelessWidget {
           Row(
             children: [
               Text(
-                '포트폴리오 구성',
+                l10n.portfolioCompositionLabel,
                 style: TextStyle(
                   fontSize: 14,
                   height: 20 / 14,
@@ -60,7 +59,7 @@ class PortfolioAllocationCard extends StatelessWidget {
                     color: context.appColors.textPrimary,
                   ),
                   label: Text(
-                    '목표 비율 설정',
+                    l10n.setTargetRatioButton,
                     style: TextStyle(
                       fontSize: 12,
                       height: 16 / 12,
@@ -74,7 +73,7 @@ class PortfolioAllocationCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            '실제 비율',
+            l10n.actualRatioLabel,
             style: TextStyle(
               fontSize: 12,
               height: 16 / 12,
@@ -85,7 +84,12 @@ class PortfolioAllocationCard extends StatelessWidget {
           const SizedBox(height: 6),
           PortfolioAllocationChart(
             items: rows
-                .map((e) => PortfolioAllocationChartItem(ratio: e.actual, color: e.color))
+                .map(
+                  (e) => PortfolioAllocationChartItem(
+                    ratio: e.actual,
+                    color: e.color,
+                  ),
+                )
                 .toList(growable: false),
           ),
           const SizedBox(height: 16),

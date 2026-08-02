@@ -4,11 +4,13 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/intl.dart';
 import 'package:money_mate/data/repositories/app_settings_repository.dart';
 import 'package:money_mate/data/repositories/app_settings_repository_impl.dart';
 import 'package:money_mate/data/repositories/reminder_repository.dart';
 import 'package:money_mate/data/repositories/reminder_repository_impl.dart';
 import 'package:money_mate/firebase_options.dart';
+import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/ledger/widgets/add_ledger_record_screen.dart';
 import 'package:money_mate/ui/asset/screen/assets_tab_screen.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
@@ -19,6 +21,13 @@ import 'package:money_mate/ui/core/notification_permission_dialog.dart';
 import 'package:money_mate/ui/more/screen/more_tab_screen.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
+
+/// 앱 지원 언어(ko/en) 외의 기기 언어는 영어로 노출한다.
+Locale _resolveAppLocale(Locale? deviceLocale) {
+  return deviceLocale?.languageCode == 'ko'
+      ? const Locale('ko', 'KR')
+      : const Locale('en', 'US');
+}
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,6 +44,8 @@ Future<void> main() async {
   };
 
   final packageInfo = await PackageInfo.fromPlatform();
+  Intl.defaultLocale =
+      _resolveAppLocale(PlatformDispatcher.instance.locale).toString();
   final app = MoneyMateApp(appVersion: packageInfo.version);
 
   runApp(app);
@@ -53,13 +64,18 @@ class MoneyMateApp extends StatelessWidget {
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: ThemeMode.system,
-      locale: const Locale('ko', 'KR'),
       localizationsDelegates: const [
+        AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [Locale('ko', 'KR'), Locale('en', 'US')],
+      localeResolutionCallback: (deviceLocale, supportedLocales) {
+        final resolved = _resolveAppLocale(deviceLocale);
+        Intl.defaultLocale = resolved.toString();
+        return resolved;
+      },
       builder: (context, child) {
         final mediaQuery = MediaQuery.of(context);
         return MediaQuery(
@@ -91,16 +107,22 @@ class _HomeScreenState extends State<HomeScreen> {
       AppSettingsRepositoryImpl();
   final ReminderRepository _reminderRepository = ReminderRepositoryImpl();
 
-  final List<BottomNavTabItem> _tabs = const [
-    BottomNavTabItem(label: '가계부', icon: Icons.calendar_today_outlined),
-    BottomNavTabItem(label: '자산', icon: Icons.account_balance_wallet_outlined),
-    BottomNavTabItem(label: '더보기', icon: Icons.more_horiz_rounded),
+  List<BottomNavTabItem> _tabs(AppLocalizations l10n) => [
+    BottomNavTabItem(
+      label: l10n.navLedger,
+      icon: Icons.calendar_today_outlined,
+    ),
+    BottomNavTabItem(
+      label: l10n.navAsset,
+      icon: Icons.account_balance_wallet_outlined,
+    ),
+    BottomNavTabItem(label: l10n.navMore, icon: Icons.more_horiz_rounded),
   ];
 
   @override
   void initState() {
     super.initState();
-    _tabRefreshVersion = List<int>.filled(_tabs.length, 0);
+    _tabRefreshVersion = List<int>.filled(3, 0);
     WidgetsBinding.instance.addPostFrameCallback(
       (_) => _maybeRequestNotificationPermission(),
     );
@@ -133,6 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final pages = [
       LedgerTabScreen(
         key: ValueKey('ledger-tab-${_tabRefreshVersion[0]}'),
@@ -149,7 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body: pages[_currentIndex],
       bottomNavigationBar: MoneyMateBottomNavigationBar(
-        tabs: _tabs,
+        tabs: _tabs(l10n),
         currentIndex: _currentIndex,
         onTap: _onBottomTabTap,
       ),

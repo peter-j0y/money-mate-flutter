@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:money_mate/data/repositories/ledger_record_repository.dart';
 import 'package:money_mate/data/repositories/ledger_record_repository_impl.dart';
+import 'package:money_mate/l10n/app_localizations.dart';
 
 import '../../../data/model/entities/ledger_record.dart';
 
@@ -15,7 +16,7 @@ class LedgerTabViewModel extends ChangeNotifier {
   static const int _cacheWindowRadius = 2;
 
   bool _isLoading = false;
-  String? _errorMessage;
+  bool _hasLoadError = false;
   DateTime _currentMonth = DateTime.now();
   final Map<DateTime, StreamSubscription<List<LedgerEntry>>>
   _monthlySubscriptions = {};
@@ -26,7 +27,8 @@ class LedgerTabViewModel extends ChangeNotifier {
   final Map<DateTime, Map<DateTime, int>> _dailyExpenseTotalsByMonth = {};
 
   bool get isLoading => _isLoading;
-  String? get errorMessage => _errorMessage;
+  String? errorMessage(AppLocalizations l10n) =>
+      _hasLoadError ? l10n.errorLedgerLoadFailed : null;
   DateTime get currentMonth => _currentMonth;
   List<LedgerEntry> get monthlyRecords =>
       _monthlyRecordsByMonth[_currentMonth] ?? const [];
@@ -50,7 +52,7 @@ class LedgerTabViewModel extends ChangeNotifier {
   Future<void> loadMonth(DateTime month) async {
     final normalizedMonth = DateTime(month.year, month.month);
     _currentMonth = normalizedMonth;
-    _errorMessage = null;
+    _hasLoadError = false;
     _isLoading = !_monthlyRecordsByMonth.containsKey(normalizedMonth);
     notifyListeners();
 
@@ -119,7 +121,7 @@ class LedgerTabViewModel extends ChangeNotifier {
               _updateMonthCaches(month: month, records: records);
               if (_isSameMonth(month, _currentMonth)) {
                 _isLoading = false;
-                _errorMessage = null;
+                _hasLoadError = false;
               }
               notifyListeners();
             },
@@ -127,7 +129,7 @@ class LedgerTabViewModel extends ChangeNotifier {
               _updateMonthCaches(month: month, records: const []);
               if (_isSameMonth(month, _currentMonth)) {
                 _isLoading = false;
-                _errorMessage = '가계부 내역을 불러오는 중 오류가 발생했습니다.';
+                _hasLoadError = true;
               }
               notifyListeners();
             },

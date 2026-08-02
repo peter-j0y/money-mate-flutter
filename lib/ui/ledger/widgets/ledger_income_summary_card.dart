@@ -1,20 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 
 class LedgerIncomeSummaryCard extends StatelessWidget {
   const LedgerIncomeSummaryCard({
     super.key,
-    this.incomeText = '0원',
-    this.expenseText = '0원',
-    this.savableText = '0원',
+    this.incomeText,
+    this.expenseText,
+    this.savableText,
   });
 
-  final String incomeText;
-  final String expenseText;
-  final String savableText;
+  final String? incomeText;
+  final String? expenseText;
+  final String? savableText;
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final zeroText = 0.toKoreanWon();
     return Container(
       padding: const EdgeInsets.fromLTRB(4, 8, 4, 8),
       decoration: BoxDecoration(
@@ -25,24 +28,24 @@ class LedgerIncomeSummaryCard extends StatelessWidget {
         children: [
           Expanded(
             child: _SummaryValueColumn(
-              title: '수입',
-              value: incomeText,
+              title: l10n.typeIncome,
+              value: incomeText ?? zeroText,
               valueColor: context.appColors.primary,
               showRightBorder: true,
             ),
           ),
           Expanded(
             child: _SummaryValueColumn(
-              title: '지출',
-              value: expenseText,
+              title: l10n.typeExpense,
+              value: expenseText ?? zeroText,
               valueColor: context.appColors.danger,
               showRightBorder: true,
             ),
           ),
           Expanded(
             child: _SummaryValueColumn(
-              title: '합계',
-              value: savableText,
+              title: l10n.summaryTotal,
+              value: savableText ?? zeroText,
               valueColor: context.appColors.success,
             ),
           ),

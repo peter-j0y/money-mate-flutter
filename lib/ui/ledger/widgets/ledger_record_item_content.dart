@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:money_mate/data/model/entities/ledger_record.dart';
+import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:money_mate/ui/ledger/extensions/expense_payment_method_localization.dart';
 import 'package:money_mate/ui/ledger/widgets/ledger_category_options.dart';
@@ -21,20 +22,22 @@ class LedgerRecordItemContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final categoryOption = _categoryOptionOf(item);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final categoryBackgroundColor = categoryOption.accentColor.withValues(
       alpha: isDark ? 0.2 : 0.1,
     );
     final isIncome = item.type == LedgerRecordType.income;
-    final amountColor = isIncome ? context.appColors.primary : context.appColors.danger;
+    final amountColor =
+        isIncome ? context.appColors.primary : context.appColors.danger;
     final amountPrefix =
         amountStyle == LedgerAmountStyle.signed ? (isIncome ? '+' : '-') : '';
     final memo = _truncateMemo(item.memo?.trim());
     final hasMemo = memo != null && memo.isNotEmpty;
     final rightBottomText =
         showExpensePaymentMethod && !isIncome
-            ? item.paymentMethod?.koreanLabel
+            ? item.paymentMethod?.label(l10n)
             : null;
     final hasRightBottomText =
         rightBottomText != null && rightBottomText.isNotEmpty;
@@ -60,7 +63,7 @@ class LedgerRecordItemContent extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                item.category,
+                categoryOption.label(l10n),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -95,7 +98,7 @@ class LedgerRecordItemContent extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  '$amountPrefix${_wonText(item.amount)}',
+                  '$amountPrefix${item.amount.toCommaWon()}',
                   style: TextStyle(
                     fontSize: 16,
                     height: 24 / 16,
@@ -127,25 +130,13 @@ class LedgerRecordItemContent extends StatelessWidget {
     );
   }
 
-  static String _wonText(int amount) {
-    final reversed = amount.toString().split('').reversed.toList();
-    final buffer = StringBuffer();
-    for (var i = 0; i < reversed.length; i++) {
-      if (i > 0 && i % 3 == 0) {
-        buffer.write(',');
-      }
-      buffer.write(reversed[i]);
-    }
-    return '${buffer.toString().split('').reversed.join()}원';
-  }
-
   LedgerCategoryOption _categoryOptionOf(LedgerEntry entry) {
     final options =
         entry.type == LedgerRecordType.income
             ? ledgerIncomeCategoryOptions
             : ledgerExpenseCategoryOptions;
     return options.firstWhere(
-      (option) => option.label == entry.category,
+      (option) => option.code == entry.category,
       orElse: () => options.last,
     );
   }

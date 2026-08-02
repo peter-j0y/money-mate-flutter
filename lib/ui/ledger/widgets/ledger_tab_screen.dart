@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:money_mate/data/model/entities/ledger_record.dart';
 import 'package:money_mate/ui/ledger/view_models/ledger_tab_view_model.dart';
@@ -85,7 +86,9 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
     setState(() {});
   }
 
-  String get _monthLabel => '${_currentMonth.year}년 ${_currentMonth.month}월';
+  String get _monthLabel => AppLocalizations.of(
+    context,
+  )!.yearMonth(_currentMonth.year, _currentMonth.month);
 
   void _changeMonth(int monthDelta) {
     late final DateTime nextMonth;
@@ -136,8 +139,13 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
   }
 
   String _selectedDateLabel(DateTime date) {
-    const weekdays = ['월', '화', '수', '목', '금', '토', '일'];
-    return '${date.month}월 ${date.day}일 (${weekdays[date.weekday - 1]})';
+    final l10n = AppLocalizations.of(context)!;
+    final weekdays = weekdayShortLabels(l10n);
+    return l10n.monthDayWithWeekday(
+      date.month,
+      date.day,
+      weekdays[date.weekday - 1],
+    );
   }
 
   Future<void> _openAddLedgerRecordScreen(LedgerRecordType type) async {
@@ -162,7 +170,7 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
       initialDate: _currentMonth,
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
-      locale: const Locale('ko', 'KR'),
+      locale: Localizations.localeOf(context),
       initialDatePickerMode: DatePickerMode.year,
     );
 
@@ -252,7 +260,9 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
   Widget _buildCalendarTab() {
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
-    return isLandscape ? _buildCalendarTabLandscape() : _buildCalendarTabPortrait();
+    return isLandscape
+        ? _buildCalendarTabLandscape()
+        : _buildCalendarTabPortrait();
   }
 
   Widget _buildCalendarTabPortrait() {
@@ -307,7 +317,9 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
             selectedDate: _selectedDate,
             items: _selectedDateItems,
             isLoading: _viewModel.isLoading,
-            errorMessage: _viewModel.errorMessage,
+            errorMessage: _viewModel.errorMessage(
+              AppLocalizations.of(context)!,
+            ),
             selectedDateLabelBuilder: _selectedDateLabel,
             onItemTap: _handleLedgerItemTap,
           ),
@@ -350,7 +362,9 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
             selectedDate: _selectedDate,
             items: _selectedDateItems,
             isLoading: _viewModel.isLoading,
-            errorMessage: _viewModel.errorMessage,
+            errorMessage: _viewModel.errorMessage(
+              AppLocalizations.of(context)!,
+            ),
             selectedDateLabelBuilder: _selectedDateLabel,
             onItemTap: _handleLedgerItemTap,
           ),
@@ -360,6 +374,7 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
   }
 
   Widget _buildListTab() {
+    final l10n = AppLocalizations.of(context)!;
     return ListView(
       key: _listScrollKey,
       padding: EdgeInsets.zero,
@@ -369,9 +384,9 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: LedgerMonthlyRecordSection(
-            title: '수입',
-            emptyMessage: '이번 달 수입 내역이 없어요',
-            totalLabel: '총 수입 합계',
+            title: l10n.typeIncome,
+            emptyMessage: l10n.emptyMonthlyIncome,
+            totalLabel: l10n.totalIncomeLabel,
             items: _monthlyIncomeItems,
             onItemTap: (item) {
               Navigator.of(context).push(
@@ -387,9 +402,9 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: LedgerMonthlyRecordSection(
-            title: '지출',
-            emptyMessage: '이번 달 지출 내역이 없어요',
-            totalLabel: '총 지출 합계',
+            title: l10n.typeExpense,
+            emptyMessage: l10n.emptyMonthlyExpense,
+            totalLabel: l10n.totalExpenseLabel,
             items: _monthlyExpenseItems,
             onItemTap: (item) {
               Navigator.of(context).push(

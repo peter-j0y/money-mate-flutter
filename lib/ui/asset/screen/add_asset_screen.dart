@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:money_mate/data/local/app_database.dart';
 import 'package:money_mate/data/model/entities/asset_entry.dart';
+import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/asset/screen/portfolio_target_setting_screen.dart';
 import 'package:money_mate/ui/asset/view_models/add_asset_view_model.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
@@ -45,60 +47,72 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
     100000000,
   ];
 
-  static const List<_AssetTypeOption> _assetTypes = [
+  static const List<AssetType> _assetTypeOrder = [
+    AssetType.stock,
+    AssetType.cash,
+    AssetType.realEstate,
+    AssetType.crypto,
+    AssetType.savings,
+    AssetType.commodity,
+    AssetType.other,
+  ];
+
+  List<_AssetTypeOption> _assetTypes(AppLocalizations l10n) => [
     _AssetTypeOption(
       type: AssetType.stock,
-      title: '주식',
+      title: l10n.assetTypeStock,
       icon: Icons.trending_up_rounded,
       accentColor: AppColors.hexFF3B82F6,
-      nameHint: '삼성전자, S&P500 ETF 등',
+      nameHint: l10n.hintStockName,
     ),
     _AssetTypeOption(
       type: AssetType.cash,
-      title: '현금',
+      title: l10n.assetTypeCash,
       icon: Icons.account_balance_wallet_rounded,
       accentColor: AppColors.hexFF10B981,
-      nameHint: '현금, 달러, 비상금 등',
+      nameHint: l10n.hintCashName,
     ),
     _AssetTypeOption(
       type: AssetType.realEstate,
-      title: '부동산',
+      title: l10n.assetTypeRealEstate,
       icon: Icons.home_work_outlined,
       accentColor: AppColors.hexFFF59E0B,
-      nameHint: '보증금, 상가 등',
+      nameHint: l10n.hintRealEstateName,
     ),
     _AssetTypeOption(
       type: AssetType.crypto,
-      title: '가상화폐',
+      title: l10n.assetTypeCrypto,
       icon: Icons.currency_bitcoin_rounded,
       accentColor: AppColors.hexFF8B5CF6,
-      nameHint: '비트코인, 이더리움 등',
+      nameHint: l10n.hintCryptoName,
     ),
     _AssetTypeOption(
       type: AssetType.savings,
-      title: '예적금',
+      title: l10n.assetTypeSavings,
       icon: Icons.savings_outlined,
       accentColor: AppColors.hexFF0EA5E9,
-      nameHint: '주택 청약, 청년미래적금 등',
+      nameHint: l10n.hintSavingsName,
     ),
     _AssetTypeOption(
       type: AssetType.commodity,
-      title: '원자재',
+      title: l10n.assetTypeCommodity,
       icon: Icons.all_inclusive_rounded,
       accentColor: AppColors.hexFFEF4444,
-      nameHint: '금, 은, 원유 등',
+      nameHint: l10n.hintCommodityName,
     ),
     _AssetTypeOption(
       type: AssetType.other,
-      title: '기타',
+      title: l10n.assetTypeOther,
       icon: Icons.category_outlined,
       accentColor: AppColors.hexFF6B7280,
-      nameHint: '각종 포인트 등',
+      nameHint: l10n.hintOtherName,
     ),
   ];
 
-  _AssetTypeOption get _selectedAssetType => _assetTypes[_selectedIndex];
-  bool get _isStockAsset => _selectedAssetType.type == AssetType.stock;
+  _AssetTypeOption _selectedAssetType(AppLocalizations l10n) =>
+      _assetTypes(l10n)[_selectedIndex];
+  AssetType get _selectedAssetTypeCode => _assetTypeOrder[_selectedIndex];
+  bool get _isStockAsset => _selectedAssetTypeCode == AssetType.stock;
   bool get _isEditMode => widget.initialAsset != null;
 
   bool get _isSubmitEnabled =>
@@ -106,7 +120,7 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
       _amount > 0 &&
       !_viewModel.isSaving &&
       (!_includeInPortfolio ||
-          _viewModel.isCategoryInPortfolio(_selectedAssetType.type));
+          _viewModel.isCategoryInPortfolio(_selectedAssetTypeCode));
 
   @override
   void initState() {
@@ -118,7 +132,7 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
 
     _step = 2;
     final type = AssetTypeFromCode.fromCode(initial.assetType);
-    final index = _assetTypes.indexWhere((option) => option.type == type);
+    final index = _assetTypeOrder.indexWhere((t) => t == type);
     _selectedIndex = index >= 0 ? index : 0;
     _assetNameController.text = initial.assetName;
     _setAmount(initial.amount);
@@ -147,6 +161,7 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final safeAreaBottom = MediaQuery.paddingOf(context).bottom;
     final contentBottomPadding = safeAreaBottom + 120;
 
@@ -177,7 +192,7 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
                           step: _step,
                           isEditMode: _isEditMode,
                           safeAreaBottom: safeAreaBottom,
-                          selectedTypeTitle: _selectedAssetType.title,
+                          selectedTypeTitle: _selectedAssetType(l10n).title,
                           isSubmitEnabled: _isSubmitEnabled,
                           onNextTap: () => setState(() => _step = 2),
                           onBackTap: () {
@@ -212,7 +227,7 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
     final isSuccess =
         initial == null
             ? await _viewModel.saveAsset(
-              assetType: _selectedAssetType.type,
+              assetType: _selectedAssetTypeCode,
               assetName: _assetNameController.text.trim(),
               amount: _amount,
               shares: _isStockAsset ? _shares : null,
@@ -220,7 +235,7 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
             )
             : await _viewModel.updateAsset(
               id: initial.id,
-              assetType: _selectedAssetType.type,
+              assetType: _selectedAssetTypeCode,
               assetName: _assetNameController.text.trim(),
               amount: _amount,
               shares: _isStockAsset ? _shares : null,
@@ -236,7 +251,8 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
       return;
     }
 
-    final message = _viewModel.errorMessage ?? '저장에 실패했습니다.';
+    final l10n = AppLocalizations.of(context)!;
+    final message = _viewModel.errorMessage(l10n) ?? l10n.errorSaveFailed;
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text(message)));
@@ -282,6 +298,8 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
     BuildContext context,
     double contentBottomPadding,
   ) {
+    final l10n = AppLocalizations.of(context)!;
+    final assetTypes = _assetTypes(l10n);
     return Column(
       children: [
         const SizedBox(height: 18),
@@ -290,7 +308,7 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
           child: Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              '어떤 종류의 자산인가요?',
+              l10n.whatAssetType,
               style: TextStyle(
                 fontSize: 14,
                 height: 20 / 14,
@@ -305,7 +323,7 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
           child: Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              '자산 유형 선택',
+              l10n.selectAssetType,
               style: TextStyle(
                 fontSize: 20,
                 height: 30 / 20,
@@ -319,10 +337,10 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
         Expanded(
           child: ListView.separated(
             padding: EdgeInsets.fromLTRB(16, 0, 16, contentBottomPadding),
-            itemCount: _assetTypes.length,
+            itemCount: assetTypes.length,
             separatorBuilder: (_, __) => const SizedBox(height: 10),
             itemBuilder: (context, index) {
-              final option = _assetTypes[index];
+              final option = assetTypes[index];
               final isSelected = _selectedIndex == index;
               return _AssetTypeCard(
                 option: option,
@@ -340,20 +358,22 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
     BuildContext context,
     double contentBottomPadding,
   ) {
+    final l10n = AppLocalizations.of(context)!;
+    final selectedAssetType = _selectedAssetType(l10n);
     return ListView(
       padding: EdgeInsets.fromLTRB(16, 8, 16, contentBottomPadding),
       children: [
         Align(
           alignment: Alignment.centerLeft,
           child: _AssetTypeChip(
-            title: _selectedAssetType.title,
-            icon: _selectedAssetType.icon,
-            color: _selectedAssetType.accentColor,
+            title: selectedAssetType.title,
+            icon: selectedAssetType.icon,
+            color: selectedAssetType.accentColor,
           ),
         ),
         const SizedBox(height: 12),
         Text(
-          '자산 정보를 입력해주세요',
+          l10n.enterAssetInfo,
           style: TextStyle(
             fontSize: 20,
             height: 30 / 20,
@@ -363,11 +383,11 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
         ),
         const SizedBox(height: 20),
         if (!_isStockAsset) ...[
-          _SectionLabel(text: '자산명'),
+          _SectionLabel(text: l10n.assetNameLabel),
           const SizedBox(height: 8),
           _AppTextField(
             controller: _assetNameController,
-            hintText: _selectedAssetType.nameHint,
+            hintText: selectedAssetType.nameHint,
             onChanged: (_) => setState(() {}),
             focusNode: _assetNameFocusNode,
             textInputAction: TextInputAction.next,
@@ -396,7 +416,7 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
             sharesFocusNode: _sharesFocusNode,
           ),
         ] else ...[
-          _SectionLabel(text: '현재 금액'),
+          _SectionLabel(text: l10n.currentAmountLabel),
           const SizedBox(height: 8),
           _AmountInputField(
             controller: _amountController,
@@ -416,7 +436,7 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
                 _quickAmounts
                     .map(
                       (amount) => _QuickAmountButton(
-                        label: '+${_toKoreanUnit(amount)}',
+                        label: '+${_quickAmountLabel(amount)}',
                         onTap: () {
                           _amount += amount;
                           _amountController.text = _formatWithComma(_amount);
@@ -428,20 +448,20 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
           ),
         ],
         const SizedBox(height: 20),
-        _SectionLabel(text: '포트폴리오 관리'),
+        _SectionLabel(text: l10n.portfolioManagementLabel),
         const SizedBox(height: 8),
         _PortfolioOptionCard(
-          title: '포트폴리오에 포함',
-          subtitle: '목표 비율 차트에 반영돼요',
+          title: l10n.includeInPortfolioTitle,
+          subtitle: l10n.includeInPortfolioSubtitle,
           icon: Icons.pie_chart_outline_rounded,
           accentColor: AppColors.hexFF6B7280,
           selected: _includeInPortfolio,
           onTap: () => setState(() => _includeInPortfolio = true),
         ),
         if (_includeInPortfolio &&
-            !_viewModel.isCategoryInPortfolio(_selectedAssetType.type))
+            !_viewModel.isCategoryInPortfolio(_selectedAssetTypeCode))
           _PortfolioCategoryWarning(
-            categoryName: _selectedAssetType.title,
+            categoryName: selectedAssetType.title,
             onSettingsTap: () async {
               final result = await Navigator.of(context).push<bool>(
                 MaterialPageRoute(
@@ -455,8 +475,8 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
           ),
         const SizedBox(height: 8),
         _PortfolioOptionCard(
-          title: '포트폴리오에서 제외',
-          subtitle: '자산 총액에는 포함되지만 비율 계산에서 빠져요',
+          title: l10n.excludeFromPortfolioTitle,
+          subtitle: l10n.excludeFromPortfolioSubtitle,
           icon: Icons.inventory_2_outlined,
           accentColor: AppColors.hexFF6B7280,
           selected: !_includeInPortfolio,
@@ -526,6 +546,7 @@ class _TitleWithStepDot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final inactiveDotColor = context.appColors.primary.withValues(alpha: 0.35);
 
     return Column(
@@ -533,7 +554,7 @@ class _TitleWithStepDot extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          isEditMode ? '자산 수정' : '자산 추가',
+          isEditMode ? l10n.editAssetTitle : l10n.addAssetTitle,
           style: TextStyle(
             fontSize: 18,
             height: 20 / 14,
@@ -607,6 +628,7 @@ class _BottomActionArea extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       width: double.infinity,
       child: Column(
@@ -654,7 +676,7 @@ class _BottomActionArea extends StatelessWidget {
                           shadowColor: AppColors.rgba_19_127_236_025,
                         ),
                         child: Text(
-                          '$selectedTypeTitle 자산 추가',
+                          l10n.addAssetTypeButton(selectedTypeTitle),
                           style: TextStyle(
                             fontSize: 18,
                             height: 28 / 18,
@@ -673,14 +695,12 @@ class _BottomActionArea extends StatelessWidget {
                             child: FilledButton(
                               onPressed: onBackTap,
                               style: FilledButton.styleFrom(
-                                backgroundColor:
-                                    context.appColors.surfaceMuted,
+                                backgroundColor: context.appColors.surfaceMuted,
                                 foregroundColor:
                                     context.appColors.textSecondary,
                                 padding: EdgeInsets.zero,
                                 minimumSize: const Size(56, 56),
-                                tapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap,
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                 alignment: Alignment.center,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16),
@@ -712,7 +732,9 @@ class _BottomActionArea extends StatelessWidget {
                                 elevation: 0,
                               ),
                               child: Text(
-                                isEditMode ? '수정하기' : '자산 추가',
+                                isEditMode
+                                    ? l10n.commonUpdate
+                                    : l10n.addAssetTitle,
                                 style: TextStyle(
                                   fontSize: 16,
                                   height: 24 / 16,
@@ -950,6 +972,7 @@ class _AmountInputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       height: 56,
       padding: const EdgeInsets.fromLTRB(16, 2, 16, 2),
@@ -995,7 +1018,7 @@ class _AmountInputField extends StatelessWidget {
             ),
           ),
           Text(
-            '원',
+            l10n.currencyUnitSuffix,
             style: TextStyle(
               fontSize: 14,
               height: 20 / 14,
@@ -1038,20 +1061,21 @@ class _StockHoldingSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final summaryBg = context.appColors.primary.withValues(alpha: 0.12);
     final summaryPrimary = context.appColors.primary;
     final summarySecondary = context.appColors.primary.withValues(alpha: 0.55);
     final sharesText = _formatShares(shares);
-    final evaluatedText = _toKoreanWon(evaluatedAmount);
+    final evaluatedText = evaluatedAmount.toKoreanWon();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _SectionLabel(text: '종목명'),
+        _SectionLabel(text: l10n.stockNameLabel),
         const SizedBox(height: 8),
         _AppTextField(
           controller: nameController,
-          hintText: '삼성전자, S&P500 ETF 등',
+          hintText: l10n.hintStockName,
           onChanged: onNameChanged,
           focusNode: nameFocusNode,
           textInputAction: TextInputAction.next,
@@ -1059,7 +1083,7 @@ class _StockHoldingSection extends StatelessWidget {
               (_) => FocusScope.of(context).requestFocus(unitPriceFocusNode),
         ),
         const SizedBox(height: 20),
-        _SectionLabel(text: '1주당 가격'),
+        _SectionLabel(text: l10n.unitPriceLabel),
         const SizedBox(height: 8),
         _AmountInputField(
           controller: unitPriceController,
@@ -1070,7 +1094,7 @@ class _StockHoldingSection extends StatelessWidget {
               (_) => FocusScope.of(context).requestFocus(sharesFocusNode),
         ),
         const SizedBox(height: 20),
-        _SectionLabel(text: '보유 주수'),
+        _SectionLabel(text: l10n.sharesHeldLabel),
         const SizedBox(height: 8),
         Container(
           height: 56,
@@ -1109,7 +1133,7 @@ class _StockHoldingSection extends StatelessWidget {
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     isCollapsed: true,
-                    hintText: '예: 10 또는 10.5',
+                    hintText: l10n.sharesHint,
                     hintStyle: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w400,
@@ -1121,7 +1145,7 @@ class _StockHoldingSection extends StatelessWidget {
                 ),
               ),
               Text(
-                '주',
+                l10n.sharesUnit,
                 style: TextStyle(
                   fontSize: 14,
                   height: 20 / 14,
@@ -1144,7 +1168,7 @@ class _StockHoldingSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '평가금액',
+                l10n.evaluatedAmountLabel,
                 style: TextStyle(
                   fontSize: 12,
                   height: 16 / 12,
@@ -1156,7 +1180,7 @@ class _StockHoldingSection extends StatelessWidget {
               Row(
                 children: [
                   Text(
-                    '$sharesText주',
+                    l10n.sharesWithUnit(sharesText),
                     style: TextStyle(
                       fontSize: 12,
                       height: 16 / 12,
@@ -1176,7 +1200,7 @@ class _StockHoldingSection extends StatelessWidget {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    '${unitPriceController.text}원',
+                    l10n.amountWithWonSuffix(unitPriceController.text),
                     style: TextStyle(
                       fontSize: 12,
                       height: 16 / 12,
@@ -1252,6 +1276,7 @@ class _PortfolioCategoryWarning extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final warningColor = context.appColors.warning;
     final bgColor = warningColor.withValues(alpha: isDark ? 0.15 : 0.1);
@@ -1262,25 +1287,19 @@ class _PortfolioCategoryWarning extends StatelessWidget {
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: warningColor.withValues(alpha: 0.3),
-        ),
+        border: Border.all(color: warningColor.withValues(alpha: 0.3)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            Icons.info_outline_rounded,
-            size: 18,
-            color: warningColor,
-          ),
+          Icon(Icons.info_outline_rounded, size: 18, color: warningColor),
           const SizedBox(width: 8),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '$categoryName 카테고리가 포트폴리오에 없습니다',
+                  l10n.categoryNotInPortfolio(categoryName),
                   style: TextStyle(
                     fontSize: 13,
                     height: 18 / 13,
@@ -1290,7 +1309,7 @@ class _PortfolioCategoryWarning extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '포트폴리오 설정에서 카테고리를 추가해주세요',
+                  l10n.addCategoryInPortfolioSettings,
                   style: TextStyle(
                     fontSize: 12,
                     height: 16 / 12,
@@ -1316,7 +1335,7 @@ class _PortfolioCategoryWarning extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          '포트폴리오 설정',
+                          l10n.portfolioSettingsLabel,
                           style: TextStyle(
                             fontSize: 12,
                             height: 16 / 12,
@@ -1469,9 +1488,13 @@ String _formatWithComma(int value) {
   return buffer.toString();
 }
 
-String _toKoreanUnit(int amount) {
-  if (amount >= 100000000) return '1억';
-  return '${amount ~/ 10000}만';
+/// 빠른 금액 버튼용 축약 표기. 한국어 로케일에서는 억/만 단위, 그 외에는 콤마 포맷을 사용한다.
+String _quickAmountLabel(int amount) {
+  if (Intl.getCurrentLocale().startsWith('ko')) {
+    if (amount >= 100000000) return '1억';
+    return '${amount ~/ 10000}만';
+  }
+  return amount.toCommaWon();
 }
 
 String _formatShares(double? value) {
@@ -1482,25 +1505,4 @@ String _formatShares(double? value) {
     return value.toInt().toString();
   }
   return value.toStringAsFixed(2).replaceFirst(RegExp(r'\.?0+$'), '');
-}
-
-String _toKoreanWon(int amount) {
-  if (amount <= 0) {
-    return '0원';
-  }
-  final eok = amount ~/ 100000000;
-  final man = (amount % 100000000) ~/ 10000;
-  final won = amount % 10000;
-
-  final parts = <String>[];
-  if (eok > 0) {
-    parts.add('${_formatWithComma(eok)}억');
-  }
-  if (man > 0) {
-    parts.add('${_formatWithComma(man)}만');
-  }
-  if (won > 0) {
-    parts.add(_formatWithComma(won));
-  }
-  return '${parts.join(' ')}원';
 }

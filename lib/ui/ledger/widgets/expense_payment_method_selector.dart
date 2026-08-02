@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:money_mate/data/model/entities/ledger_record.dart';
 import 'package:money_mate/ui/ledger/extensions/expense_payment_method_localization.dart';
@@ -17,11 +18,12 @@ class ExpensePaymentMethodSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '지출 수단',
+          l10n.expensePaymentMethodLabel,
           style: TextStyle(
             fontSize: 14,
             height: 20 / 14,
@@ -36,7 +38,7 @@ class ExpensePaymentMethodSelector extends StatelessWidget {
           children: [
             for (var i = 0; i < options.length; i++)
               _PaymentMethodChip(
-                label: options[i].koreanLabel,
+                label: options[i].label(l10n),
                 selected: selectedMethod == options[i],
                 onTap: () => onChanged(options[i]),
               ),
@@ -66,10 +68,12 @@ class _PaymentMethodChip extends StatelessWidget {
       child: Ink(
         padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 9),
         decoration: BoxDecoration(
-          color: selected ? context.appColors.primary : context.appColors.surface,
+          color:
+              selected ? context.appColors.primary : context.appColors.surface,
           borderRadius: BorderRadius.circular(9999),
           border: Border.all(
-            color: selected ? context.appColors.primary : context.appColors.border,
+            color:
+                selected ? context.appColors.primary : context.appColors.border,
           ),
         ),
         child: Text(

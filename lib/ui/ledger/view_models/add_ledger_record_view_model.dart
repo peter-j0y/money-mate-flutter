@@ -1,8 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:money_mate/data/repositories/ledger_record_repository_impl.dart';
 import 'package:money_mate/data/repositories/ledger_record_repository.dart';
+import 'package:money_mate/l10n/app_localizations.dart';
 
 import '../../../data/model/entities/ledger_record.dart';
+
+enum _AddLedgerRecordError { invalidAmount, saveFailed }
 
 class AddLedgerRecordViewModel extends ChangeNotifier {
   AddLedgerRecordViewModel({LedgerRecordRepository? repository})
@@ -11,10 +14,20 @@ class AddLedgerRecordViewModel extends ChangeNotifier {
   final LedgerRecordRepository _repository;
 
   bool _isSaving = false;
-  String? _errorMessage;
+  _AddLedgerRecordError? _errorKind;
 
   bool get isSaving => _isSaving;
-  String? get errorMessage => _errorMessage;
+
+  String? errorMessage(AppLocalizations l10n) {
+    switch (_errorKind) {
+      case _AddLedgerRecordError.invalidAmount:
+        return l10n.errorAmountMustBePositive;
+      case _AddLedgerRecordError.saveFailed:
+        return l10n.errorSaveFailedRetry;
+      case null:
+        return null;
+    }
+  }
 
   Future<bool> saveRecord({
     required LedgerRecordType type,
@@ -25,13 +38,13 @@ class AddLedgerRecordViewModel extends ChangeNotifier {
     String? memo,
   }) async {
     if (amount <= 0) {
-      _errorMessage = '금액은 0원보다 커야 합니다.';
+      _errorKind = _AddLedgerRecordError.invalidAmount;
       notifyListeners();
       return false;
     }
 
     _isSaving = true;
-    _errorMessage = null;
+    _errorKind = null;
     notifyListeners();
 
     try {
@@ -47,7 +60,7 @@ class AddLedgerRecordViewModel extends ChangeNotifier {
       );
       return true;
     } catch (_) {
-      _errorMessage = '저장 중 오류가 발생했습니다. 다시 시도해 주세요.';
+      _errorKind = _AddLedgerRecordError.saveFailed;
       return false;
     } finally {
       _isSaving = false;

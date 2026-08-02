@@ -1,7 +1,10 @@
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:intl/intl.dart';
+import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -12,24 +15,15 @@ class _ReminderMessage {
   final String body;
 }
 
-const List<_ReminderMessage> _reminderMessages = [
-  _ReminderMessage(
-    '오늘 가계부 작성하셨나요?',
-    '1분만 투자해서 가계부 쓰고, 소비 습관을 만들어보아요.',
-  ),
-  _ReminderMessage(
-    '오늘 가계부 작성하셨나요?',
-    '잊기 전에 가계부에 적고 낭비된 돈이 없는지 찾아보세요.',
-  ),
-  _ReminderMessage(
-    '오늘 가계부 작성하셨나요?',
-    '오늘 하루 지출, 잊기 전에 빠르게 정리하러 가기!',
-  ),
-  _ReminderMessage(
-    '오늘 가계부 작성하셨나요?',
-    '지금 기록해두지 않으면 내일 또 같은 지출을 반복할지도 몰라요!',
-  ),
+List<_ReminderMessage> _reminderMessages(AppLocalizations l10n) => [
+  _ReminderMessage(l10n.reminderNotificationTitle, l10n.reminderBody1),
+  _ReminderMessage(l10n.reminderNotificationTitle, l10n.reminderBody2),
+  _ReminderMessage(l10n.reminderNotificationTitle, l10n.reminderBody3),
+  _ReminderMessage(l10n.reminderNotificationTitle, l10n.reminderBody4),
 ];
+
+AppLocalizations _currentLocalizations() =>
+    lookupAppLocalizations(Locale(Intl.getCurrentLocale()));
 
 /// 선택한 요일·시간에 매주 반복되는 기록 리마인드 알림을 예약/취소한다.
 class ReminderNotificationScheduler {
@@ -41,16 +35,16 @@ class ReminderNotificationScheduler {
   bool _initialized = false;
 
   static const String _channelId = 'reminder_channel';
-  static const String _channelName = '기록 리마인드';
-  static const String _channelDescription = '설정한 시간에 오늘 기록을 잊지 않도록 알려드려요';
 
   // 알림 id는 요일(1~7)마다 하나씩 고정 배정한다.
   static int _notificationIdFor(int weekday) => 100 + weekday;
 
-  _ReminderMessage _randomMessage() =>
-      _reminderMessages[_random.nextInt(_reminderMessages.length)];
+  _ReminderMessage _randomMessage(AppLocalizations l10n) {
+    final messages = _reminderMessages(l10n);
+    return messages[_random.nextInt(messages.length)];
+  }
 
-  Future<void> _ensureInitialized() async {
+  Future<void> _ensureInitialized(AppLocalizations l10n) async {
     if (_initialized) return;
 
     tz_data.initializeTimeZones();
@@ -67,10 +61,10 @@ class ReminderNotificationScheduler {
       const InitializationSettings(android: androidSettings, iOS: iosSettings),
     );
 
-    const channel = AndroidNotificationChannel(
+    final channel = AndroidNotificationChannel(
       _channelId,
-      _channelName,
-      description: _channelDescription,
+      l10n.reminderTitle,
+      description: l10n.reminderSubtitle,
     );
     await _plugin
         .resolvePlatformSpecificImplementation<
@@ -86,20 +80,21 @@ class ReminderNotificationScheduler {
     required int hour,
     required int minute,
   }) async {
-    await _ensureInitialized();
+    final l10n = _currentLocalizations();
+    await _ensureInitialized(l10n);
     await cancelAll();
 
-    const details = NotificationDetails(
+    final details = NotificationDetails(
       android: AndroidNotificationDetails(
         _channelId,
-        _channelName,
-        channelDescription: _channelDescription,
+        l10n.reminderTitle,
+        channelDescription: l10n.reminderSubtitle,
       ),
-      iOS: DarwinNotificationDetails(),
+      iOS: const DarwinNotificationDetails(),
     );
 
     for (final weekday in weekdays) {
-      final message = _randomMessage();
+      final message = _randomMessage(l10n);
       await _plugin.zonedSchedule(
         _notificationIdFor(weekday),
         message.title,

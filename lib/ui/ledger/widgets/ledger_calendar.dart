@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 
 class LedgerCalendar extends StatefulWidget {
@@ -75,6 +76,8 @@ class _LedgerCalendarState extends State<LedgerCalendar> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final weekdayLabels = weekdaySundayFirstLabels(l10n);
     final collapsedProgress = widget.collapseProgress.clamp(0.0, 1.0);
     final rowHeight =
         lerpDouble(
@@ -98,15 +101,21 @@ class _LedgerCalendarState extends State<LedgerCalendar> {
       ),
       child: Column(
         children: [
-          const Row(
+          Row(
             children: [
-              _WeekdayLabel(text: '일', color: AppColors.hexFFEF4444),
-              _WeekdayLabel(text: '월'),
-              _WeekdayLabel(text: '화'),
-              _WeekdayLabel(text: '수'),
-              _WeekdayLabel(text: '목'),
-              _WeekdayLabel(text: '금'),
-              _WeekdayLabel(text: '토', color: AppColors.hexFF3B82F6),
+              _WeekdayLabel(
+                text: weekdayLabels[0],
+                color: AppColors.hexFFEF4444,
+              ),
+              _WeekdayLabel(text: weekdayLabels[1]),
+              _WeekdayLabel(text: weekdayLabels[2]),
+              _WeekdayLabel(text: weekdayLabels[3]),
+              _WeekdayLabel(text: weekdayLabels[4]),
+              _WeekdayLabel(text: weekdayLabels[5]),
+              _WeekdayLabel(
+                text: weekdayLabels[6],
+                color: AppColors.hexFF3B82F6,
+              ),
             ],
           ),
           const SizedBox(height: 8),
@@ -341,7 +350,9 @@ class _CalendarMonthGrid extends StatelessWidget {
     if (isCurrentMonth && day.weekday == DateTime.saturday) {
       return AppColors.hexFF3B82F6;
     }
-    return isCurrentMonth ? context.appColors.textPrimary : context.appColors.textTertiary;
+    return isCurrentMonth
+        ? context.appColors.textPrimary
+        : context.appColors.textTertiary;
   }
 
   String _wonText(int amount) {

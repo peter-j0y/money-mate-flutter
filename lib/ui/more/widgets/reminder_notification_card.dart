@@ -3,11 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:money_mate/data/repositories/reminder_repository.dart';
 import 'package:money_mate/data/repositories/reminder_repository_impl.dart';
+import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:money_mate/ui/core/notification_permission_dialog.dart';
 import 'package:permission_handler/permission_handler.dart';
-
-const List<String> _weekdayLabels = ['월', '화', '수', '목', '금', '토', '일'];
 
 class ReminderNotificationCard extends StatefulWidget {
   ReminderNotificationCard({super.key, ReminderRepository? repository})
@@ -150,6 +149,8 @@ class _ReminderNotificationCardState extends State<ReminderNotificationCard>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final weekdayLabels = weekdayShortLabels(l10n);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final accentColor = context.appColors.primary;
     final iconBackgroundColor = accentColor.withValues(
@@ -184,7 +185,7 @@ class _ReminderNotificationCardState extends State<ReminderNotificationCard>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      '기록 리마인드',
+                      l10n.reminderTitle,
                       style: TextStyle(
                         fontSize: 15,
                         height: 20 / 15,
@@ -194,7 +195,7 @@ class _ReminderNotificationCardState extends State<ReminderNotificationCard>
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '설정한 시간에 오늘 기록을 잊지 않도록 알려드려요',
+                      l10n.reminderSubtitle,
                       style: TextStyle(
                         fontSize: 12,
                         height: 16 / 12,
@@ -230,7 +231,7 @@ class _ReminderNotificationCardState extends State<ReminderNotificationCard>
                         Divider(height: 1, color: context.appColors.border),
                         const SizedBox(height: 16),
                         Text(
-                          '알림 요일',
+                          l10n.reminderWeekdayLabel,
                           style: TextStyle(
                             fontSize: 12,
                             height: 16 / 12,
@@ -247,7 +248,7 @@ class _ReminderNotificationCardState extends State<ReminderNotificationCard>
                               weekday,
                             );
                             return _WeekdayDot(
-                              label: _weekdayLabels[index],
+                              label: weekdayLabels[index],
                               selected: isSelected,
                               accentColor: accentColor,
                               onTap: () => _toggleWeekday(weekday),
@@ -256,7 +257,7 @@ class _ReminderNotificationCardState extends State<ReminderNotificationCard>
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          '알림 시간',
+                          l10n.reminderTimeLabel,
                           style: TextStyle(
                             fontSize: 12,
                             height: 16 / 12,

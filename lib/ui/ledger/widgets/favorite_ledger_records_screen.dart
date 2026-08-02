@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:money_mate/data/model/entities/favorite_ledger_record.dart';
 import 'package:money_mate/data/model/entities/ledger_record.dart';
 import 'package:money_mate/data/repositories/favorite_ledger_record_repository.dart';
+import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:money_mate/ui/ledger/view_models/favorite_ledger_records_view_model.dart';
 import 'package:money_mate/ui/ledger/widgets/add_favorite_ledger_record_screen.dart';
@@ -52,7 +53,11 @@ class _FavoriteLedgerRecordsScreenState
     if (_viewModel.isAtLimit) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('즐겨찾기는 최대 $maxFavoriteLedgerRecordCount개까지 저장할 수 있어요.'),
+          content: Text(
+            AppLocalizations.of(
+              context,
+            )!.errorFavoriteLimitExceeded(maxFavoriteLedgerRecordCount),
+          ),
         ),
       );
       return;
@@ -99,6 +104,7 @@ class _FavoriteLedgerRecordsScreenState
       return;
     }
 
+    final l10n = AppLocalizations.of(context)!;
     final isSuccess = await _viewModel.deleteFavorites(_selectedIds);
     if (!mounted) {
       return;
@@ -109,33 +115,35 @@ class _FavoriteLedgerRecordsScreenState
       return;
     }
 
-    final message = _viewModel.actionErrorMessage ?? '삭제 중 오류가 발생했습니다.';
+    final message =
+        _viewModel.actionErrorMessage(l10n) ?? l10n.errorDeleteFailed;
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<bool> _showDeleteConfirmDialog() async {
+    final l10n = AppLocalizations.of(context)!;
     final result = await showDialog<bool>(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
           backgroundColor: context.appColors.surface,
-          content: Text('선택한 ${_selectedIds.length}개 항목을 즐겨찾기에서 삭제할까요?'),
+          content: Text(l10n.deleteFavoritesConfirm(_selectedIds.length)),
           actions: [
             TextButton(
               style: TextButton.styleFrom(
                 foregroundColor: context.appColors.primary,
               ),
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: const Text('취소'),
+              child: Text(l10n.commonCancel),
             ),
             TextButton(
               style: TextButton.styleFrom(
                 foregroundColor: context.appColors.danger,
               ),
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: const Text('삭제'),
+              child: Text(l10n.commonDelete),
             ),
           ],
         );
@@ -154,7 +162,7 @@ class _FavoriteLedgerRecordsScreenState
         child: Column(
           children: [
             LedgerScreenHeader(
-              title: '즐겨찾기',
+              title: AppLocalizations.of(context)!.favoriteTitle,
               onCloseTap:
                   _isEditMode ? _exitEditMode : () => Navigator.pop(context),
               trailing: _isEditMode ? null : _buildDefaultActions(),
@@ -225,9 +233,9 @@ class _FavoriteLedgerRecordsScreenState
                       color: AppColors.white,
                     ),
                   )
-                  : const Text(
-                    '삭제',
-                    style: TextStyle(
+                  : Text(
+                    AppLocalizations.of(context)!.commonDelete,
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                       color: AppColors.white,
@@ -239,6 +247,7 @@ class _FavoriteLedgerRecordsScreenState
   }
 
   Widget _buildBody() {
+    final l10n = AppLocalizations.of(context)!;
     if (_viewModel.isLoading) {
       return const Padding(
         padding: EdgeInsets.symmetric(horizontal: 16),
@@ -248,7 +257,7 @@ class _FavoriteLedgerRecordsScreenState
       );
     }
 
-    final errorMessage = _viewModel.errorMessage;
+    final errorMessage = _viewModel.errorMessage(l10n);
     if (errorMessage != null) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -273,7 +282,7 @@ class _FavoriteLedgerRecordsScreenState
     if (items.isEmpty) {
       return Center(
         child: Text(
-          '즐겨찾기한 내역이 없어요',
+          l10n.noFavoriteRecords,
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 14,

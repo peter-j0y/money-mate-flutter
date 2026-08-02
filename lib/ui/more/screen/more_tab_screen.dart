@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:money_mate/ui/more/notion_legal_links.dart';
 import 'package:money_mate/ui/more/widgets/reminder_notification_card.dart';
@@ -32,20 +33,12 @@ Future<({String osVersion, String deviceModel})> _getDeviceInfo() async {
 }
 
 String _buildSupportEmailBody({
+  required AppLocalizations l10n,
   required String appVersion,
   required String osVersion,
   required String deviceModel,
 }) {
-  return '✍️ 오류 제보 및 문의 내용:\n'
-      '\n'
-      '\n'
-      '\n'
-      '----------------------------------\n'
-      '💡 아래 정보는 오류 해결을 위한 기술 데이터로 오류 해결을 위해서만 사용됩니다.\n'
-      '• 앱 버전: $appVersion\n'
-      '• OS 버전: $osVersion\n'
-      '• 기기명: $deviceModel\n'
-      '----------------------------------';
+  return l10n.supportEmailBody(appVersion, osVersion, deviceModel);
 }
 
 class MoreTabScreen extends StatelessWidget {
@@ -67,7 +60,9 @@ class MoreTabScreen extends StatelessWidget {
 
     if (!launched && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('페이지를 열 수 없어요. 잠시 후 다시 시도해주세요.')),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.cannotOpenPageRetry),
+        ),
       );
     }
   }
@@ -77,10 +72,12 @@ class MoreTabScreen extends StatelessWidget {
   }
 
   Future<void> _contactSupport(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
     final deviceInfo = await _getDeviceInfo();
-    final subject = Uri.encodeComponent('[머니메이트] 문의하기');
+    final subject = Uri.encodeComponent(l10n.inquirySubject);
     final body = Uri.encodeComponent(
       _buildSupportEmailBody(
+        l10n: l10n,
         appVersion: appVersion,
         osVersion: deviceInfo.osVersion,
         deviceModel: deviceInfo.deviceModel,
@@ -97,7 +94,7 @@ class MoreTabScreen extends StatelessWidget {
 
     if (!launched && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('메일 앱을 열 수 없어요. $_supportEmail 으로 문의해주세요.')),
+        SnackBar(content: Text(l10n.cannotOpenMailApp(_supportEmail))),
       );
     }
   }
@@ -120,6 +117,7 @@ class MoreTabScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final safeAreaBottom = MediaQuery.paddingOf(context).bottom;
 
     return Scaffold(
@@ -131,27 +129,30 @@ class MoreTabScreen extends StatelessWidget {
             const _Header(),
             const SizedBox(height: 24),
             _SettingsSection(
-              title: '일반',
+              title: l10n.sectionGeneral,
               rows: [
                 _SettingsRow(
                   icon: Icons.campaign_outlined,
                   accentColor: AppColors.hexFF0EA5E9,
-                  title: '공지사항',
+                  title: l10n.notices,
                   trailing: const _RowChevron(),
                   onTap: () => _openNotices(context),
                 ),
               ],
             ),
             const SizedBox(height: 28),
-            _SettingsSection(title: '알림', rows: [ReminderNotificationCard()]),
+            _SettingsSection(
+              title: l10n.sectionNotification,
+              rows: [ReminderNotificationCard()],
+            ),
             const SizedBox(height: 28),
             _SettingsSection(
-              title: '고객지원',
+              title: l10n.sectionSupport,
               rows: [
                 _SettingsRow(
                   icon: Icons.mail_outline_rounded,
                   accentColor: context.appColors.success,
-                  title: '문의하기',
+                  title: l10n.contactUs,
                   trailing: const _RowChevron(),
                   onTap: () => _contactSupport(context),
                 ),
@@ -159,26 +160,26 @@ class MoreTabScreen extends StatelessWidget {
             ),
             const SizedBox(height: 28),
             _SettingsSection(
-              title: '약관 및 정책',
+              title: l10n.sectionTermsPolicy,
               rows: [
                 _SettingsRow(
                   icon: Icons.privacy_tip_outlined,
                   accentColor: context.appColors.primary,
-                  title: '개인정보처리방침',
+                  title: l10n.privacyPolicy,
                   trailing: const _RowChevron(),
                   onTap: () => _openPrivacyPolicy(context),
                 ),
                 _SettingsRow(
                   icon: Icons.description_outlined,
                   accentColor: AppColors.hexFF6B7280,
-                  title: '이용약관',
+                  title: l10n.termsOfService,
                   trailing: const _RowChevron(),
                   onTap: () => _openTermsOfService(context),
                 ),
                 _SettingsRow(
                   icon: Icons.article_outlined,
                   accentColor: AppColors.hexFFF97316,
-                  title: '오픈소스 라이선스',
+                  title: l10n.openSourceLicenses,
                   trailing: const _RowChevron(),
                   onTap: () => _openOpenSourceLicenses(context),
                 ),
@@ -186,12 +187,12 @@ class MoreTabScreen extends StatelessWidget {
             ),
             const SizedBox(height: 28),
             _SettingsSection(
-              title: '앱 정보',
+              title: l10n.appInfo,
               rows: [
                 _SettingsRow(
                   icon: Icons.info_outline_rounded,
                   accentColor: AppColors.hexFF6B7280,
-                  title: '앱 정보',
+                  title: l10n.appInfo,
                   trailing: Text(
                     appVersion,
                     style: TextStyle(
@@ -219,7 +220,7 @@ class _Header extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '더보기',
+          AppLocalizations.of(context)!.moreTabTitle,
           style: TextStyle(
             fontSize: 22,
             height: 28 / 22,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -9,29 +10,28 @@ class NotificationPermissionDialog {
   const NotificationPermissionDialog._();
 
   static Future<bool> show(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
     final result = await showDialog<bool>(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
           backgroundColor: context.appColors.surface,
-          title: const Text('기록하는 습관 만들기'),
-          content: const Text(
-            '설정한 시간에 기록을 잊지 않도록 알려드려요.\n알림은 언제든지 설정에서 끌 수 있어요.',
-          ),
+          title: Text(l10n.notificationDialogTitle),
+          content: Text(l10n.notificationDialogBody),
           actions: [
             TextButton(
               style: TextButton.styleFrom(
                 foregroundColor: context.appColors.textSecondary,
               ),
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: const Text('다음에'),
+              child: Text(l10n.notificationDialogLater),
             ),
             TextButton(
               style: TextButton.styleFrom(
                 foregroundColor: context.appColors.primary,
               ),
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: const Text('알림 받기'),
+              child: Text(l10n.notificationDialogAllow),
             ),
           ],
         );
@@ -44,27 +44,28 @@ class NotificationPermissionDialog {
   /// 설정 앱의 알림 화면으로 이동할지 확인받는 다이얼로그.
   /// 반환값은 사용자가 실제로 설정 화면으로 이동했는지 여부.
   static Future<bool> showSettingsRedirect(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
     final shouldOpenSettings = await showDialog<bool>(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
           backgroundColor: context.appColors.surface,
-          title: const Text('알림 권한이 꺼져 있어요'),
-          content: const Text('설정에서 알림 권한을 켜야 리마인드를 받을 수 있어요.'),
+          title: Text(l10n.notificationOffTitle),
+          content: Text(l10n.notificationOffBody),
           actions: [
             TextButton(
               style: TextButton.styleFrom(
                 foregroundColor: context.appColors.textSecondary,
               ),
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: const Text('취소'),
+              child: Text(l10n.commonCancel),
             ),
             TextButton(
               style: TextButton.styleFrom(
                 foregroundColor: context.appColors.primary,
               ),
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: const Text('설정으로 이동'),
+              child: Text(l10n.goToSettings),
             ),
           ],
         );

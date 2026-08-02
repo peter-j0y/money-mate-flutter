@@ -4,6 +4,16 @@ import 'package:money_mate/data/repositories/asset_repository.dart';
 import 'package:money_mate/data/repositories/asset_repository_impl.dart';
 import 'package:money_mate/data/repositories/portfolio_target_repository.dart';
 import 'package:money_mate/data/repositories/portfolio_target_repository_impl.dart';
+import 'package:money_mate/l10n/app_localizations.dart';
+
+enum _AddAssetError {
+  emptyName,
+  invalidAmount,
+  invalidShares,
+  saveFailed,
+  updateNotFound,
+  updateFailed,
+}
 
 class AddAssetViewModel extends ChangeNotifier {
   AddAssetViewModel({
@@ -19,11 +29,29 @@ class AddAssetViewModel extends ChangeNotifier {
   final PortfolioTargetRepository _portfolioTargetRepository;
 
   bool _isSaving = false;
-  String? _errorMessage;
+  _AddAssetError? _errorKind;
   Map<AssetType, PortfolioTargetEntry> _targetMap = {};
 
   bool get isSaving => _isSaving;
-  String? get errorMessage => _errorMessage;
+
+  String? errorMessage(AppLocalizations l10n) {
+    switch (_errorKind) {
+      case _AddAssetError.emptyName:
+        return l10n.errorAssetNameRequired;
+      case _AddAssetError.invalidAmount:
+        return l10n.errorAmountMustBePositive;
+      case _AddAssetError.invalidShares:
+        return l10n.errorSharesMustBePositive;
+      case _AddAssetError.saveFailed:
+        return l10n.errorAssetSaveFailed;
+      case _AddAssetError.updateNotFound:
+        return l10n.errorAssetNotFound;
+      case _AddAssetError.updateFailed:
+        return l10n.errorAssetUpdateFailed;
+      case null:
+        return null;
+    }
+  }
 
   bool isCategoryInPortfolio(AssetType type) {
     final target = _targetMap[type];
@@ -52,7 +80,7 @@ class AddAssetViewModel extends ChangeNotifier {
     }
 
     _isSaving = true;
-    _errorMessage = null;
+    _errorKind = null;
     notifyListeners();
 
     try {
@@ -67,7 +95,7 @@ class AddAssetViewModel extends ChangeNotifier {
       );
       return true;
     } catch (_) {
-      _errorMessage = '자산 저장 중 오류가 발생했습니다. 다시 시도해 주세요.';
+      _errorKind = _AddAssetError.saveFailed;
       return false;
     } finally {
       _isSaving = false;
@@ -88,7 +116,7 @@ class AddAssetViewModel extends ChangeNotifier {
     }
 
     _isSaving = true;
-    _errorMessage = null;
+    _errorKind = null;
     notifyListeners();
 
     try {
@@ -103,11 +131,11 @@ class AddAssetViewModel extends ChangeNotifier {
         ),
       );
       if (!updated) {
-        _errorMessage = '수정할 자산을 찾지 못했어요.';
+        _errorKind = _AddAssetError.updateNotFound;
       }
       return updated;
     } catch (_) {
-      _errorMessage = '자산 수정 중 오류가 발생했습니다. 다시 시도해 주세요.';
+      _errorKind = _AddAssetError.updateFailed;
       return false;
     } finally {
       _isSaving = false;
@@ -121,17 +149,17 @@ class AddAssetViewModel extends ChangeNotifier {
     double? shares,
   }) {
     if (assetName.trim().isEmpty) {
-      _errorMessage = '자산명을 입력해 주세요.';
+      _errorKind = _AddAssetError.emptyName;
       notifyListeners();
       return false;
     }
     if (amount <= 0) {
-      _errorMessage = '금액은 0원보다 커야 합니다.';
+      _errorKind = _AddAssetError.invalidAmount;
       notifyListeners();
       return false;
     }
     if (shares != null && shares <= 0) {
-      _errorMessage = '주수는 0보다 커야 합니다.';
+      _errorKind = _AddAssetError.invalidShares;
       notifyListeners();
       return false;
     }

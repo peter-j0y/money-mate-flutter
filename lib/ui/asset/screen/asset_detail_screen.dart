@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:money_mate/data/local/app_database.dart';
 import 'package:money_mate/data/repositories/asset_repository.dart';
 import 'package:money_mate/data/repositories/asset_repository_impl.dart';
+import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/asset/screen/add_asset_screen.dart';
 import 'package:money_mate/ui/asset/view_models/assets_tab_view_model.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
@@ -43,26 +44,27 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
   }
 
   Future<bool> _showDeleteConfirmDialog() async {
+    final l10n = AppLocalizations.of(context)!;
     final result = await showDialog<bool>(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
           backgroundColor: context.appColors.surface,
-          content: const Text('삭제하면 자산을 다시 복구할 수 없어요. 정말로 삭제할까요?'),
+          content: Text(l10n.deleteAssetConfirm),
           actions: [
             TextButton(
               style: TextButton.styleFrom(
                 foregroundColor: context.appColors.primary,
               ),
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: const Text('취소'),
+              child: Text(l10n.commonCancel),
             ),
             TextButton(
               style: TextButton.styleFrom(
                 foregroundColor: context.appColors.danger,
               ),
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: const Text('삭제'),
+              child: Text(l10n.commonDelete),
             ),
           ],
         );
@@ -81,6 +83,7 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
       return;
     }
 
+    final l10n = AppLocalizations.of(context)!;
     setState(() => _isDeleting = true);
 
     try {
@@ -92,7 +95,7 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
       if (!deleted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('삭제할 자산을 찾지 못했어요.')));
+        ).showSnackBar(SnackBar(content: Text(l10n.errorAssetDeleteNotFound)));
         setState(() => _isDeleting = false);
         return;
       }
@@ -104,13 +107,14 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
       }
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('삭제 중 오류가 발생했습니다.')));
+      ).showSnackBar(SnackBar(content: Text(l10n.errorDeleteFailed)));
       setState(() => _isDeleting = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final meta = widget.categoryMeta;
     final asset = widget.asset;
@@ -148,7 +152,7 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
                             children: [
                               Expanded(
                                 child: _RatioMiniCard(
-                                  label: '${meta.label} 내 비중',
+                                  label: l10n.innerRatioLabel(meta.label(l10n)),
                                   ratio: widget.innerRatio,
                                   color: meta.accentColor,
                                 ),
@@ -156,7 +160,7 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
                               const SizedBox(width: 12),
                               Expanded(
                                 child: _RatioMiniCard(
-                                  label: '전체 자산 내 비중',
+                                  label: l10n.overallRatioLabel,
                                   ratio: widget.overallRatio,
                                   color: context.appColors.textTertiary,
                                 ),
@@ -198,6 +202,7 @@ class _DetailTopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.fromLTRB(0, 16, 0, 8),
       child: SizedBox(
@@ -222,7 +227,7 @@ class _DetailTopBar extends StatelessWidget {
             ),
             Center(
               child: Text(
-                '자산 상세',
+                l10n.assetDetailTitle,
                 style: TextStyle(
                   fontSize: 18,
                   height: 24 / 18,
@@ -249,7 +254,7 @@ class _DetailTopBar extends StatelessWidget {
                           ),
                         )
                         : Text(
-                          '삭제',
+                          l10n.commonDelete,
                           style: TextStyle(
                             fontSize: 14,
                             height: 20 / 14,
@@ -279,6 +284,7 @@ class _DetailHero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
@@ -301,10 +307,14 @@ class _DetailHero extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(categoryMeta.icon, size: 16, color: categoryMeta.accentColor),
+                Icon(
+                  categoryMeta.icon,
+                  size: 16,
+                  color: categoryMeta.accentColor,
+                ),
                 const SizedBox(width: 6),
                 Text(
-                  categoryMeta.label,
+                  categoryMeta.label(l10n),
                   style: TextStyle(
                     fontSize: 14,
                     height: 20 / 14,
@@ -356,7 +366,7 @@ class _AmountCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '평가금액',
+            AppLocalizations.of(context)!.evaluatedAmountLabel,
             style: TextStyle(
               fontSize: 12,
               height: 16 / 12,
@@ -466,7 +476,9 @@ class _PortfolioStatusCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final iconColor = includeInPortfolio ? accentColor : context.appColors.textTertiary;
+    final l10n = AppLocalizations.of(context)!;
+    final iconColor =
+        includeInPortfolio ? accentColor : context.appColors.textTertiary;
 
     return Container(
       width: double.infinity,
@@ -506,7 +518,9 @@ class _PortfolioStatusCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  includeInPortfolio ? '포트폴리오 포함' : '포트폴리오 제외',
+                  includeInPortfolio
+                      ? l10n.includedInPortfolio
+                      : l10n.excludedFromPortfolio,
                   style: TextStyle(
                     fontSize: 14,
                     height: 20 / 14,
@@ -516,7 +530,9 @@ class _PortfolioStatusCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  includeInPortfolio ? '목표 비율 차트에 반영돼요' : '목표 비율 계산에서 제외돼요',
+                  includeInPortfolio
+                      ? l10n.includeInPortfolioSubtitle
+                      : l10n.excludedFromTargetCalc,
                   style: TextStyle(
                     fontSize: 12,
                     height: 16 / 12,
@@ -545,7 +561,7 @@ class _DetailBottomActions extends StatelessWidget {
     return Container(
       padding: EdgeInsets.fromLTRB(20, 13, 20, safeAreaBottom + 20),
       child: _ActionButton(
-        label: '수정하기',
+        label: AppLocalizations.of(context)!.commonUpdate,
         color: context.appColors.inverseText,
         backgroundColor: context.appColors.primary,
         onTap: onEditTap,

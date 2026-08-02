@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:money_mate/data/model/entities/ledger_record.dart';
 import 'package:money_mate/ui/ledger/widgets/ledger_record_item_content.dart';
@@ -30,6 +31,7 @@ class SelectedDateLedgerSection extends StatelessWidget {
     if (selectedDate == null) {
       return const SizedBox.shrink();
     }
+    final l10n = AppLocalizations.of(context)!;
 
     final totalAmount = items.fold<int>(
       0,
@@ -56,7 +58,7 @@ class SelectedDateLedgerSection extends StatelessWidget {
                 ),
               ),
               Text(
-                '합계 ${_wonText(totalAmount)}',
+                l10n.totalWithAmount(totalAmount.toCommaWon()),
                 style: TextStyle(
                   fontSize: 12,
                   height: 16 / 12,
@@ -75,7 +77,7 @@ class SelectedDateLedgerSection extends StatelessWidget {
                 child: LedgerStateCard(
                   child: Center(
                     child: Text(
-                      '해당 날짜에 등록된 내역이 없어요',
+                      l10n.emptyDateRecords,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 14,
@@ -129,21 +131,6 @@ class SelectedDateLedgerSection extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _wonText(int amount) {
-    final sign = amount < 0 ? '-' : '';
-    final reversed = amount.abs().toString().split('').reversed.toList();
-    final buffer = StringBuffer();
-
-    for (var i = 0; i < reversed.length; i++) {
-      if (i > 0 && i % 3 == 0) {
-        buffer.write(',');
-      }
-      buffer.write(reversed[i]);
-    }
-
-    return '$sign${buffer.toString().split('').reversed.join()}원';
   }
 }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:flutter/services.dart';
 import 'package:money_mate/data/model/entities/ledger_record.dart';
@@ -73,7 +74,7 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
     _selectedDate = widget.entry.date;
     _amountFocusNode = FocusNode();
     _amountController = TextEditingController(
-      text: _formatWon(widget.entry.amount).replaceAll('원', ''),
+      text: _formatDigitsWithComma(widget.entry.amount),
     );
     _memoController = TextEditingController(text: widget.entry.memo ?? '');
   }
@@ -86,12 +87,17 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
     super.dispose();
   }
 
-  String _koreanDateText(DateTime date) {
-    const weekdays = ['월', '화', '수', '목', '금', '토', '일'];
-    return '${date.year}년 ${date.month}월 ${date.day}일 (${weekdays[date.weekday - 1]})';
+  String _dateText(DateTime date, AppLocalizations l10n) {
+    final weekdays = weekdayShortLabels(l10n);
+    return l10n.dateWithWeekday(
+      date.year,
+      date.month,
+      date.day,
+      weekdays[date.weekday - 1],
+    );
   }
 
-  String _formatWon(int amount) {
+  String _formatDigitsWithComma(int amount) {
     final reversed = amount.toString().split('').reversed.toList();
     final buffer = StringBuffer();
     for (var i = 0; i < reversed.length; i++) {
@@ -100,7 +106,7 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
       }
       buffer.write(reversed[i]);
     }
-    return '${buffer.toString().split('').reversed.join()}원';
+    return buffer.toString().split('').reversed.join();
   }
 
   int _findInitialCategoryIndex(int typeIndex) {
@@ -109,7 +115,7 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
             ? ledgerIncomeCategoryOptions
             : ledgerExpenseCategoryOptions;
     final index = options.indexWhere(
-      (option) => option.label == widget.entry.category,
+      (option) => option.code == widget.entry.category,
     );
     return index >= 0 ? index : 0;
   }
@@ -128,7 +134,7 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
       initialDate: _selectedDate,
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
-      locale: const Locale('ko', 'KR'),
+      locale: Localizations.localeOf(context),
     );
 
     if (pickedDate == null) {
@@ -140,19 +146,19 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
 
   void _onTypeChanged(int nextTypeIndex) {
     final previousOptions = _categoryOptions;
-    final previousLabel =
+    final previousCode =
         _selectedCategoryIndex >= 0 &&
                 _selectedCategoryIndex < previousOptions.length
-            ? previousOptions[_selectedCategoryIndex].label
+            ? previousOptions[_selectedCategoryIndex].code
             : null;
     final nextOptions =
         nextTypeIndex == 0
             ? ledgerIncomeCategoryOptions
             : ledgerExpenseCategoryOptions;
     final mappedIndex =
-        previousLabel == null
+        previousCode == null
             ? -1
-            : nextOptions.indexWhere((option) => option.label == previousLabel);
+            : nextOptions.indexWhere((option) => option.code == previousCode);
 
     setState(() {
       _selectedTypeIndex = nextTypeIndex;
@@ -167,25 +173,26 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
   }
 
   Future<void> _onSaveTap() async {
+    final l10n = AppLocalizations.of(context)!;
     final recordId = widget.entry.id;
     if (recordId == null) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('수정할 항목 ID가 없습니다.')));
+      ).showSnackBar(SnackBar(content: Text(l10n.errorMissingEditId)));
       return;
     }
 
     if (_selectedCategoryIndex < 0) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('카테고리를 선택해 주세요.')));
+      ).showSnackBar(SnackBar(content: Text(l10n.errorCategoryRequired)));
       return;
     }
 
     if (_amountValue <= 0) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('금액은 0원보다 커야 합니다.')));
+      ).showSnackBar(SnackBar(content: Text(l10n.errorAmountMustBePositive)));
       return;
     }
 
@@ -194,7 +201,7 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
     final isExpense = _selectedTypeIndex == 1;
     final draft = LedgerEntryDraft(
       type: isExpense ? LedgerRecordType.expense : LedgerRecordType.income,
-      category: _categoryOptions[_selectedCategoryIndex].label,
+      category: _categoryOptions[_selectedCategoryIndex].code,
       amount: _amountValue,
       date: _selectedDate,
       paymentMethod: isExpense ? _selectedExpensePaymentMethod : null,
@@ -213,7 +220,7 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
       if (!replaced) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('수정할 항목을 찾지 못했어요.')));
+        ).showSnackBar(SnackBar(content: Text(l10n.errorEditItemNotFound)));
         setState(() => _isUpdating = false);
         return;
       }
@@ -225,7 +232,7 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
       }
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('수정 중 오류가 발생했습니다.')));
+      ).showSnackBar(SnackBar(content: Text(l10n.errorUpdateFailed)));
       setState(() => _isUpdating = false);
     }
   }
@@ -243,11 +250,12 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
       return;
     }
 
+    final l10n = AppLocalizations.of(context)!;
     final recordId = widget.entry.id;
     if (recordId == null) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('삭제할 항목 ID가 없습니다.')));
+      ).showSnackBar(SnackBar(content: Text(l10n.errorMissingDeleteId)));
       return;
     }
 
@@ -262,7 +270,7 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
       if (!deleted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('삭제할 항목을 찾지 못했어요.')));
+        ).showSnackBar(SnackBar(content: Text(l10n.errorDeleteItemNotFound)));
         setState(() => _isDeleting = false);
         return;
       }
@@ -274,7 +282,7 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
       }
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('삭제 중 오류가 발생했습니다.')));
+      ).showSnackBar(SnackBar(content: Text(l10n.errorDeleteFailed)));
       setState(() => _isDeleting = false);
     }
   }
@@ -283,19 +291,24 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
     final result = await showDialog<bool>(
       context: context,
       builder: (dialogContext) {
+        final l10n = AppLocalizations.of(dialogContext)!;
         return AlertDialog(
           backgroundColor: context.appColors.surface,
-          content: const Text('삭제하면 기록을 다시 복구할 수 없어요. 정말로 삭제할까요?'),
+          content: Text(l10n.deleteRecordConfirm),
           actions: [
             TextButton(
-              style: TextButton.styleFrom(foregroundColor: context.appColors.primary),
+              style: TextButton.styleFrom(
+                foregroundColor: context.appColors.primary,
+              ),
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: const Text('취소'),
+              child: Text(l10n.commonCancel),
             ),
             TextButton(
-              style: TextButton.styleFrom(foregroundColor: context.appColors.danger),
+              style: TextButton.styleFrom(
+                foregroundColor: context.appColors.danger,
+              ),
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: const Text('삭제'),
+              child: Text(l10n.commonDelete),
             ),
           ],
         );
@@ -307,6 +320,7 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final safeAreaBottom = MediaQuery.paddingOf(context).bottom;
     final contentBottomPadding = safeAreaBottom + 120;
 
@@ -317,11 +331,11 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
         child: Column(
           children: [
             LedgerScreenHeader(
-              title: '기록 상세',
+              title: l10n.recordDetailTitle,
               onCloseTap: () => Navigator.pop(context),
               actions: [
                 LedgerScreenHeaderAction(
-                  label: '삭제',
+                  label: l10n.commonDelete,
                   color: context.appColors.danger,
                   onTap: _onDeleteTap,
                 ),
@@ -340,15 +354,15 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const _SectionLabel(text: '날짜'),
+                        _SectionLabel(text: l10n.fieldDate),
                         const SizedBox(height: 8),
                         LedgerDateCard(
                           date: _selectedDate,
-                          dateTextBuilder: _koreanDateText,
+                          dateTextBuilder: (date) => _dateText(date, l10n),
                           onTap: _pickDate,
                         ),
                         const SizedBox(height: 24),
-                        const _SectionLabel(text: '금액'),
+                        _SectionLabel(text: l10n.fieldAmount),
                         const SizedBox(height: 8),
                         LedgerAmountField.editable(
                           controller: _amountController,
@@ -362,14 +376,14 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
                           color: context.appColors.surfaceMuted,
                         ),
                         const SizedBox(height: 24),
-                        const _SectionLabel(text: '유형'),
+                        _SectionLabel(text: l10n.fieldType),
                         const SizedBox(height: 8),
                         LedgerRecordTypeToggle(
                           selectedIndex: _selectedTypeIndex,
                           onChanged: _onTypeChanged,
                         ),
                         const SizedBox(height: 24),
-                        const _SectionLabel(text: '카테고리'),
+                        _SectionLabel(text: l10n.fieldCategory),
                         const SizedBox(height: 8),
                         LedgerCategoryGrid(
                           options: _categoryOptions,
@@ -395,14 +409,14 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
                           ),
                         ],
                         const SizedBox(height: 24),
-                        const _SectionLabel(text: '메모'),
+                        _SectionLabel(text: l10n.fieldMemo),
                         const SizedBox(height: 8),
                         LedgerMemoSection.editable(
                           controller: _memoController,
                           onTap: _markTapped,
                           placeholder:
                               _isMemoInitiallyEmpty
-                                  ? '기존 메모가 없어요. 내용을 추가해 보세요.'
+                                  ? l10n.memoEmptyPlaceholderEdit
                                   : null,
                         ),
                       ],
@@ -429,8 +443,10 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
                                             begin: Alignment.topCenter,
                                             end: Alignment.bottomCenter,
                                             colors: [
-                                              context.appColors.background.withValues(alpha: 0),
-                                              context.appColors.background.withValues(alpha: 0.65),
+                                              context.appColors.background
+                                                  .withValues(alpha: 0),
+                                              context.appColors.background
+                                                  .withValues(alpha: 0.65),
                                               context.appColors.background,
                                             ],
                                             stops: [0, 0.6, 1],
@@ -451,7 +467,8 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
                                         height: 60,
                                         child: FilledButton(
                                           style: FilledButton.styleFrom(
-                                            backgroundColor: context.appColors.primary,
+                                            backgroundColor:
+                                                context.appColors.primary,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
                                                   BorderRadius.circular(24),
@@ -476,9 +493,9 @@ class _LedgerRecordDetailScreenState extends State<LedgerRecordDetailScreen> {
                                                               AppColors.white,
                                                         ),
                                                   )
-                                                  : const Text(
-                                                    '수정하기',
-                                                    style: TextStyle(
+                                                  : Text(
+                                                    l10n.commonUpdate,
+                                                    style: const TextStyle(
                                                       fontSize: 18,
                                                       height: 28 / 18,
                                                       fontWeight:
