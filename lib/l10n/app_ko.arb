@@ -1,0 +1,311 @@
+{
+  "@@locale": "ko",
+
+  "navLedger": "가계부",
+  "navAsset": "자산",
+  "navMore": "더보기",
+
+  "commonCancel": "취소",
+  "commonDelete": "삭제",
+  "commonDone": "완료",
+  "commonUpdate": "수정하기",
+
+  "weekdayMon": "월",
+  "weekdayTue": "화",
+  "weekdayWed": "수",
+  "weekdayThu": "목",
+  "weekdayFri": "금",
+  "weekdaySat": "토",
+  "weekdaySun": "일",
+
+  "dateWithWeekday": "{year}년 {month}월 {day}일 ({weekday})",
+  "@dateWithWeekday": {
+    "placeholders": {
+      "year": {"type": "int"},
+      "month": {"type": "int"},
+      "day": {"type": "int"},
+      "weekday": {"type": "String"}
+    }
+  },
+  "monthDayWithWeekday": "{month}월 {day}일 ({weekday})",
+  "@monthDayWithWeekday": {
+    "placeholders": {
+      "month": {"type": "int"},
+      "day": {"type": "int"},
+      "weekday": {"type": "String"}
+    }
+  },
+  "yearMonth": "{year}년 {month}월",
+  "@yearMonth": {
+    "placeholders": {
+      "year": {"type": "int"},
+      "month": {"type": "int"}
+    }
+  },
+
+  "paymentMethodCash": "현금",
+  "paymentMethodCreditCard": "신용카드",
+  "paymentMethodDebitCard": "체크카드",
+  "paymentMethodBankTransfer": "계좌이체",
+  "paymentMethodPoints": "포인트",
+  "paymentMethodOther": "기타",
+
+  "categoryIncomeSalary": "월급",
+  "categoryIncomeSideJob": "부업",
+  "categoryIncomeBonus": "보너스",
+  "categoryIncomeAllowance": "용돈",
+  "categoryIncomeInterestDividend": "이자/배당",
+  "categoryOther": "기타",
+  "categoryExpenseFood": "식비",
+  "categoryExpenseTransport": "교통",
+  "categoryExpenseShopping": "쇼핑",
+  "categoryExpenseCultureHobby": "문화/취미",
+  "categoryExpenseHousingUtilities": "주거/통신",
+  "categoryExpenseMedicalHealth": "의료/건강",
+  "categoryExpenseEducation": "교육",
+
+  "errorLedgerLoadFailed": "가계부 내역을 불러오는 중 오류가 발생했습니다.",
+  "errorDeleteFailedRetry": "삭제 중 오류가 발생했습니다. 다시 시도해 주세요.",
+  "errorFavoriteListLoadFailed": "즐겨찾기 목록을 불러오는 중 오류가 발생했습니다.",
+  "errorAmountMustBePositive": "금액은 0원보다 커야 합니다.",
+  "errorSaveFailedRetry": "저장 중 오류가 발생했습니다. 다시 시도해 주세요.",
+  "errorLoadLedgerRecordsFailed": "가계부 기록을 불러오지 못했습니다. 다시 시도해 주세요.",
+  "errorFavoriteLimitExceeded": "즐겨찾기는 최대 {count}개까지 저장할 수 있어요.",
+  "@errorFavoriteLimitExceeded": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "errorAddFavoriteFailed": "즐겨찾기 추가 중 오류가 발생했습니다. 다시 시도해 주세요.",
+  "errorAssetSaveFailed": "자산 저장 중 오류가 발생했습니다. 다시 시도해 주세요.",
+  "errorAssetNotFound": "수정할 자산을 찾지 못했어요.",
+  "errorAssetUpdateFailed": "자산 수정 중 오류가 발생했습니다. 다시 시도해 주세요.",
+  "errorAssetNameRequired": "자산명을 입력해 주세요.",
+  "errorSharesMustBePositive": "주수는 0보다 커야 합니다.",
+
+  "errorDateRequired": "날짜를 선택해 주세요.",
+  "errorTypeRequired": "유형을 선택해 주세요.",
+  "errorCategoryRequired": "카테고리를 선택해 주세요.",
+  "errorPaymentMethodRequired": "지출 수단을 선택해 주세요.",
+  "errorSaveFailed": "저장에 실패했습니다.",
+
+  "errorMissingEditId": "수정할 항목 ID가 없습니다.",
+  "errorEditItemNotFound": "수정할 항목을 찾지 못했어요.",
+  "errorUpdateFailed": "수정 중 오류가 발생했습니다.",
+  "errorMissingDeleteId": "삭제할 항목 ID가 없습니다.",
+  "errorDeleteItemNotFound": "삭제할 항목을 찾지 못했어요.",
+  "errorDeleteFailed": "삭제 중 오류가 발생했습니다.",
+  "deleteRecordConfirm": "삭제하면 기록을 다시 복구할 수 없어요. 정말로 삭제할까요?",
+  "deleteAssetConfirm": "삭제하면 자산을 다시 복구할 수 없어요. 정말로 삭제할까요?",
+  "errorAssetDeleteNotFound": "삭제할 자산을 찾지 못했어요.",
+  "recordDetailTitle": "기록 상세",
+  "fieldDate": "날짜",
+  "fieldAmount": "금액",
+  "fieldType": "유형",
+  "fieldCategory": "카테고리",
+  "fieldMemo": "메모",
+  "memoEmptyPlaceholderEdit": "기존 메모가 없어요. 내용을 추가해 보세요.",
+
+  "addRecordTitle": "기록 추가",
+  "actionAdd": "추가하기",
+
+  "viewCalendar": "달력",
+  "viewList": "목록",
+
+  "typeIncome": "수입",
+  "typeExpense": "지출",
+  "summaryTotal": "합계",
+
+  "addShort": "+ 추가",
+
+  "memoInputPlaceholder": "내용을 입력해주세요 (예: 퇴근길 버스비)",
+
+  "emptyMonthlyIncome": "이번 달 수입 내역이 없어요",
+  "totalIncomeLabel": "총 수입 합계",
+  "emptyMonthlyExpense": "이번 달 지출 내역이 없어요",
+  "totalExpenseLabel": "총 지출 합계",
+
+  "totalWithAmount": "합계 {amount}",
+  "@totalWithAmount": {
+    "placeholders": {
+      "amount": {"type": "String"}
+    }
+  },
+  "emptyDateRecords": "해당 날짜에 등록된 내역이 없어요",
+
+  "favoriteAddFailed": "즐겨찾기 추가에 실패했습니다.",
+  "selectFavoriteRecordTitle": "즐겨찾기에 추가할 내역 선택",
+  "noSavedLedgerRecords": "저장된 가계부 기록이 없어요",
+  "favoriteTitle": "즐겨찾기",
+  "noFavoriteRecords": "즐겨찾기한 내역이 없어요",
+  "deleteFavoritesConfirm": "선택한 {count}개 항목을 즐겨찾기에서 삭제할까요?",
+  "@deleteFavoritesConfirm": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "expensePaymentMethodLabel": "지출 수단",
+
+  "supportEmailBody": "✍️ 오류 제보 및 문의 내용:\n\n\n\n----------------------------------\n💡 아래 정보는 오류 해결을 위한 기술 데이터로 오류 해결을 위해서만 사용됩니다.\n• 앱 버전: {appVersion}\n• OS 버전: {osVersion}\n• 기기명: {deviceModel}\n----------------------------------",
+  "@supportEmailBody": {
+    "placeholders": {
+      "appVersion": {"type": "String"},
+      "osVersion": {"type": "String"},
+      "deviceModel": {"type": "String"}
+    }
+  },
+  "cannotOpenPageRetry": "페이지를 열 수 없어요. 잠시 후 다시 시도해주세요.",
+  "inquirySubject": "[머니메이트] 문의하기",
+  "cannotOpenMailApp": "메일 앱을 열 수 없어요. {email} 으로 문의해주세요.",
+  "@cannotOpenMailApp": {
+    "placeholders": {
+      "email": {"type": "String"}
+    }
+  },
+  "sectionGeneral": "일반",
+  "notices": "공지사항",
+  "sectionNotification": "알림",
+  "sectionSupport": "고객지원",
+  "contactUs": "문의하기",
+  "sectionTermsPolicy": "약관 및 정책",
+  "privacyPolicy": "개인정보처리방침",
+  "termsOfService": "이용약관",
+  "openSourceLicenses": "오픈소스 라이선스",
+  "appInfo": "앱 정보",
+  "moreTabTitle": "더보기",
+
+  "reminderTitle": "기록 리마인드",
+  "reminderSubtitle": "설정한 시간에 오늘 기록을 잊지 않도록 알려드려요",
+  "reminderWeekdayLabel": "알림 요일",
+  "reminderTimeLabel": "알림 시간",
+  "reminderNotificationTitle": "오늘 가계부 작성하셨나요?",
+  "reminderBody1": "1분만 투자해서 가계부 쓰고, 소비 습관을 만들어보아요.",
+  "reminderBody2": "잊기 전에 가계부에 적고 낭비된 돈이 없는지 찾아보세요.",
+  "reminderBody3": "오늘 하루 지출, 잊기 전에 빠르게 정리하러 가기!",
+  "reminderBody4": "지금 기록해두지 않으면 내일 또 같은 지출을 반복할지도 몰라요!",
+
+  "notificationDialogTitle": "기록하는 습관 만들기",
+  "notificationDialogBody": "설정한 시간에 기록을 잊지 않도록 알려드려요.\n알림은 언제든지 설정에서 끌 수 있어요.",
+  "notificationDialogLater": "다음에",
+  "notificationDialogAllow": "알림 받기",
+  "notificationOffTitle": "알림 권한이 꺼져 있어요",
+  "notificationOffBody": "설정에서 알림 권한을 켜야 리마인드를 받을 수 있어요.",
+  "goToSettings": "설정으로 이동",
+
+  "assetTypeStock": "주식",
+  "assetTypeCash": "현금",
+  "assetTypeRealEstate": "부동산",
+  "assetTypeCrypto": "가상화폐",
+  "assetTypeSavings": "예적금",
+  "assetTypeCommodity": "원자재",
+  "assetTypeOther": "기타",
+
+  "hintStockName": "삼성전자, S&P500 ETF 등",
+  "hintCashName": "현금, 달러, 비상금 등",
+  "hintRealEstateName": "보증금, 상가 등",
+  "hintCryptoName": "비트코인, 이더리움 등",
+  "hintSavingsName": "주택 청약, 청년미래적금 등",
+  "hintCommodityName": "금, 은, 원유 등",
+  "hintOtherName": "각종 포인트 등",
+
+  "whatAssetType": "어떤 종류의 자산인가요?",
+  "selectAssetType": "자산 유형 선택",
+  "enterAssetInfo": "자산 정보를 입력해주세요",
+  "assetNameLabel": "자산명",
+  "currentAmountLabel": "현재 금액",
+  "portfolioManagementLabel": "포트폴리오 관리",
+  "includeInPortfolioTitle": "포트폴리오에 포함",
+  "includeInPortfolioSubtitle": "목표 비율 차트에 반영돼요",
+  "excludeFromPortfolioTitle": "포트폴리오에서 제외",
+  "excludeFromPortfolioSubtitle": "자산 총액에는 포함되지만 비율 계산에서 빠져요",
+  "editAssetTitle": "자산 수정",
+  "addAssetTitle": "자산 추가",
+  "addAssetTypeButton": "{type} 자산 추가",
+  "@addAssetTypeButton": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "stockNameLabel": "종목명",
+  "unitPriceLabel": "1주당 가격",
+  "sharesHeldLabel": "보유 주수",
+  "sharesHint": "예: 10 또는 10.5",
+  "sharesUnit": "주",
+  "currencyUnitSuffix": "원",
+  "sharesWithUnit": "{shares}주",
+  "@sharesWithUnit": {
+    "placeholders": {
+      "shares": {"type": "String"}
+    }
+  },
+  "amountWithWonSuffix": "{amount}원",
+  "@amountWithWonSuffix": {
+    "placeholders": {
+      "amount": {"type": "String"}
+    }
+  },
+  "evaluatedAmountLabel": "평가금액",
+  "categoryNotInPortfolio": "{category} 카테고리가 포트폴리오에 없습니다",
+  "@categoryNotInPortfolio": {
+    "placeholders": {
+      "category": {"type": "String"}
+    }
+  },
+  "addCategoryInPortfolioSettings": "포트폴리오 설정에서 카테고리를 추가해주세요",
+  "portfolioSettingsLabel": "포트폴리오 설정",
+
+  "innerRatioLabel": "{category} 내 비중",
+  "@innerRatioLabel": {
+    "placeholders": {
+      "category": {"type": "String"}
+    }
+  },
+  "overallRatioLabel": "전체 자산 내 비중",
+  "assetDetailTitle": "자산 상세",
+  "includedInPortfolio": "포트폴리오 포함",
+  "excludedFromPortfolio": "포트폴리오 제외",
+  "excludedFromTargetCalc": "목표 비율 계산에서 제외돼요",
+
+  "innerRatioWithValue": "{category} 내 비중 {ratio}%",
+  "@innerRatioWithValue": {
+    "placeholders": {
+      "category": {"type": "String"},
+      "ratio": {"type": "String"}
+    }
+  },
+  "assetListLabel": "자산 목록",
+  "setupPortfolioTitle": "포트폴리오를 설정해보세요",
+  "setupPortfolioBody": "목표 비율을 설정하면 자산 배분 현황을\n한눈에 확인할 수 있어요",
+  "setupPortfolioButton": "포트폴리오 설정하기",
+  "totalAssetsLabel": "총 자산",
+  "noAssetsYet": "아직 등록된 자산이 없어요",
+  "addFirstAssetBody": "첫 자산을 추가하고\n포트폴리오를 한눈에 확인해 보세요",
+  "addAssetButton": "자산 추가하기",
+
+  "portfolioCompositionLabel": "포트폴리오 구성",
+  "setTargetRatioButton": "목표 비율 설정",
+  "actualRatioLabel": "실제 비율",
+  "targetRatioWithValue": "목표 {value}%",
+  "@targetRatioWithValue": {
+    "placeholders": {
+      "value": {"type": "String"}
+    }
+  },
+
+  "ratioActualPrefix": "실제 ",
+  "ratioTargetPrefix": "목표 ",
+
+  "includedTargetTotalLabel": "포함 유형 목표 합계",
+  "adjustmentNeeded": "조정 필요",
+  "equalDistributionButton": "균등 배분",
+  "actualRatioWithValue": "실제 {value}%",
+  "@actualRatioWithValue": {
+    "placeholders": {
+      "value": {"type": "String"}
+    }
+  },
+  "savePortfolioSettingsButton": "포트폴리오 설정 저장",
+  "balanceTargetTo100": "목표 합계를 100%로 맞춰주세요.",
+  "portfolioSaveSuccess": "포트폴리오 목표 비율을 저장했습니다."
+}

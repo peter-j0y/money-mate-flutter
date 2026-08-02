@@ -85,6 +85,14 @@ lib/data/
 - **배경색 동적 생성**: 다크 모드에서 밝은 배경색이 필요할 경우 `color.withValues(alpha: isDark ? 0.2 : 0.1)` 패턴 사용
 - **테마 체크**: `final isDark = Theme.of(context).brightness == Brightness.dark;`
 
+### Localization Guidelines
+
+**UI에 노출되는 모든 문자열은 하드코딩하지 않고 다국어 처리합니다.**
+
+- **양쪽 arb 파일 동시 추가**: 새 문자열을 추가할 때는 `lib/l10n/app_ko.arb`와 `lib/l10n/app_en.arb`에 동일한 키로 반드시 함께 추가
+- **하드코딩 금지**: 위젯 내 문자열 리터럴 직접 작성 금지. 반드시 `AppLocalizations.of(context)!.xxx` (또는 프로젝트에서 사용하는 접근자)를 통해 참조
+- **키 작성 후 코드 생성**: arb 파일 수정 후 `flutter gen-l10n` 또는 `flutter pub get`으로 생성 코드 갱신 확인
+
 ### Naming Conventions
 
 - Classes: `UpperCamelCase`
