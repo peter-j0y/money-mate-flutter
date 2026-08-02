@@ -15,27 +15,34 @@ class LedgerCategoryGrid extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int>? onCategoryTap;
 
+  static const int _crossAxisCount = 4;
+  static const double _spacing = 12;
+
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: options.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 4,
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
-        mainAxisExtent: 92,
-      ),
-      itemBuilder: (context, index) {
-        final option = options[index];
-        final selected = selectedIndex == index;
-        final hasTap = onCategoryTap != null;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final itemWidth =
+            (constraints.maxWidth - _spacing * (_crossAxisCount - 1)) /
+            _crossAxisCount;
 
-        return _LedgerCategoryGridItem(
-          option: option,
-          selected: selected,
-          onTap: hasTap ? () => onCategoryTap!(index) : null,
+        return Wrap(
+          spacing: _spacing,
+          runSpacing: _spacing,
+          children: [
+            for (var index = 0; index < options.length; index++)
+              SizedBox(
+                width: itemWidth,
+                child: _LedgerCategoryGridItem(
+                  option: options[index],
+                  selected: selectedIndex == index,
+                  onTap:
+                      onCategoryTap != null
+                          ? () => onCategoryTap!(index)
+                          : null,
+                ),
+              ),
+          ],
         );
       },
     );

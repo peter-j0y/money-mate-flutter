@@ -28,7 +28,7 @@ class PortfolioAllocationRow extends StatelessWidget {
     final badgeBg = badgeColor.withValues(alpha: isDark ? 0.2 : 0.1);
 
     return Container(
-      height: 53,
+      constraints: const BoxConstraints(minHeight: 53),
       decoration: BoxDecoration(
         border:
             showDivider
@@ -51,6 +51,8 @@ class PortfolioAllocationRow extends StatelessWidget {
           Expanded(
             child: Text(
               label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 14,
                 height: 20 / 14,
