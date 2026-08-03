@@ -70,8 +70,11 @@ class MoreTabScreen extends StatelessWidget {
     }
   }
 
+  bool _isKorean(BuildContext context) =>
+      Localizations.localeOf(context).languageCode == 'ko';
+
   void _openNotices(BuildContext context) {
-    _openExternalLink(context, NotionLegalLinks.notice);
+    _openExternalLink(context, NotionLegalLinks.notice(_isKorean(context)));
   }
 
   Future<void> _contactSupport(BuildContext context) async {
@@ -103,11 +106,17 @@ class MoreTabScreen extends StatelessWidget {
   }
 
   void _openPrivacyPolicy(BuildContext context) {
-    _openExternalLink(context, NotionLegalLinks.privacyPolicy);
+    _openExternalLink(
+      context,
+      NotionLegalLinks.privacyPolicy(_isKorean(context)),
+    );
   }
 
   void _openTermsOfService(BuildContext context) {
-    _openExternalLink(context, NotionLegalLinks.termsOfService);
+    _openExternalLink(
+      context,
+      NotionLegalLinks.termsOfService(_isKorean(context)),
+    );
   }
 
   void _openOpenSourceLicenses(BuildContext context) {
