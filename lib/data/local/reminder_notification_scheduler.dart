@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:intl/intl.dart';
@@ -22,8 +23,20 @@ List<_ReminderMessage> _reminderMessages(AppLocalizations l10n) => [
   _ReminderMessage(l10n.reminderNotificationTitle, l10n.reminderBody4),
 ];
 
-AppLocalizations _currentLocalizations() =>
-    lookupAppLocalizations(Locale(Intl.getCurrentLocale()));
+// Intl.getCurrentLocale()은 "ko_KR"처럼 밑줄로 연결된 문자열을 반환하는데,
+// Locale(String) 단일 인자 생성자는 이를 파싱하지 않고 전체를 languageCode로
+// 취급해버려 lookupAppLocalizations가 항상 지원하지 않는 로케일로 보고 예외를
+// 던진다. 언어 코드만 분리해서 넘겨야 한다.
+// 앱이 지원하지 않는 예기치 못한 언어 코드가 들어오는 경우를 대비해,
+// 알림 예약 자체가 실패하지 않도록 영어로 안전하게 폴백한다.
+AppLocalizations _currentLocalizations() {
+  final languageCode = Intl.getCurrentLocale().split(RegExp('[_-]')).first;
+  try {
+    return lookupAppLocalizations(Locale(languageCode));
+  } on FlutterError {
+    return lookupAppLocalizations(const Locale('en'));
+  }
+}
 
 /// 선택한 요일·시간에 매주 반복되는 기록 리마인드 알림을 예약/취소한다.
 class ReminderNotificationScheduler {
