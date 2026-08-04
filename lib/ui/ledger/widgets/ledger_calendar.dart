@@ -1,7 +1,9 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:money_mate/data/model/entities/currency.dart';
 import 'package:money_mate/l10n/app_localizations.dart';
+import 'package:money_mate/ui/core/currency/current_currency.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 
 class LedgerCalendar extends StatefulWidget {
@@ -37,8 +39,8 @@ class LedgerCalendar extends StatefulWidget {
 
   final DateTime displayedMonth;
   final DateTime? selectedDate;
-  final int Function(DateTime date)? incomeTotalForDate;
-  final int Function(DateTime date)? expenseTotalForDate;
+  final Map<CurrencyCode, int> Function(DateTime date)? incomeTotalForDate;
+  final Map<CurrencyCode, int> Function(DateTime date)? expenseTotalForDate;
   final double collapseProgress;
   final ValueChanged<DateTime>? onMonthChanged;
   final ValueChanged<DateTime>? onDateTap;
@@ -188,8 +190,8 @@ class _CalendarMonthGrid extends StatelessWidget {
 
   final DateTime displayedMonth;
   final DateTime? selectedDate;
-  final int Function(DateTime date)? incomeTotalForDate;
-  final int Function(DateTime date)? expenseTotalForDate;
+  final Map<CurrencyCode, int> Function(DateTime date)? incomeTotalForDate;
+  final Map<CurrencyCode, int> Function(DateTime date)? expenseTotalForDate;
   final double rowHeight;
   final double amountOpacity;
   final bool shouldRenderAmounts;
@@ -234,12 +236,14 @@ class _CalendarMonthGrid extends StatelessWidget {
                   final isToday = _isSameDate(day, today);
                   final shouldShowTodayMarker =
                       isToday && !isSelected && !isTodaySelected;
-                  final incomeTotal =
-                      incomeTotalForDate?.call(normalizedDay) ?? 0;
-                  final expenseTotal =
-                      expenseTotalForDate?.call(normalizedDay) ?? 0;
+                  final incomeTotals =
+                      incomeTotalForDate?.call(normalizedDay) ?? const {};
+                  final expenseTotals =
+                      expenseTotalForDate?.call(normalizedDay) ?? const {};
                   final canShowAmounts =
                       shouldRenderAmounts && amountOpacity > 0;
+                  final incomeText = _signedAmountsText(incomeTotals, '+');
+                  final expenseText = _signedAmountsText(expenseTotals, '-');
 
                   return Expanded(
                     child: InkWell(
@@ -302,19 +306,19 @@ class _CalendarMonthGrid extends StatelessWidget {
                             ),
                             if (canShowAmounts) ...[
                               const SizedBox(height: 2),
-                              if (isCurrentMonth && incomeTotal > 0)
+                              if (isCurrentMonth && incomeText.isNotEmpty)
                                 Opacity(
                                   opacity: amountOpacity,
                                   child: _AdaptiveCalendarAmountText(
-                                    text: '+${_wonText(incomeTotal)}',
+                                    text: incomeText,
                                     color: context.appColors.primary,
                                   ),
                                 ),
-                              if (isCurrentMonth && expenseTotal > 0)
+                              if (isCurrentMonth && expenseText.isNotEmpty)
                                 Opacity(
                                   opacity: amountOpacity,
                                   child: _AdaptiveCalendarAmountText(
-                                    text: '-${_wonText(expenseTotal)}',
+                                    text: expenseText,
                                     color: context.appColors.danger,
                                   ),
                                 ),
@@ -355,16 +359,30 @@ class _CalendarMonthGrid extends StatelessWidget {
         : context.appColors.textTertiary;
   }
 
-  String _wonText(int amount) {
-    final reversed = amount.toString().split('').reversed.toList();
-    final buffer = StringBuffer();
-    for (var i = 0; i < reversed.length; i++) {
-      if (i > 0 && i % 3 == 0) {
-        buffer.write(',');
-      }
-      buffer.write(reversed[i]);
+  /// 통화별 합계 중 하나만 골라 부호와 함께 표시한다. 통화 기호는 셀 공간이
+  /// 좁아 생략하고, 통화별 소수점 자릿수만 정확히 반영한다. 하루에 여러 통화가
+  /// 섞이는 드문 경우에는 주 통화(있다면) 또는 금액이 가장 큰 통화 하나만
+  /// 보여주고 나머지가 있음을 말줄임(…)으로 표시한다.
+  String _signedAmountsText(Map<CurrencyCode, int> totals, String sign) {
+    final entries = totals.entries.where((entry) => entry.value != 0).toList();
+    if (entries.isEmpty) {
+      return '';
     }
-    return buffer.toString().split('').reversed.join();
+
+    final primaryEntry =
+        entries.length == 1
+            ? entries.first
+            : entries.firstWhere(
+              (entry) => entry.key == CurrentCurrency.code,
+              orElse:
+                  () => entries.reduce(
+                    (a, b) => b.value.abs() > a.value.abs() ? b : a,
+                  ),
+            );
+
+    final text =
+        '$sign${primaryEntry.value.toDecimalAmountText(primaryEntry.key)}';
+    return entries.length > 1 ? '$text…' : text;
   }
 }
 

@@ -24,8 +24,10 @@ class LedgerTabViewModel extends ChangeNotifier {
   final Map<DateTime, List<LedgerEntry>> _monthlyRecordsByMonth = {};
   final Map<DateTime, Map<DateTime, List<LedgerEntry>>> _recordsByDateByMonth =
       {};
-  final Map<DateTime, Map<DateTime, int>> _dailyIncomeTotalsByMonth = {};
-  final Map<DateTime, Map<DateTime, int>> _dailyExpenseTotalsByMonth = {};
+  final Map<DateTime, Map<DateTime, Map<CurrencyCode, int>>>
+  _dailyIncomeTotalsByMonth = {};
+  final Map<DateTime, Map<DateTime, Map<CurrencyCode, int>>>
+  _dailyExpenseTotalsByMonth = {};
 
   bool get isLoading => _isLoading;
   String? errorMessage(AppLocalizations l10n) =>
@@ -44,20 +46,16 @@ class LedgerTabViewModel extends ChangeNotifier {
 
   /// 통화별 이번 달 수입/지출/저축가능액. 여러 통화가 섞여도
   /// "₩1,000,000 · $200"처럼 통화별로 정확히 표시하기 위한 값이다.
-  Map<CurrencyCode, int> get monthlyIncomeTotalsByCurrency =>
-      _groupByCurrency(
-        _monthlyRecords.where((r) => r.type == LedgerRecordType.income),
-      );
+  Map<CurrencyCode, int> get monthlyIncomeTotalsByCurrency => _groupByCurrency(
+    _monthlyRecords.where((r) => r.type == LedgerRecordType.income),
+  );
 
-  Map<CurrencyCode, int> get monthlyExpenseTotalsByCurrency =>
-      _groupByCurrency(
-        _monthlyRecords.where((r) => r.type == LedgerRecordType.expense),
-      );
+  Map<CurrencyCode, int> get monthlyExpenseTotalsByCurrency => _groupByCurrency(
+    _monthlyRecords.where((r) => r.type == LedgerRecordType.expense),
+  );
 
   Map<CurrencyCode, int> get monthlySavableTotalsByCurrency {
-    final result = <CurrencyCode, int>{
-      ...monthlyIncomeTotalsByCurrency,
-    };
+    final result = <CurrencyCode, int>{...monthlyIncomeTotalsByCurrency};
     monthlyExpenseTotalsByCurrency.forEach((currency, expense) {
       result[currency] = (result[currency] ?? 0) - expense;
     });
@@ -73,9 +71,9 @@ class LedgerTabViewModel extends ChangeNotifier {
     return result;
   }
 
-  Map<DateTime, int> get dailyIncomeTotalsByDate =>
+  Map<DateTime, Map<CurrencyCode, int>> get dailyIncomeTotalsByDate =>
       _dailyIncomeTotalsByMonth[_currentMonth] ?? const {};
-  Map<DateTime, int> get dailyExpenseTotalsByDate =>
+  Map<DateTime, Map<CurrencyCode, int>> get dailyExpenseTotalsByDate =>
       _dailyExpenseTotalsByMonth[_currentMonth] ?? const {};
 
   List<LedgerEntry> get _monthlyRecords =>
@@ -105,16 +103,16 @@ class LedgerTabViewModel extends ChangeNotifier {
     return _recordsByDateByMonth[month]?[_normalizeDate(date)] ?? const [];
   }
 
-  int incomeTotalForDate(DateTime date) {
+  Map<CurrencyCode, int> incomeTotalsByCurrencyForDate(DateTime date) {
     final normalizedDate = _normalizeDate(date);
     final month = _normalizeMonth(date);
-    return _dailyIncomeTotalsByMonth[month]?[normalizedDate] ?? 0;
+    return _dailyIncomeTotalsByMonth[month]?[normalizedDate] ?? const {};
   }
 
-  int expenseTotalForDate(DateTime date) {
+  Map<CurrencyCode, int> expenseTotalsByCurrencyForDate(DateTime date) {
     final normalizedDate = _normalizeDate(date);
     final month = _normalizeMonth(date);
-    return _dailyExpenseTotalsByMonth[month]?[normalizedDate] ?? 0;
+    return _dailyExpenseTotalsByMonth[month]?[normalizedDate] ?? const {};
   }
 
   DateTime _normalizeDate(DateTime date) {
@@ -199,17 +197,20 @@ class LedgerTabViewModel extends ChangeNotifier {
     _monthlyRecordsByMonth[month] = List<LedgerEntry>.unmodifiable(records);
 
     final recordsByDate = <DateTime, List<LedgerEntry>>{};
-    final incomeTotals = <DateTime, int>{};
-    final expenseTotals = <DateTime, int>{};
+    final incomeTotals = <DateTime, Map<CurrencyCode, int>>{};
+    final expenseTotals = <DateTime, Map<CurrencyCode, int>>{};
 
     for (final record in records) {
       final key = _normalizeDate(record.date);
       recordsByDate.putIfAbsent(key, () => <LedgerEntry>[]).add(record);
+      final currency = CurrencyCode.fromCode(record.currencyCode);
 
       if (record.type == LedgerRecordType.income) {
-        incomeTotals[key] = (incomeTotals[key] ?? 0) + record.amount;
+        final byCurrency = incomeTotals.putIfAbsent(key, () => {});
+        byCurrency[currency] = (byCurrency[currency] ?? 0) + record.amount;
       } else if (record.type == LedgerRecordType.expense) {
-        expenseTotals[key] = (expenseTotals[key] ?? 0) + record.amount;
+        final byCurrency = expenseTotals.putIfAbsent(key, () => {});
+        byCurrency[currency] = (byCurrency[currency] ?? 0) + record.amount;
       }
     }
 

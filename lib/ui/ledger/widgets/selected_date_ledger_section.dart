@@ -43,6 +43,17 @@ class SelectedDateLedgerSection extends StatelessWidget {
           (totalsByCurrency[currency] ?? 0) + signedAmount;
     }
 
+    // 통화가 하나면 "합계 ₩150,000"처럼 한 줄로, 여러 개면 라벨 다음 줄부터
+    // 통화별 금액을 한 줄씩 나열한다(주 통화 우선, 그다음 금액 큰 순).
+    final amountLines = formatGroupedCurrencyAmounts(
+      totalsByCurrency,
+      sortByPrimaryCurrencyFirst: true,
+    ).split('\n');
+    final totalText =
+        amountLines.length > 1
+            ? '${l10n.totalWithAmount(amountLines.first)}\n${amountLines.skip(1).join('\n')}'
+            : l10n.totalWithAmount(amountLines.first);
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Column(
@@ -61,9 +72,8 @@ class SelectedDateLedgerSection extends StatelessWidget {
                 ),
               ),
               Text(
-                l10n.totalWithAmount(
-                  formatGroupedCurrencyAmounts(totalsByCurrency),
-                ),
+                totalText,
+                textAlign: TextAlign.end,
                 style: TextStyle(
                   fontSize: 12,
                   height: 16 / 12,

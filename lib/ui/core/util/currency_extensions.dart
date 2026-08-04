@@ -80,6 +80,23 @@ extension CurrencyFormatExtension on int {
         ? '$sign${rule.symbol}$amountText'
         : '$sign$amountText${rule.symbol}';
   }
+
+  /// 통화 기호 없이 소수점 자릿수만 통화 규칙에 맞게 반영해 금액을 포맷한다.
+  /// 달력 셀처럼 공간이 좁아 통화 기호를 생략해야 하는 곳에서 사용한다.
+  String toDecimalAmountText(CurrencyCode currency) {
+    final sign = this < 0 ? '-' : '';
+    final absValue = abs();
+    final decimalDigits = currency.decimalDigits;
+
+    if (decimalDigits > 0) {
+      final scale = currency.minorUnitScale;
+      final majorPart = absValue ~/ scale;
+      final minorPart = absValue % scale;
+      final minorText = minorPart.toString().padLeft(decimalDigits, '0');
+      return '$sign${_formatWithComma(majorPart)}.$minorText';
+    }
+    return '$sign${_formatWithComma(absValue)}';
+  }
 }
 
 /// 금액 입력 필드 옆에 붙는 통화 단위 표기. KRW는 기존 문구(원/KRW)를 유지하고,
@@ -93,13 +110,28 @@ String currencyInputSuffixLabel(CurrencyCode currency, AppLocalizations l10n) {
 /// 한 줄로 이어붙이면 통화가 늘어날수록 폭이 길어져 레이아웃이 깨지기 쉬워
 /// 가로가 아닌 세로로 쌓이게 한다.
 /// 0원인 통화는 표시하지 않으며, 전부 0이면 현재 주 통화 기준 0을 보여준다.
+/// [sortByPrimaryCurrencyFirst]가 true이면 현재 주 통화를 맨 위에 두고,
+/// 나머지는 금액이 큰 순서로 정렬한다(기본은 통화 코드 선언 순서).
 String formatGroupedCurrencyAmounts(
   Map<CurrencyCode, int> amountsByCurrency, {
   bool useKoreanUnitGrouping = false,
+  bool sortByPrimaryCurrencyFirst = false,
 }) {
   final nonZeroEntries =
-      amountsByCurrency.entries.where((entry) => entry.value != 0).toList()
-        ..sort((a, b) => a.key.index.compareTo(b.key.index));
+      amountsByCurrency.entries.where((entry) => entry.value != 0).toList();
+
+  if (sortByPrimaryCurrencyFirst) {
+    nonZeroEntries.sort((a, b) {
+      final aIsPrimary = a.key == CurrentCurrency.code;
+      final bIsPrimary = b.key == CurrentCurrency.code;
+      if (aIsPrimary != bIsPrimary) {
+        return aIsPrimary ? -1 : 1;
+      }
+      return b.value.abs().compareTo(a.value.abs());
+    });
+  } else {
+    nonZeroEntries.sort((a, b) => a.key.index.compareTo(b.key.index));
+  }
 
   if (nonZeroEntries.isEmpty) {
     return 0.toFormattedCurrency(

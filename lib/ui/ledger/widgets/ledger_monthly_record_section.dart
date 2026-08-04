@@ -29,7 +29,8 @@ class LedgerMonthlyRecordSection extends StatelessWidget {
     final totalsByCurrency = <CurrencyCode, int>{};
     for (final item in items) {
       final currency = CurrencyCode.fromCode(item.currencyCode);
-      totalsByCurrency[currency] = (totalsByCurrency[currency] ?? 0) + item.amount;
+      totalsByCurrency[currency] =
+          (totalsByCurrency[currency] ?? 0) + item.amount;
     }
 
     return Column(
@@ -130,7 +131,11 @@ class LedgerMonthlyRecordSection extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      formatGroupedCurrencyAmounts(totalsByCurrency),
+                      formatGroupedCurrencyAmounts(
+                        totalsByCurrency,
+                        sortByPrimaryCurrencyFirst: true,
+                      ),
+                      textAlign: TextAlign.end,
                       style: TextStyle(
                         fontSize: 14,
                         height: 20 / 14,

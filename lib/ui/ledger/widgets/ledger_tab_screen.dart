@@ -207,12 +207,15 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
         child: LedgerIncomeSummaryCard(
           incomeText: formatGroupedCurrencyAmounts(
             _viewModel.monthlyIncomeTotalsByCurrency,
+            sortByPrimaryCurrencyFirst: true,
           ),
           expenseText: formatGroupedCurrencyAmounts(
             _viewModel.monthlyExpenseTotalsByCurrency,
+            sortByPrimaryCurrencyFirst: true,
           ),
           savableText: formatGroupedCurrencyAmounts(
             _viewModel.monthlySavableTotalsByCurrency,
+            sortByPrimaryCurrencyFirst: true,
           ),
         ),
       ),
@@ -306,8 +309,10 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
                         displayedMonth: _currentMonth,
                         selectedDate: _selectedDate,
                         collapseProgress: collapseProgress,
-                        incomeTotalForDate: _viewModel.incomeTotalForDate,
-                        expenseTotalForDate: _viewModel.expenseTotalForDate,
+                        incomeTotalForDate:
+                            _viewModel.incomeTotalsByCurrencyForDate,
+                        expenseTotalForDate:
+                            _viewModel.expenseTotalsByCurrencyForDate,
                         onMonthChanged: _handleCalendarMonthChanged,
                         onDateTap: _handleCalendarDateTap,
                       );
@@ -351,8 +356,10 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
                   child: LedgerCalendar(
                     displayedMonth: _currentMonth,
                     selectedDate: _selectedDate,
-                    incomeTotalForDate: _viewModel.incomeTotalForDate,
-                    expenseTotalForDate: _viewModel.expenseTotalForDate,
+                    incomeTotalForDate:
+                        _viewModel.incomeTotalsByCurrencyForDate,
+                    expenseTotalForDate:
+                        _viewModel.expenseTotalsByCurrencyForDate,
                     onMonthChanged: _handleCalendarMonthChanged,
                     onDateTap: _handleCalendarDateTap,
                   ),
