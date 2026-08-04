@@ -36,14 +36,6 @@ class LedgerTabViewModel extends ChangeNotifier {
   List<LedgerEntry> get monthlyRecords =>
       _monthlyRecordsByMonth[_currentMonth] ?? const [];
 
-  int get monthlyIncomeTotal => _monthlyRecords
-      .where((record) => record.type == LedgerRecordType.income)
-      .fold(0, (sum, record) => sum + record.amount);
-  int get monthlyExpenseTotal => _monthlyRecords
-      .where((record) => record.type == LedgerRecordType.expense)
-      .fold(0, (sum, record) => sum + record.amount);
-  int get monthlySavableTotal => monthlyIncomeTotal - monthlyExpenseTotal;
-
   /// 통화별 이번 달 수입/지출/저축가능액. 여러 통화가 섞여도
   /// "₩1,000,000 · $200"처럼 통화별로 정확히 표시하기 위한 값이다.
   Map<CurrencyCode, int> get monthlyIncomeTotalsByCurrency => _groupByCurrency(

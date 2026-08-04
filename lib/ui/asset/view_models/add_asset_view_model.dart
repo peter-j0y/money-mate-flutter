@@ -6,7 +6,6 @@ import 'package:money_mate/data/repositories/asset_repository_impl.dart';
 import 'package:money_mate/data/repositories/portfolio_target_repository.dart';
 import 'package:money_mate/data/repositories/portfolio_target_repository_impl.dart';
 import 'package:money_mate/l10n/app_localizations.dart';
-import 'package:money_mate/ui/core/currency/current_currency.dart';
 
 enum _AddAssetError {
   emptyName,
@@ -91,7 +90,10 @@ class AddAssetViewModel extends ChangeNotifier {
           assetType: assetType,
           assetName: assetName.trim(),
           amount: amount,
-          currencyCode: CurrentCurrency.code.isoCode,
+          // 자산 입력 화면은 환율 연동 전까지 원화로만 입력을 받으므로
+          // (add_asset_screen.dart의 _activeCurrency 참고), 저장 통화도
+          // 사용자의 주 통화가 아닌 KRW로 고정한다.
+          currencyCode: CurrencyCode.krw.isoCode,
           shares: shares,
           includeInPortfolio: includeInPortfolio,
         ),
