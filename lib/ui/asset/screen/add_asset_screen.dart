@@ -118,11 +118,13 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
   bool get _isStockAsset => _selectedAssetTypeCode == AssetType.stock;
   bool get _isEditMode => widget.initialAsset != null;
 
-  /// 신규 자산은 현재 주 통화를, 수정 시에는 그 자산이 저장된 원래 통화를 사용한다.
+  /// 자산 통화는 환율 연동 전까지 KRW로 고정한다. 통화가 섞이면 포트폴리오
+  /// 비율 계산(assets_tab_view_model.dart의 portfolioTotal/actualRatio 등)이
+  /// 부정확해지기 때문이다. 수정 시에는 그 자산이 저장된 원래 통화를 그대로 쓴다.
   CurrencyCode get _activeCurrency =>
       widget.initialAsset != null
           ? CurrencyCode.fromCode(widget.initialAsset!.currencyCode)
-          : CurrentCurrency.code;
+          : CurrencyCode.krw;
 
   bool get _isSubmitEnabled =>
       _assetNameController.text.trim().isNotEmpty &&
@@ -136,6 +138,13 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
     super.initState();
     final initial = widget.initialAsset;
     if (initial == null) {
+      if (CurrentCurrency.code != CurrencyCode.krw) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            _showAssetCurrencyNoticeDialog();
+          }
+        });
+      }
       return;
     }
 
@@ -157,6 +166,33 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
         _activeCurrency,
       );
     }
+  }
+
+  /// 주 통화가 KRW가 아닌 사용자에게, 자산은 환율 연동 전까지 KRW로만
+  /// 입력된다는 점을 미리 안내한다.
+  Future<void> _showAssetCurrencyNoticeDialog() async {
+    final l10n = AppLocalizations.of(context)!;
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          backgroundColor: context.appColors.surface,
+          title: Text(l10n.assetCurrencyNoticeTitle),
+          content: Text(
+            l10n.assetCurrencyNoticeBody(CurrentCurrency.code.isoCode),
+          ),
+          actions: [
+            TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: context.appColors.primary,
+              ),
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(l10n.commonConfirm),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -464,7 +500,9 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
                       .map(
                         (amount) => _QuickAmountButton(
                           label: '+${_quickAmountLabel(amount)}',
-                          onTap: () => setState(() => _setAmount(_amount + amount)),
+                          onTap:
+                              () =>
+                                  setState(() => _setAmount(_amount + amount)),
                         ),
                       )
                       .toList(),

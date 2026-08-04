@@ -146,6 +146,16 @@
   "notificationOffBody": "Turn on notification permission in settings to receive reminders.",
   "goToSettings": "Go to Settings",
 
+  "commonConfirm": "OK",
+
+  "assetCurrencyNoticeTitle": "Assets are entered in KRW",
+  "assetCurrencyNoticeBody": "Until exchange rates are supported, asset amounts can only be entered in KRW. Note that this differs from your main currency ({currency}).",
+  "@assetCurrencyNoticeBody": {
+    "placeholders": {
+      "currency": {"type": "String"}
+    }
+  },
+
   "assetTypeStock": "Stocks",
   "assetTypeCash": "Cash",
   "assetTypeRealEstate": "Real Estate",

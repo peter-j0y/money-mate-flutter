@@ -397,6 +397,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get goToSettings => 'Go to Settings';
 
   @override
+  String get commonConfirm => 'OK';
+
+  @override
+  String get assetCurrencyNoticeTitle => 'Assets are entered in KRW';
+
+  @override
+  String assetCurrencyNoticeBody(String currency) {
+    return 'Until exchange rates are supported, asset amounts can only be entered in KRW. Note that this differs from your main currency ($currency).';
+  }
+
+  @override
   String get assetTypeStock => 'Stocks';
 
   @override

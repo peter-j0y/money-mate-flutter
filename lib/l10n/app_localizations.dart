@@ -839,6 +839,24 @@ abstract class AppLocalizations {
   /// **'설정으로 이동'**
   String get goToSettings;
 
+  /// No description provided for @commonConfirm.
+  ///
+  /// In ko, this message translates to:
+  /// **'확인'**
+  String get commonConfirm;
+
+  /// No description provided for @assetCurrencyNoticeTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'자산은 원화로 입력돼요'**
+  String get assetCurrencyNoticeTitle;
+
+  /// No description provided for @assetCurrencyNoticeBody.
+  ///
+  /// In ko, this message translates to:
+  /// **'환율 기능 출시 전까지 자산 금액은 원화(KRW) 기준으로만 입력할 수 있어요. 현재 설정된 주 통화({currency})와는 다르니 참고해 주세요.'**
+  String assetCurrencyNoticeBody(String currency);
+
   /// No description provided for @assetTypeStock.
   ///
   /// In ko, this message translates to:

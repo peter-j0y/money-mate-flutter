@@ -397,6 +397,17 @@ class AppLocalizationsKo extends AppLocalizations {
   String get goToSettings => '설정으로 이동';
 
   @override
+  String get commonConfirm => '확인';
+
+  @override
+  String get assetCurrencyNoticeTitle => '자산은 원화로 입력돼요';
+
+  @override
+  String assetCurrencyNoticeBody(String currency) {
+    return '환율 기능 출시 전까지 자산 금액은 원화(KRW) 기준으로만 입력할 수 있어요. 현재 설정된 주 통화($currency)와는 다르니 참고해 주세요.';
+  }
+
+  @override
   String get assetTypeStock => '주식';
 
   @override
