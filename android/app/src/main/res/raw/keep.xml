@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  flutter_local_notifications의 AndroidInitializationSettings('ic_stat_reminder')는
+  런타임에 리소스 이름을 문자열로 전달한다. R8 리소스 슈링커는 코드/XML에서
+  R.drawable.ic_stat_reminder 같은 정적 참조를 찾지 못하면 release 빌드(shrinkResources
+  true)에서 이 아이콘을 "사용 안 함"으로 판단해 제거해버리고, 그 결과 런타임에
+  PlatformException(invalid_icon, ...)로 크래시가 난다. tools:keep으로 명시적으로
+  보존한다. https://developer.android.com/build/shrink-code#keep-resources
+-->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@drawable/ic_stat_reminder" />
