@@ -38,8 +38,8 @@ android {
         applicationId = "com.peter.money_mate"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        // firebase_crashlytics requires minSdk 23 or higher.
-        minSdk = 23
+        // Play 자동 보호(Play Integrity) 요구사항: minSdk 24 이상 (firebase_crashlytics 최소 요구치인 23보다 높음).
+        minSdk = 24
         targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
