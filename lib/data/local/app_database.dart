@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
@@ -16,8 +17,7 @@ class LedgerRecords extends Table {
 
   IntColumn get amount => integer()();
 
-  TextColumn get currencyCode =>
-      text().withDefault(const Constant('KRW'))();
+  TextColumn get currencyCode => text().withDefault(const Constant('KRW'))();
 
   DateTimeColumn get date => dateTime()();
 
@@ -37,8 +37,7 @@ class Assets extends Table {
 
   IntColumn get amount => integer()();
 
-  TextColumn get currencyCode =>
-      text().withDefault(const Constant('KRW'))();
+  TextColumn get currencyCode => text().withDefault(const Constant('KRW'))();
 
   RealColumn get shares => real().nullable()();
 
@@ -69,8 +68,7 @@ class FavoriteLedgerRecords extends Table {
 
   IntColumn get amount => integer()();
 
-  TextColumn get currencyCode =>
-      text().withDefault(const Constant('KRW'))();
+  TextColumn get currencyCode => text().withDefault(const Constant('KRW'))();
 
   TextColumn get paymentMethod => text().nullable()();
 
@@ -84,6 +82,10 @@ class FavoriteLedgerRecords extends Table {
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase._internal() : super(_openConnection());
+
+  /// 마이그레이션 테스트에서 옛 스키마 DB를 주입할 때만 사용한다.
+  @visibleForTesting
+  AppDatabase.forTesting(super.executor);
 
   static final AppDatabase _instance = AppDatabase._internal();
 
@@ -111,17 +113,39 @@ class AppDatabase extends _$AppDatabase {
         await m.createTable(favoriteLedgerRecords);
       }
       if (from < 7) {
-        await m.addColumn(ledgerRecords, ledgerRecords.currencyCode);
-        await m.addColumn(assets, assets.currencyCode);
+        await _addColumnIfMissing(m, ledgerRecords, ledgerRecords.currencyCode);
+        await _addColumnIfMissing(m, assets, assets.currencyCode);
       }
       if (from < 8) {
-        await m.addColumn(
+        await _addColumnIfMissing(
+          m,
           favoriteLedgerRecords,
           favoriteLedgerRecords.currencyCode,
         );
       }
     },
   );
+
+  /// 컬럼이 아직 없을 때만 추가한다.
+  /// `createTable`은 그 시점이 아니라 현재 코드의 스키마로 테이블을 만들기 때문에,
+  /// 여러 버전을 한 번에 올라오면(예: 5 → 8) 뒤 단계에서 추가할 컬럼이 이미 있을 수 있다.
+  /// 또 이전 실행에서 마이그레이션이 중간에 실패해 일부 컬럼만 추가된 DB도 복구할 수 있다.
+  Future<void> _addColumnIfMissing(
+    Migrator m,
+    TableInfo<Table, dynamic> table,
+    GeneratedColumn<Object> column,
+  ) async {
+    final columns =
+        await customSelect(
+          'PRAGMA table_info("${table.actualTableName}")',
+        ).get();
+    final exists = columns.any(
+      (row) => row.read<String>('name') == column.name,
+    );
+    if (!exists) {
+      await m.addColumn(table, column);
+    }
+  }
 
   /// 기기 지역 기반 주 통화 추론 시, 기존 기록이 있는 사용자는 KRW를 유지하기 위한 판별용.
   Future<bool> hasAnyLedgerOrAssetRecords() async {
