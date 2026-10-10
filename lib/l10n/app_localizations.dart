@@ -1318,6 +1318,108 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'포트폴리오 목표 비율을 저장했습니다.'**
   String get portfolioSaveSuccess;
+
+  /// No description provided for @statisticsTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'통계'**
+  String get statisticsTitle;
+
+  /// No description provided for @statisticsMonthlySectionTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'월간 통계'**
+  String get statisticsMonthlySectionTitle;
+
+  /// No description provided for @statisticsTrendSectionTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'최근 12개월 추이'**
+  String get statisticsTrendSectionTitle;
+
+  /// No description provided for @statisticsIncomeExpenseTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'수입·지출'**
+  String get statisticsIncomeExpenseTitle;
+
+  /// No description provided for @statisticsCategoryExpenseTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'카테고리별 지출'**
+  String get statisticsCategoryExpenseTitle;
+
+  /// No description provided for @statisticsCategoryIncomeTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'카테고리별 수입'**
+  String get statisticsCategoryIncomeTitle;
+
+  /// No description provided for @statisticsTotal.
+  ///
+  /// In ko, this message translates to:
+  /// **'합계'**
+  String get statisticsTotal;
+
+  /// No description provided for @statisticsChartLine.
+  ///
+  /// In ko, this message translates to:
+  /// **'꺾은선'**
+  String get statisticsChartLine;
+
+  /// No description provided for @statisticsChartBar.
+  ///
+  /// In ko, this message translates to:
+  /// **'막대'**
+  String get statisticsChartBar;
+
+  /// No description provided for @statisticsNoTrendData.
+  ///
+  /// In ko, this message translates to:
+  /// **'최근 12개월간 기록이 없습니다.'**
+  String get statisticsNoTrendData;
+
+  /// No description provided for @statisticsNoTrendExpense.
+  ///
+  /// In ko, this message translates to:
+  /// **'최근 12개월간 지출 기록이 없습니다.'**
+  String get statisticsNoTrendExpense;
+
+  /// No description provided for @statisticsNoTrendIncome.
+  ///
+  /// In ko, this message translates to:
+  /// **'최근 12개월간 수입 기록이 없습니다.'**
+  String get statisticsNoTrendIncome;
+
+  /// No description provided for @statisticsNoMonthlyExpense.
+  ///
+  /// In ko, this message translates to:
+  /// **'이 달의 지출 기록이 없습니다.'**
+  String get statisticsNoMonthlyExpense;
+
+  /// No description provided for @statisticsNoMonthlyIncome.
+  ///
+  /// In ko, this message translates to:
+  /// **'이 달의 수입 기록이 없습니다.'**
+  String get statisticsNoMonthlyIncome;
+
+  /// No description provided for @statisticsNoCategorySelected.
+  ///
+  /// In ko, this message translates to:
+  /// **'표시할 카테고리를 선택해주세요.'**
+  String get statisticsNoCategorySelected;
+
+  /// No description provided for @statisticsSelectedMonthTotal.
+  ///
+  /// In ko, this message translates to:
+  /// **'{month} · 합계 {total}'**
+  String statisticsSelectedMonthTotal(String month, String total);
+
+  /// No description provided for @statisticsSelectedMonthSummary.
+  ///
+  /// In ko, this message translates to:
+  /// **'{month} · 수입 {income} · 지출 {expense}'**
+  String statisticsSelectedMonthSummary(String month, String income, String expense);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

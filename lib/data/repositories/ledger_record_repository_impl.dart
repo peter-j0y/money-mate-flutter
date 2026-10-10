@@ -35,6 +35,11 @@ class LedgerRecordRepositoryImpl implements LedgerRecordRepository {
   }
 
   @override
+  Stream<List<LedgerEntry>> watchRecordsBetween(DateTime start, DateTime end) {
+    return _localDataSource.watchRecordsBetween(start, end);
+  }
+
+  @override
   Future<List<LedgerEntry>> fetchRecordsPage({
     required int limit,
     required int offset,

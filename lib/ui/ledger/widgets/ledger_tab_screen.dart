@@ -12,6 +12,7 @@ import 'favorite_ledger_records_screen.dart';
 import 'ledger_month_selector.dart';
 import 'ledger_monthly_record_section.dart';
 import 'ledger_record_detail_screen.dart';
+import 'ledger_statistics_screen.dart';
 import 'ledger_top_navigation_bar.dart';
 import 'selected_date_ledger_section.dart';
 
@@ -258,6 +259,15 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
     );
   }
 
+  void _openStatisticsScreen() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder:
+            (context) => LedgerStatisticsScreen(initialMonth: _currentMonth),
+      ),
+    );
+  }
+
   void _handleLedgerItemTap(LedgerEntry item) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
@@ -450,6 +460,14 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
                     child: LedgerTopNavigationBar(
                       selectedView: _selectedView,
                       onChanged: (view) => setState(() => _selectedView = view),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: _openStatisticsScreen,
+                    tooltip: AppLocalizations.of(context)!.statisticsTitle,
+                    icon: Icon(
+                      Icons.bar_chart_rounded,
+                      color: context.appColors.textPrimary,
                     ),
                   ),
                   IconButton(

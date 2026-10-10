@@ -214,12 +214,23 @@ class AppDatabase extends _$AppDatabase {
     return query.watch();
   }
 
+  /// [start] 이상 [end] 미만 기간의 가계부 기록을 감시한다.
+  Stream<List<LedgerRecord>> watchRecordsBetween(DateTime start, DateTime end) {
+    return _recordsBetweenQuery(start, end).watch();
+  }
+
   SimpleSelectStatement<$LedgerRecordsTable, LedgerRecord> _monthlyRecordsQuery(
     DateTime month,
   ) {
     final start = DateTime(month.year, month.month, 1);
     final end = DateTime(month.year, month.month + 1, 1);
+    return _recordsBetweenQuery(start, end);
+  }
 
+  SimpleSelectStatement<$LedgerRecordsTable, LedgerRecord> _recordsBetweenQuery(
+    DateTime start,
+    DateTime end,
+  ) {
     return select(ledgerRecords)
       ..where(
         (tbl) =>

@@ -653,4 +653,59 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get portfolioSaveSuccess => '포트폴리오 목표 비율을 저장했습니다.';
+
+  @override
+  String get statisticsTitle => '통계';
+
+  @override
+  String get statisticsMonthlySectionTitle => '월간 통계';
+
+  @override
+  String get statisticsTrendSectionTitle => '최근 12개월 추이';
+
+  @override
+  String get statisticsIncomeExpenseTitle => '수입·지출';
+
+  @override
+  String get statisticsCategoryExpenseTitle => '카테고리별 지출';
+
+  @override
+  String get statisticsCategoryIncomeTitle => '카테고리별 수입';
+
+  @override
+  String get statisticsTotal => '합계';
+
+  @override
+  String get statisticsChartLine => '꺾은선';
+
+  @override
+  String get statisticsChartBar => '막대';
+
+  @override
+  String get statisticsNoTrendData => '최근 12개월간 기록이 없습니다.';
+
+  @override
+  String get statisticsNoTrendExpense => '최근 12개월간 지출 기록이 없습니다.';
+
+  @override
+  String get statisticsNoTrendIncome => '최근 12개월간 수입 기록이 없습니다.';
+
+  @override
+  String get statisticsNoMonthlyExpense => '이 달의 지출 기록이 없습니다.';
+
+  @override
+  String get statisticsNoMonthlyIncome => '이 달의 수입 기록이 없습니다.';
+
+  @override
+  String get statisticsNoCategorySelected => '표시할 카테고리를 선택해주세요.';
+
+  @override
+  String statisticsSelectedMonthTotal(String month, String total) {
+    return '$month · 합계 $total';
+  }
+
+  @override
+  String statisticsSelectedMonthSummary(String month, String income, String expense) {
+    return '$month · 수입 $income · 지출 $expense';
+  }
 }
