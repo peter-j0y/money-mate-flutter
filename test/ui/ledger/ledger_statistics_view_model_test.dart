@@ -396,5 +396,48 @@ void main() {
       expect(viewModel.selectedTrendIndex, 0);
       viewModel.dispose();
     });
+
+    test('집계는 캐시되어 달 선택·체크 변경 때는 다시 계산하지 않고, 통화가 바뀌면 다시 계산한다', () async {
+      final viewModel = createViewModel([
+        statisticsTestEntry(
+          type: LedgerRecordType.expense,
+          amount: 100,
+          date: DateTime(2026, 9, 1),
+        ),
+        statisticsTestEntry(
+          type: LedgerRecordType.expense,
+          amount: 5,
+          date: DateTime(2026, 10, 1),
+          currency: 'USD',
+        ),
+      ]);
+      viewModel.start(initialMonth: now, primary: CurrencyCode.krw);
+      await pumpEventQueue();
+
+      final trend = viewModel.monthlyTrend;
+      final expenseTrend = viewModel.categoryTrend(LedgerRecordType.expense);
+      expect(identical(viewModel.monthlyTrend, trend), isTrue);
+
+      viewModel.selectTrendIndex(0);
+      viewModel.selectCategoryIndex(LedgerRecordType.expense, 0);
+      viewModel.setCategoryVisible(
+        LedgerRecordType.expense,
+        '식비',
+        visible: false,
+      );
+      expect(identical(viewModel.monthlyTrend, trend), isTrue);
+      expect(
+        identical(
+          viewModel.categoryTrend(LedgerRecordType.expense),
+          expenseTrend,
+        ),
+        isTrue,
+      );
+
+      viewModel.selectCurrency(CurrencyCode.usd);
+      expect(identical(viewModel.monthlyTrend, trend), isFalse);
+      expect(viewModel.monthlyTrend.single.expense, 5);
+      viewModel.dispose();
+    });
   });
 }

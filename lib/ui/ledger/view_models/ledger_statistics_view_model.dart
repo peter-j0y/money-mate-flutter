@@ -83,83 +83,49 @@ class LedgerStatisticsViewModel extends ChangeNotifier {
           ? _preferences.hiddenExpenseCategories
           : _preferences.hiddenIncomeCategories;
 
+  // 집계 결과 캐시. 화면은 다시 그릴 때마다 아래 getter를 여러 번 읽으므로,
+  // 입력(기록·고른 달의 기록·통화)이 바뀔 때만 [_recompute]로 한 번 계산해 둔다.
+  // 그래프에서 달을 고르거나 체크박스·그래프 유형을 바꿀 때는 다시 계산하지 않는다.
+  List<CurrencyCode> _availableCurrencies = const [];
+  CurrencyCode _currency = CurrencyCode.krw;
+  List<MonthlyIncomeExpense> _monthlyTrend = const [];
+  List<DateTime> _trendMonths = const [];
+  Map<LedgerRecordType, List<MonthlyCategoryAmounts>> _categoryTrends =
+      const {};
+  Map<LedgerRecordType, List<String>> _categoriesInRange = const {};
+  Map<LedgerRecordType, List<MapEntry<String, int>>> _monthCategoryAmounts =
+      const {};
+
   /// 통화가 다른 금액은 합산할 수 없어서 통계는 한 통화 기준으로 보여준다.
   /// 사용자가 고르지 않았다면 주 통화를, 주 통화 기록이 없으면 기록이 있는 첫 통화를 쓴다.
-  CurrencyCode get currency {
-    final available = availableCurrencies;
-    final selected = _selectedCurrency;
-    if (selected != null && available.contains(selected)) return selected;
-    if (available.isEmpty || available.contains(_primaryCurrency)) {
-      return _primaryCurrency;
-    }
-    return available.first;
-  }
+  CurrencyCode get currency => _currency;
 
   /// 통계 기간과 원형 섹션에서 고른 달에 기록이 있는 통화 목록(주 통화 우선, 나머지는 선언 순서).
-  List<CurrencyCode> get availableCurrencies {
-    final codes = <CurrencyCode>{
-      for (final record in _records) CurrencyCode.fromCode(record.currencyCode),
-      for (final record in _monthRecords)
-        CurrencyCode.fromCode(record.currencyCode),
-    };
-    return codes.toList()..sort((a, b) {
-      if (a == _primaryCurrency) return -1;
-      if (b == _primaryCurrency) return 1;
-      return a.index.compareTo(b.index);
-    });
-  }
+  List<CurrencyCode> get availableCurrencies => _availableCurrencies;
 
   /// 세 그래프가 공유하는 기간(첫 기록 달 ~ 이번 달).
-  List<MonthlyIncomeExpense> get monthlyTrend => buildMonthlyTrend(
-    records: _records,
-    currency: currency,
-    currentMonth: _normalizeMonth(_now()),
-  );
+  List<MonthlyIncomeExpense> get monthlyTrend => _monthlyTrend;
 
-  int? get selectedTrendIndex =>
-      _indexOrLast(monthlyTrend.length, _selectedTrendMonth);
+  int? get selectedTrendIndex => _indexOrLast(_selectedTrendMonth);
 
-  List<MonthlyCategoryAmounts> categoryTrend(LedgerRecordType type) {
-    return buildCategoryTrend(
-      records: _records,
-      type: type,
-      currency: currency,
-      months: [for (final item in monthlyTrend) item.month],
-      knownCategories: _categoryCodes(type),
-    );
-  }
+  List<MonthlyCategoryAmounts> categoryTrend(LedgerRecordType type) =>
+      _categoryTrends[type] ?? const [];
 
   /// 기간 안에 기록이 있는 카테고리. 카테고리 정의 순서(기타는 마지막)를 따른다.
-  List<String> categoriesInRange(LedgerRecordType type) {
-    final present = {
-      for (final month in categoryTrend(type)) ...month.amounts.keys,
-    };
-    return [
-      for (final code in _categoryOrder(type))
-        if (present.contains(code)) code,
-    ];
-  }
+  List<String> categoriesInRange(LedgerRecordType type) =>
+      _categoriesInRange[type] ?? const [];
 
   int? selectedCategoryIndex(LedgerRecordType type) =>
-      _indexOrLast(monthlyTrend.length, _selectedCategoryMonths[type]);
+      _indexOrLast(_selectedCategoryMonths[type]);
 
   /// 원형 섹션에서 고른 달의 카테고리별 합계(금액 큰 순서).
-  List<MapEntry<String, int>> monthCategoryAmounts(LedgerRecordType type) {
-    final month = _normalizeMonth(_selectedMonth);
-    final amounts =
-        buildCategoryTrend(
-          records: _monthRecords,
-          type: type,
-          currency: currency,
-          months: [month],
-          knownCategories: _categoryCodes(type),
-        ).single.amounts;
-    return amounts.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
-  }
+  List<MapEntry<String, int>> monthCategoryAmounts(LedgerRecordType type) =>
+      _monthCategoryAmounts[type] ?? const [];
 
   void start({required DateTime initialMonth, required CurrencyCode primary}) {
     _primaryCurrency = primary;
     _selectedMonth = _normalizeMonth(initialMonth);
+    _recompute();
     _loadPreferences();
     _watchSelectedMonth();
 
@@ -177,12 +143,14 @@ class LedgerStatisticsViewModel extends ChangeNotifier {
             _records = List.unmodifiable(records);
             _isLoading = false;
             _hasLoadError = false;
+            _recompute();
             notifyListeners();
           },
           onError: (_) {
             _records = const [];
             _isLoading = false;
             _hasLoadError = true;
+            _recompute();
             notifyListeners();
           },
         );
@@ -202,6 +170,7 @@ class LedgerStatisticsViewModel extends ChangeNotifier {
   void selectCurrency(CurrencyCode currency) {
     if (_selectedCurrency == currency) return;
     _selectedCurrency = currency;
+    _recompute();
     notifyListeners();
   }
 
@@ -251,6 +220,7 @@ class LedgerStatisticsViewModel extends ChangeNotifier {
   void _watchSelectedMonth() {
     _isMonthLoading = true;
     _monthRecords = const [];
+    _recompute();
     notifyListeners();
 
     _monthSubscription?.cancel();
@@ -260,29 +230,104 @@ class LedgerStatisticsViewModel extends ChangeNotifier {
           (records) {
             _monthRecords = List.unmodifiable(records);
             _isMonthLoading = false;
+            _recompute();
             notifyListeners();
           },
           onError: (_) {
             _monthRecords = const [];
             _isMonthLoading = false;
             _hasLoadError = true;
+            _recompute();
             notifyListeners();
           },
         );
   }
 
+  /// 입력이 바뀐 직후에 호출해 모든 집계를 한 번에 다시 계산한다.
+  void _recompute() {
+    final codes = <CurrencyCode>{
+      for (final record in _records) CurrencyCode.fromCode(record.currencyCode),
+      for (final record in _monthRecords)
+        CurrencyCode.fromCode(record.currencyCode),
+    };
+    _availableCurrencies = List.unmodifiable(
+      codes.toList()..sort((a, b) {
+        if (a == _primaryCurrency) return -1;
+        if (b == _primaryCurrency) return 1;
+        return a.index.compareTo(b.index);
+      }),
+    );
+
+    final selected = _selectedCurrency;
+    if (selected != null && _availableCurrencies.contains(selected)) {
+      _currency = selected;
+    } else if (_availableCurrencies.isEmpty ||
+        _availableCurrencies.contains(_primaryCurrency)) {
+      _currency = _primaryCurrency;
+    } else {
+      _currency = _availableCurrencies.first;
+    }
+
+    _monthlyTrend = List.unmodifiable(
+      buildMonthlyTrend(
+        records: _records,
+        currency: _currency,
+        currentMonth: _normalizeMonth(_now()),
+      ),
+    );
+    _trendMonths = List.unmodifiable([
+      for (final item in _monthlyTrend) item.month,
+    ]);
+
+    final categoryTrends = <LedgerRecordType, List<MonthlyCategoryAmounts>>{};
+    final categoriesInRange = <LedgerRecordType, List<String>>{};
+    final monthCategoryAmounts =
+        <LedgerRecordType, List<MapEntry<String, int>>>{};
+    for (final type in LedgerRecordType.values) {
+      final knownCategories = _categoryCodes(type);
+      final trend = buildCategoryTrend(
+        records: _records,
+        type: type,
+        currency: _currency,
+        months: _trendMonths,
+        knownCategories: knownCategories,
+      );
+      categoryTrends[type] = List.unmodifiable(trend);
+
+      final present = {for (final month in trend) ...month.amounts.keys};
+      categoriesInRange[type] = List.unmodifiable([
+        for (final code in _categoryOrder(type))
+          if (present.contains(code)) code,
+      ]);
+
+      final monthAmounts =
+          buildCategoryTrend(
+            records: _monthRecords,
+            type: type,
+            currency: _currency,
+            months: [_selectedMonth],
+            knownCategories: knownCategories,
+          ).single.amounts;
+      monthCategoryAmounts[type] = List.unmodifiable(
+        monthAmounts.entries.toList()
+          ..sort((a, b) => b.value.compareTo(a.value)),
+      );
+    }
+    _categoryTrends = Map.unmodifiable(categoryTrends);
+    _categoriesInRange = Map.unmodifiable(categoriesInRange);
+    _monthCategoryAmounts = Map.unmodifiable(monthCategoryAmounts);
+  }
+
   DateTime? _monthAt(int index) {
-    final trend = monthlyTrend;
-    if (index < 0 || index >= trend.length) return null;
-    return trend[index].month;
+    if (index < 0 || index >= _trendMonths.length) return null;
+    return _trendMonths[index];
   }
 
   /// 고른 달이 기간 안에 있으면 그 인덱스, 아니면 마지막 달.
-  int? _indexOrLast(int length, DateTime? selected) {
-    if (length == 0) return null;
-    final months = [for (final item in monthlyTrend) item.month];
-    final index = months.indexOf(selected ?? months.last);
-    return index >= 0 ? index : length - 1;
+  int? _indexOrLast(DateTime? selected) {
+    if (_trendMonths.isEmpty) return null;
+    final index = _trendMonths.indexOf(selected ?? _trendMonths.last);
+    return index >= 0 ? index : _trendMonths.length - 1;
   }
 
   Future<void> _loadPreferences() async {
