@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/data/analytics/analytics_events.dart';
+import 'package:money_mate/data/analytics/analytics_service.dart';
 import 'package:money_mate/l10n/app_localizations.dart';
+import 'package:money_mate/ui/core/analytics/analytics_route_observer.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:money_mate/data/model/entities/ledger_record.dart';
 import 'package:money_mate/ui/ledger/view_models/ledger_tab_view_model.dart';
@@ -152,6 +155,7 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
   Future<void> _openAddLedgerRecordScreen(LedgerRecordType type) async {
     final didSave = await Navigator.of(context).push<bool>(
       MaterialPageRoute<bool>(
+        settings: AnalyticsScreen.addLedgerRecord.routeSettings,
         builder:
             (context) => AddLedgerRecordScreen(
               initialDate: _selectedDate ?? DateTime.now(),
@@ -251,17 +255,27 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
     widget.onSelectedDateChanged?.call(date);
   }
 
+  void _onViewChanged(LedgerViewType view) {
+    if (view == LedgerViewType.monthly && _selectedView != view) {
+      AnalyticsService.instance.logButtonClick(AnalyticsButton.ledgerListView);
+    }
+    setState(() => _selectedView = view);
+  }
+
   void _openFavoritesScreen() {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
+        settings: AnalyticsScreen.favoriteLedgerRecords.routeSettings,
         builder: (context) => const FavoriteLedgerRecordsScreen(),
       ),
     );
   }
 
   void _openStatisticsScreen() {
+    AnalyticsService.instance.logButtonClick(AnalyticsButton.ledgerStatistics);
     Navigator.of(context).push(
       MaterialPageRoute<void>(
+        settings: AnalyticsScreen.ledgerStatistics.routeSettings,
         builder:
             (context) => LedgerStatisticsScreen(initialMonth: _currentMonth),
       ),
@@ -269,8 +283,10 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
   }
 
   void _handleLedgerItemTap(LedgerEntry item) {
+    AnalyticsService.instance.logButtonClick(AnalyticsButton.ledgerRecordView);
     Navigator.of(context).push(
       MaterialPageRoute<void>(
+        settings: AnalyticsScreen.ledgerRecordDetail.routeSettings,
         builder: (context) => LedgerRecordDetailScreen(entry: item),
       ),
     );
@@ -411,13 +427,7 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
             emptyMessage: l10n.emptyMonthlyIncome,
             totalLabel: l10n.totalIncomeLabel,
             items: _monthlyIncomeItems,
-            onItemTap: (item) {
-              Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (context) => LedgerRecordDetailScreen(entry: item),
-                ),
-              );
-            },
+            onItemTap: _handleLedgerItemTap,
             onAddTap: () => _openAddLedgerRecordScreen(LedgerRecordType.income),
           ),
         ),
@@ -429,13 +439,7 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
             emptyMessage: l10n.emptyMonthlyExpense,
             totalLabel: l10n.totalExpenseLabel,
             items: _monthlyExpenseItems,
-            onItemTap: (item) {
-              Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (context) => LedgerRecordDetailScreen(entry: item),
-                ),
-              );
-            },
+            onItemTap: _handleLedgerItemTap,
             onAddTap:
                 () => _openAddLedgerRecordScreen(LedgerRecordType.expense),
           ),
@@ -459,7 +463,7 @@ class _LedgerTabScreenState extends State<LedgerTabScreen> {
                   Expanded(
                     child: LedgerTopNavigationBar(
                       selectedView: _selectedView,
-                      onChanged: (view) => setState(() => _selectedView = view),
+                      onChanged: _onViewChanged,
                     ),
                   ),
                   IconButton(

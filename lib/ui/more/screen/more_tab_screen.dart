@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:money_mate/data/model/entities/currency.dart';
+import 'package:money_mate/data/analytics/analytics_events.dart';
 import 'package:money_mate/l10n/app_localizations.dart';
+import 'package:money_mate/ui/core/analytics/analytics_route_observer.dart';
 import 'package:money_mate/ui/core/currency/current_currency.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:money_mate/ui/more/notion_legal_links.dart';
@@ -358,6 +360,7 @@ class _MainCurrencyRowState extends State<_MainCurrencyRow> {
   Future<void> _openCurrencySetting(BuildContext context) async {
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
+        settings: AnalyticsScreen.currencySetting.routeSettings,
         builder: (_) => const CurrencySettingScreen(),
       ),
     );

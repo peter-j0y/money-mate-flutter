@@ -5,6 +5,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart';
+import 'package:money_mate/data/analytics/analytics_events.dart';
+import 'package:money_mate/data/analytics/analytics_service.dart';
+import 'package:money_mate/data/analytics/firebase_analytics_service.dart';
 import 'package:money_mate/data/local/app_database.dart';
 import 'package:money_mate/data/model/entities/currency.dart';
 import 'package:money_mate/data/repositories/app_settings_repository.dart';
@@ -13,6 +16,7 @@ import 'package:money_mate/data/repositories/reminder_repository.dart';
 import 'package:money_mate/data/repositories/reminder_repository_impl.dart';
 import 'package:money_mate/firebase_options.dart';
 import 'package:money_mate/l10n/app_localizations.dart';
+import 'package:money_mate/ui/core/analytics/analytics_route_observer.dart';
 import 'package:money_mate/ui/core/currency/current_currency.dart';
 import 'package:money_mate/ui/ledger/widgets/add_ledger_record_screen.dart';
 import 'package:money_mate/ui/asset/screen/assets_tab_screen.dart';
@@ -62,6 +66,7 @@ Future<void> main() async {
     !kDebugMode,
   );
   await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(!kDebugMode);
+  AnalyticsService.instance = FirebaseAnalyticsService();
 
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
   PlatformDispatcher.instance.onError = (error, stack) {
@@ -89,6 +94,7 @@ class MoneyMateApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      navigatorObservers: [analyticsRouteObserver],
       title: 'Where is My Money',
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
@@ -128,7 +134,13 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with RouteAware {
+  static const List<AnalyticsScreen> _tabScreens = [
+    AnalyticsScreen.ledgerTab,
+    AnalyticsScreen.assetsTab,
+    AnalyticsScreen.moreTab,
+  ];
+
   int _currentIndex = 0;
   DateTime _selectedLedgerDate = DateTime.now();
   late final List<int> _tabRefreshVersion;
@@ -155,6 +167,30 @@ class _HomeScreenState extends State<HomeScreen> {
     WidgetsBinding.instance.addPostFrameCallback(
       (_) => _maybeRequestNotificationPermission(),
     );
+    _logCurrentTabScreen();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route is PageRoute) {
+      analyticsRouteObserver.subscribe(this, route);
+    }
+  }
+
+  @override
+  void dispose() {
+    analyticsRouteObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  /// 하위 화면에서 홈으로 돌아오면 보이는 탭을 다시 화면 진입으로 기록한다.
+  @override
+  void didPopNext() => _logCurrentTabScreen();
+
+  void _logCurrentTabScreen() {
+    AnalyticsService.instance.logScreenView(_tabScreens[_currentIndex]);
   }
 
   Future<void> _maybeRequestNotificationPermission() async {
@@ -173,13 +209,17 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _onBottomTabTap(int index) {
+    final isTabChanged = _currentIndex != index;
     setState(() {
-      if (_currentIndex == index) {
+      if (!isTabChanged) {
         _tabRefreshVersion[index] += 1;
         return;
       }
       _currentIndex = index;
     });
+    if (isTabChanged) {
+      _logCurrentTabScreen();
+    }
   }
 
   @override
@@ -209,8 +249,12 @@ class _HomeScreenState extends State<HomeScreen> {
           _currentIndex == 0
               ? FloatingActionButton(
                 onPressed: () {
+                  AnalyticsService.instance.logButtonClick(
+                    AnalyticsButton.ledgerAddFab,
+                  );
                   Navigator.of(context).push(
                     MaterialPageRoute<void>(
+                      settings: AnalyticsScreen.addLedgerRecord.routeSettings,
                       builder:
                           (context) => AddLedgerRecordScreen(
                             initialDate: _selectedLedgerDate,

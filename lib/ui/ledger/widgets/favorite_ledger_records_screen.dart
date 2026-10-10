@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:money_mate/data/model/entities/favorite_ledger_record.dart';
 import 'package:money_mate/data/model/entities/ledger_record.dart';
 import 'package:money_mate/data/repositories/favorite_ledger_record_repository.dart';
+import 'package:money_mate/data/analytics/analytics_events.dart';
+import 'package:money_mate/data/analytics/analytics_service.dart';
 import 'package:money_mate/l10n/app_localizations.dart';
+import 'package:money_mate/ui/core/analytics/analytics_route_observer.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:money_mate/ui/ledger/view_models/favorite_ledger_records_view_model.dart';
 import 'package:money_mate/ui/ledger/widgets/add_favorite_ledger_record_screen.dart';
@@ -50,6 +53,7 @@ class _FavoriteLedgerRecordsScreenState
   }
 
   void _openAddFavoriteScreen() {
+    AnalyticsService.instance.logButtonClick(AnalyticsButton.favoriteRecordAdd);
     if (_viewModel.isAtLimit) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -65,6 +69,7 @@ class _FavoriteLedgerRecordsScreenState
 
     Navigator.of(context).push(
       MaterialPageRoute<void>(
+        settings: AnalyticsScreen.addFavoriteLedgerRecord.routeSettings,
         builder: (context) => const AddFavoriteLedgerRecordScreen(),
       ),
     );
@@ -329,6 +334,7 @@ class _FavoriteLedgerRecordsScreenState
   Future<void> _openAddLedgerRecordScreen(FavoriteLedgerEntry favorite) async {
     final didSave = await Navigator.of(context).push<bool>(
       MaterialPageRoute<bool>(
+        settings: AnalyticsScreen.addLedgerRecord.routeSettings,
         builder:
             (context) => AddLedgerRecordScreen(
               initialDate: DateTime.now(),
