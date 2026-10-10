@@ -3,7 +3,9 @@ import 'package:money_mate/data/local/app_database.dart';
 import 'package:money_mate/data/model/entities/currency.dart';
 import 'package:money_mate/data/repositories/asset_repository.dart';
 import 'package:money_mate/data/repositories/asset_repository_impl.dart';
+import 'package:money_mate/data/analytics/analytics_events.dart';
 import 'package:money_mate/l10n/app_localizations.dart';
+import 'package:money_mate/ui/core/analytics/analytics_route_observer.dart';
 import 'package:money_mate/ui/asset/screen/add_asset_screen.dart';
 import 'package:money_mate/ui/asset/view_models/assets_tab_view_model.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
@@ -33,6 +35,7 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
   Future<void> _onEditTap() async {
     final result = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
+        settings: AnalyticsScreen.editAsset.routeSettings,
         builder: (_) => AddAssetScreen(initialAsset: widget.asset),
       ),
     );

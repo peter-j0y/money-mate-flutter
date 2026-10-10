@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:money_mate/data/model/entities/currency.dart';
+import 'package:money_mate/data/analytics/analytics_events.dart';
+import 'package:money_mate/data/analytics/analytics_service.dart';
 import 'package:money_mate/l10n/app_localizations.dart';
+import 'package:money_mate/ui/core/analytics/analytics_route_observer.dart';
 import 'package:money_mate/ui/core/currency/current_currency.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:money_mate/ui/ledger/widgets/ledger_category_grid.dart';
@@ -192,6 +195,7 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
   }
 
   Future<void> _onSubmitTap() async {
+    AnalyticsService.instance.logButtonClick(AnalyticsButton.ledgerRecordSave);
     final validationMessage = _validationMessage(AppLocalizations.of(context)!);
     if (validationMessage != null) {
       _showValidationToast(validationMessage);
@@ -245,6 +249,7 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
       context,
     ).push<FavoriteLedgerEntry>(
       MaterialPageRoute<FavoriteLedgerEntry>(
+        settings: AnalyticsScreen.favoriteLedgerRecords.routeSettings,
         builder:
             (context) => const FavoriteLedgerRecordsScreen(isSelectMode: true),
       ),
