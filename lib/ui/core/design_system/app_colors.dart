@@ -101,6 +101,29 @@ class AppColors {
   static const Color rgba_255_255_255_05 = Color.fromRGBO(255, 255, 255, 0.5);
   static const Color rgba_255_255_255_09 = Color.fromRGBO(255, 255, 255, 0.9);
 
+  // Chart Categorical Palette
+  // 통계 차트에서 카테고리를 구분하는 색상. 마지막 색은 '기타' 전용(중립색)이다.
+  static const List<Color> chartCategoryLight = [
+    Color(0xFF3B82F6),
+    Color(0xFFF97316),
+    Color(0xFF10B981),
+    Color(0xFFEC4899),
+    Color(0xFF8B5CF6),
+    Color(0xFFEAB308),
+    Color(0xFF14B8A6),
+    Color(0xFF64748B),
+  ];
+  static const List<Color> chartCategoryDark = [
+    Color(0xFF60A5FA),
+    Color(0xFFFB923C),
+    Color(0xFF34D399),
+    Color(0xFFF472B6),
+    Color(0xFFA78BFA),
+    Color(0xFFFACC15),
+    Color(0xFF2DD4BF),
+    Color(0xFF94A3B8),
+  ];
+
   // 전체 팔레트 순회가 필요할 때 사용
   static const List<Color> all = [
     white,

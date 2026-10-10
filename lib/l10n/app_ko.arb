@@ -328,5 +328,36 @@
   },
   "savePortfolioSettingsButton": "포트폴리오 설정 저장",
   "balanceTargetTo100": "목표 합계를 100%로 맞춰주세요.",
-  "portfolioSaveSuccess": "포트폴리오 목표 비율을 저장했습니다."
+  "portfolioSaveSuccess": "포트폴리오 목표 비율을 저장했습니다.",
+
+  "statisticsTitle": "통계",
+  "statisticsMonthlySectionTitle": "월간 통계",
+  "statisticsTrendSectionTitle": "최근 12개월 추이",
+  "statisticsIncomeExpenseTitle": "수입·지출",
+  "statisticsCategoryExpenseTitle": "카테고리별 지출",
+  "statisticsCategoryIncomeTitle": "카테고리별 수입",
+  "statisticsTotal": "합계",
+  "statisticsChartLine": "꺾은선",
+  "statisticsChartBar": "막대",
+  "statisticsNoTrendData": "최근 12개월간 기록이 없습니다.",
+  "statisticsNoTrendExpense": "최근 12개월간 지출 기록이 없습니다.",
+  "statisticsNoTrendIncome": "최근 12개월간 수입 기록이 없습니다.",
+  "statisticsNoMonthlyExpense": "이 달의 지출 기록이 없습니다.",
+  "statisticsNoMonthlyIncome": "이 달의 수입 기록이 없습니다.",
+  "statisticsNoCategorySelected": "표시할 카테고리를 선택해주세요.",
+  "statisticsSelectedMonthTotal": "{month} · 합계 {total}",
+  "@statisticsSelectedMonthTotal": {
+    "placeholders": {
+      "month": {"type": "String"},
+      "total": {"type": "String"}
+    }
+  },
+  "statisticsSelectedMonthSummary": "{month} · 수입 {income} · 지출 {expense}",
+  "@statisticsSelectedMonthSummary": {
+    "placeholders": {
+      "month": {"type": "String"},
+      "income": {"type": "String"},
+      "expense": {"type": "String"}
+    }
+  }
 }
