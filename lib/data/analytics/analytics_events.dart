@@ -50,7 +50,13 @@ enum AnalyticsButton {
 /// 이름 제약은 [AnalyticsButton]과 같다.
 enum AnalyticsEvent {
   /// 조건을 충족해 OS 리뷰 시트를 요청했다. 실제로 시트가 노출됐는지는 OS가 알려주지 않는다.
-  reviewPromptRequested('review_prompt_requested');
+  reviewPromptRequested('review_prompt_requested'),
+
+  /// 가계부 기록을 처음 저장했다(저장 후 기록이 1건). 활성화 전환율의 기준이다.
+  firstRecordSaved('first_record_saved'),
+
+  /// 리마인더 알림이 꺼진 상태에서 켜졌다. 켜진 경로(다이얼로그, 더보기 토글)는 구분하지 않는다.
+  reminderEnabled('reminder_enabled');
 
   const AnalyticsEvent(this.eventName);
 

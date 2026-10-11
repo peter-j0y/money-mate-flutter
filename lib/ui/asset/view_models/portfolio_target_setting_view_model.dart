@@ -11,7 +11,8 @@ class PortfolioTargetSettingViewModel extends ChangeNotifier {
     AssetLocalDataSource? assetDataSource,
     PortfolioTargetLocalDataSource? targetDataSource,
   }) : _assetDataSource = assetDataSource ?? AssetLocalDataSource(),
-       _targetDataSource = targetDataSource ?? PortfolioTargetLocalDataSource() {
+       _targetDataSource =
+           targetDataSource ?? PortfolioTargetLocalDataSource() {
     _init();
   }
 
@@ -73,7 +74,9 @@ class PortfolioTargetSettingViewModel extends ChangeNotifier {
       }
     }
 
-    _assetSubscription = _assetDataSource.watchAssets().listen(_onAssetsChanged);
+    _assetSubscription = _assetDataSource.watchAssets().listen(
+      _onAssetsChanged,
+    );
   }
 
   void _onAssetsChanged(List<Asset> assets) {
@@ -99,9 +102,8 @@ class PortfolioTargetSettingViewModel extends ChangeNotifier {
     for (final type in AssetType.values) {
       final oldState = _itemStates[type]!;
       final categoryTotal = categoryTotals[type] ?? 0;
-      final actualRatio = portfolioTotal > 0
-          ? (categoryTotal / portfolioTotal) * 100
-          : 0.0;
+      final actualRatio =
+          portfolioTotal > 0 ? (categoryTotal / portfolioTotal) * 100 : 0.0;
       _itemStates[type] = TargetItemState(
         type: type,
         actualRatio: actualRatio,
@@ -116,7 +118,8 @@ class PortfolioTargetSettingViewModel extends ChangeNotifier {
     _itemStates[type] = TargetItemState(
       type: type,
       actualRatio: oldState.actualRatio,
-      targetRatio: value ? (oldState.targetRatio == 0 ? 10 : oldState.targetRatio) : 0,
+      targetRatio:
+          value ? (oldState.targetRatio == 0 ? 10 : oldState.targetRatio) : 0,
       isEnabled: value,
     );
     _recalculateActualRatios();
@@ -135,10 +138,11 @@ class PortfolioTargetSettingViewModel extends ChangeNotifier {
   }
 
   void applyEqualDistribution() {
-    final enabledTypes = _itemStates.entries
-        .where((e) => e.value.isEnabled)
-        .map((e) => e.key)
-        .toList();
+    final enabledTypes =
+        _itemStates.entries
+            .where((e) => e.value.isEnabled)
+            .map((e) => e.key)
+            .toList();
 
     if (enabledTypes.isEmpty) return;
 
@@ -165,13 +169,16 @@ class PortfolioTargetSettingViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final targets = _itemStates.values
-          .map((state) => PortfolioTargetData(
-                assetType: state.type,
-                isEnabled: state.isEnabled,
-                targetRatio: state.targetRatio,
-              ))
-          .toList();
+      final targets =
+          _itemStates.values
+              .map(
+                (state) => PortfolioTargetData(
+                  assetType: state.type,
+                  isEnabled: state.isEnabled,
+                  targetRatio: state.targetRatio,
+                ),
+              )
+              .toList();
 
       await _targetDataSource.upsertAllTargets(targets);
       return true;

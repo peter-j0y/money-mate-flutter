@@ -42,5 +42,7 @@ Stream<T> logDbStreamErrors<T>(
 
 List<String> _contextLines(Map<String, Object?>? context) {
   if (context == null || context.isEmpty) return const [];
-  return context.entries.map((entry) => '${entry.key}: ${entry.value}').toList(growable: false);
+  return context.entries
+      .map((entry) => '${entry.key}: ${entry.value}')
+      .toList(growable: false);
 }

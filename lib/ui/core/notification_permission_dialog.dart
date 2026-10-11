@@ -9,15 +9,22 @@ import 'package:permission_handler/permission_handler.dart';
 class NotificationPermissionDialog {
   const NotificationPermissionDialog._();
 
-  static Future<bool> show(BuildContext context) async {
+  /// [reminderTime]은 허용 시 알림이 올 시각으로, 본문에 그대로 보여준다.
+  static Future<bool> show(
+    BuildContext context, {
+    required TimeOfDay reminderTime,
+  }) async {
     final l10n = AppLocalizations.of(context)!;
+    final formattedTime = MaterialLocalizations.of(
+      context,
+    ).formatTimeOfDay(reminderTime);
     final result = await showDialog<bool>(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
           backgroundColor: context.appColors.surface,
           title: Text(l10n.notificationDialogTitle),
-          content: Text(l10n.notificationDialogBody),
+          content: Text(l10n.notificationDialogBody(formattedTime)),
           actions: [
             TextButton(
               style: TextButton.styleFrom(
