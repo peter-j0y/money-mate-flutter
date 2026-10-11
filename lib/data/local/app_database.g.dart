@@ -1949,6 +1949,427 @@ class FavoriteLedgerRecordsCompanion
   }
 }
 
+class $NetWorthSnapshotsTable extends NetWorthSnapshots
+    with TableInfo<$NetWorthSnapshotsTable, NetWorthSnapshot> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $NetWorthSnapshotsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _snapshotDateMeta = const VerificationMeta(
+    'snapshotDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> snapshotDate = GeneratedColumn<DateTime>(
+    'snapshot_date',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _assetTypeMeta = const VerificationMeta(
+    'assetType',
+  );
+  @override
+  late final GeneratedColumn<String> assetType = GeneratedColumn<String>(
+    'asset_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _currencyCodeMeta = const VerificationMeta(
+    'currencyCode',
+  );
+  @override
+  late final GeneratedColumn<String> currencyCode = GeneratedColumn<String>(
+    'currency_code',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _amountMeta = const VerificationMeta('amount');
+  @override
+  late final GeneratedColumn<int> amount = GeneratedColumn<int>(
+    'amount',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    snapshotDate,
+    assetType,
+    currencyCode,
+    amount,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'net_worth_snapshots';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<NetWorthSnapshot> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('snapshot_date')) {
+      context.handle(
+        _snapshotDateMeta,
+        snapshotDate.isAcceptableOrUnknown(
+          data['snapshot_date']!,
+          _snapshotDateMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_snapshotDateMeta);
+    }
+    if (data.containsKey('asset_type')) {
+      context.handle(
+        _assetTypeMeta,
+        assetType.isAcceptableOrUnknown(data['asset_type']!, _assetTypeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_assetTypeMeta);
+    }
+    if (data.containsKey('currency_code')) {
+      context.handle(
+        _currencyCodeMeta,
+        currencyCode.isAcceptableOrUnknown(
+          data['currency_code']!,
+          _currencyCodeMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_currencyCodeMeta);
+    }
+    if (data.containsKey('amount')) {
+      context.handle(
+        _amountMeta,
+        amount.isAcceptableOrUnknown(data['amount']!, _amountMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_amountMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {snapshotDate, assetType, currencyCode},
+  ];
+  @override
+  NetWorthSnapshot map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return NetWorthSnapshot(
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}id'],
+          )!,
+      snapshotDate:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}snapshot_date'],
+          )!,
+      assetType:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}asset_type'],
+          )!,
+      currencyCode:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}currency_code'],
+          )!,
+      amount:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}amount'],
+          )!,
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}created_at'],
+          )!,
+    );
+  }
+
+  @override
+  $NetWorthSnapshotsTable createAlias(String alias) {
+    return $NetWorthSnapshotsTable(attachedDatabase, alias);
+  }
+}
+
+class NetWorthSnapshot extends DataClass
+    implements Insertable<NetWorthSnapshot> {
+  final int id;
+
+  /// 기기 로컬 날짜의 자정.
+  final DateTime snapshotDate;
+  final String assetType;
+  final String currencyCode;
+  final int amount;
+  final DateTime createdAt;
+  const NetWorthSnapshot({
+    required this.id,
+    required this.snapshotDate,
+    required this.assetType,
+    required this.currencyCode,
+    required this.amount,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['snapshot_date'] = Variable<DateTime>(snapshotDate);
+    map['asset_type'] = Variable<String>(assetType);
+    map['currency_code'] = Variable<String>(currencyCode);
+    map['amount'] = Variable<int>(amount);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  NetWorthSnapshotsCompanion toCompanion(bool nullToAbsent) {
+    return NetWorthSnapshotsCompanion(
+      id: Value(id),
+      snapshotDate: Value(snapshotDate),
+      assetType: Value(assetType),
+      currencyCode: Value(currencyCode),
+      amount: Value(amount),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory NetWorthSnapshot.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return NetWorthSnapshot(
+      id: serializer.fromJson<int>(json['id']),
+      snapshotDate: serializer.fromJson<DateTime>(json['snapshotDate']),
+      assetType: serializer.fromJson<String>(json['assetType']),
+      currencyCode: serializer.fromJson<String>(json['currencyCode']),
+      amount: serializer.fromJson<int>(json['amount']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'snapshotDate': serializer.toJson<DateTime>(snapshotDate),
+      'assetType': serializer.toJson<String>(assetType),
+      'currencyCode': serializer.toJson<String>(currencyCode),
+      'amount': serializer.toJson<int>(amount),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  NetWorthSnapshot copyWith({
+    int? id,
+    DateTime? snapshotDate,
+    String? assetType,
+    String? currencyCode,
+    int? amount,
+    DateTime? createdAt,
+  }) => NetWorthSnapshot(
+    id: id ?? this.id,
+    snapshotDate: snapshotDate ?? this.snapshotDate,
+    assetType: assetType ?? this.assetType,
+    currencyCode: currencyCode ?? this.currencyCode,
+    amount: amount ?? this.amount,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  NetWorthSnapshot copyWithCompanion(NetWorthSnapshotsCompanion data) {
+    return NetWorthSnapshot(
+      id: data.id.present ? data.id.value : this.id,
+      snapshotDate:
+          data.snapshotDate.present
+              ? data.snapshotDate.value
+              : this.snapshotDate,
+      assetType: data.assetType.present ? data.assetType.value : this.assetType,
+      currencyCode:
+          data.currencyCode.present
+              ? data.currencyCode.value
+              : this.currencyCode,
+      amount: data.amount.present ? data.amount.value : this.amount,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('NetWorthSnapshot(')
+          ..write('id: $id, ')
+          ..write('snapshotDate: $snapshotDate, ')
+          ..write('assetType: $assetType, ')
+          ..write('currencyCode: $currencyCode, ')
+          ..write('amount: $amount, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, snapshotDate, assetType, currencyCode, amount, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is NetWorthSnapshot &&
+          other.id == this.id &&
+          other.snapshotDate == this.snapshotDate &&
+          other.assetType == this.assetType &&
+          other.currencyCode == this.currencyCode &&
+          other.amount == this.amount &&
+          other.createdAt == this.createdAt);
+}
+
+class NetWorthSnapshotsCompanion extends UpdateCompanion<NetWorthSnapshot> {
+  final Value<int> id;
+  final Value<DateTime> snapshotDate;
+  final Value<String> assetType;
+  final Value<String> currencyCode;
+  final Value<int> amount;
+  final Value<DateTime> createdAt;
+  const NetWorthSnapshotsCompanion({
+    this.id = const Value.absent(),
+    this.snapshotDate = const Value.absent(),
+    this.assetType = const Value.absent(),
+    this.currencyCode = const Value.absent(),
+    this.amount = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  NetWorthSnapshotsCompanion.insert({
+    this.id = const Value.absent(),
+    required DateTime snapshotDate,
+    required String assetType,
+    required String currencyCode,
+    required int amount,
+    this.createdAt = const Value.absent(),
+  }) : snapshotDate = Value(snapshotDate),
+       assetType = Value(assetType),
+       currencyCode = Value(currencyCode),
+       amount = Value(amount);
+  static Insertable<NetWorthSnapshot> custom({
+    Expression<int>? id,
+    Expression<DateTime>? snapshotDate,
+    Expression<String>? assetType,
+    Expression<String>? currencyCode,
+    Expression<int>? amount,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (snapshotDate != null) 'snapshot_date': snapshotDate,
+      if (assetType != null) 'asset_type': assetType,
+      if (currencyCode != null) 'currency_code': currencyCode,
+      if (amount != null) 'amount': amount,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  NetWorthSnapshotsCompanion copyWith({
+    Value<int>? id,
+    Value<DateTime>? snapshotDate,
+    Value<String>? assetType,
+    Value<String>? currencyCode,
+    Value<int>? amount,
+    Value<DateTime>? createdAt,
+  }) {
+    return NetWorthSnapshotsCompanion(
+      id: id ?? this.id,
+      snapshotDate: snapshotDate ?? this.snapshotDate,
+      assetType: assetType ?? this.assetType,
+      currencyCode: currencyCode ?? this.currencyCode,
+      amount: amount ?? this.amount,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (snapshotDate.present) {
+      map['snapshot_date'] = Variable<DateTime>(snapshotDate.value);
+    }
+    if (assetType.present) {
+      map['asset_type'] = Variable<String>(assetType.value);
+    }
+    if (currencyCode.present) {
+      map['currency_code'] = Variable<String>(currencyCode.value);
+    }
+    if (amount.present) {
+      map['amount'] = Variable<int>(amount.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('NetWorthSnapshotsCompanion(')
+          ..write('id: $id, ')
+          ..write('snapshotDate: $snapshotDate, ')
+          ..write('assetType: $assetType, ')
+          ..write('currencyCode: $currencyCode, ')
+          ..write('amount: $amount, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -1959,6 +2380,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final $FavoriteLedgerRecordsTable favoriteLedgerRecords =
       $FavoriteLedgerRecordsTable(this);
+  late final $NetWorthSnapshotsTable netWorthSnapshots =
+      $NetWorthSnapshotsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1968,6 +2391,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     assets,
     portfolioTargets,
     favoriteLedgerRecords,
+    netWorthSnapshots,
   ];
 }
 
@@ -3009,6 +3433,249 @@ typedef $$FavoriteLedgerRecordsTableProcessedTableManager =
       FavoriteLedgerRecord,
       PrefetchHooks Function()
     >;
+typedef $$NetWorthSnapshotsTableCreateCompanionBuilder =
+    NetWorthSnapshotsCompanion Function({
+      Value<int> id,
+      required DateTime snapshotDate,
+      required String assetType,
+      required String currencyCode,
+      required int amount,
+      Value<DateTime> createdAt,
+    });
+typedef $$NetWorthSnapshotsTableUpdateCompanionBuilder =
+    NetWorthSnapshotsCompanion Function({
+      Value<int> id,
+      Value<DateTime> snapshotDate,
+      Value<String> assetType,
+      Value<String> currencyCode,
+      Value<int> amount,
+      Value<DateTime> createdAt,
+    });
+
+class $$NetWorthSnapshotsTableFilterComposer
+    extends Composer<_$AppDatabase, $NetWorthSnapshotsTable> {
+  $$NetWorthSnapshotsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get snapshotDate => $composableBuilder(
+    column: $table.snapshotDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get assetType => $composableBuilder(
+    column: $table.assetType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get currencyCode => $composableBuilder(
+    column: $table.currencyCode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get amount => $composableBuilder(
+    column: $table.amount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$NetWorthSnapshotsTableOrderingComposer
+    extends Composer<_$AppDatabase, $NetWorthSnapshotsTable> {
+  $$NetWorthSnapshotsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get snapshotDate => $composableBuilder(
+    column: $table.snapshotDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get assetType => $composableBuilder(
+    column: $table.assetType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get currencyCode => $composableBuilder(
+    column: $table.currencyCode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get amount => $composableBuilder(
+    column: $table.amount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$NetWorthSnapshotsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $NetWorthSnapshotsTable> {
+  $$NetWorthSnapshotsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get snapshotDate => $composableBuilder(
+    column: $table.snapshotDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get assetType =>
+      $composableBuilder(column: $table.assetType, builder: (column) => column);
+
+  GeneratedColumn<String> get currencyCode => $composableBuilder(
+    column: $table.currencyCode,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get amount =>
+      $composableBuilder(column: $table.amount, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$NetWorthSnapshotsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $NetWorthSnapshotsTable,
+          NetWorthSnapshot,
+          $$NetWorthSnapshotsTableFilterComposer,
+          $$NetWorthSnapshotsTableOrderingComposer,
+          $$NetWorthSnapshotsTableAnnotationComposer,
+          $$NetWorthSnapshotsTableCreateCompanionBuilder,
+          $$NetWorthSnapshotsTableUpdateCompanionBuilder,
+          (
+            NetWorthSnapshot,
+            BaseReferences<
+              _$AppDatabase,
+              $NetWorthSnapshotsTable,
+              NetWorthSnapshot
+            >,
+          ),
+          NetWorthSnapshot,
+          PrefetchHooks Function()
+        > {
+  $$NetWorthSnapshotsTableTableManager(
+    _$AppDatabase db,
+    $NetWorthSnapshotsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () => $$NetWorthSnapshotsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer:
+              () => $$NetWorthSnapshotsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer:
+              () => $$NetWorthSnapshotsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<DateTime> snapshotDate = const Value.absent(),
+                Value<String> assetType = const Value.absent(),
+                Value<String> currencyCode = const Value.absent(),
+                Value<int> amount = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => NetWorthSnapshotsCompanion(
+                id: id,
+                snapshotDate: snapshotDate,
+                assetType: assetType,
+                currencyCode: currencyCode,
+                amount: amount,
+                createdAt: createdAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required DateTime snapshotDate,
+                required String assetType,
+                required String currencyCode,
+                required int amount,
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => NetWorthSnapshotsCompanion.insert(
+                id: id,
+                snapshotDate: snapshotDate,
+                assetType: assetType,
+                currencyCode: currencyCode,
+                amount: amount,
+                createdAt: createdAt,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$NetWorthSnapshotsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $NetWorthSnapshotsTable,
+      NetWorthSnapshot,
+      $$NetWorthSnapshotsTableFilterComposer,
+      $$NetWorthSnapshotsTableOrderingComposer,
+      $$NetWorthSnapshotsTableAnnotationComposer,
+      $$NetWorthSnapshotsTableCreateCompanionBuilder,
+      $$NetWorthSnapshotsTableUpdateCompanionBuilder,
+      (
+        NetWorthSnapshot,
+        BaseReferences<
+          _$AppDatabase,
+          $NetWorthSnapshotsTable,
+          NetWorthSnapshot
+        >,
+      ),
+      NetWorthSnapshot,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -3021,4 +3688,6 @@ class $AppDatabaseManager {
       $$PortfolioTargetsTableTableManager(_db, _db.portfolioTargets);
   $$FavoriteLedgerRecordsTableTableManager get favoriteLedgerRecords =>
       $$FavoriteLedgerRecordsTableTableManager(_db, _db.favoriteLedgerRecords);
+  $$NetWorthSnapshotsTableTableManager get netWorthSnapshots =>
+      $$NetWorthSnapshotsTableTableManager(_db, _db.netWorthSnapshots);
 }

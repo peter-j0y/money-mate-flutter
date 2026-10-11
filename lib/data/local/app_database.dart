@@ -77,8 +77,36 @@ class FavoriteLedgerRecords extends Table {
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }
 
+/// 날짜별 순자산 히스토리. 자산 유형·통화별 합계를, 직전 스냅샷과 달라진 날에만 한 묶음 쌓는다.
+/// 지난 날짜의 행은 수정하지 않는다 (히스토리는 나중에 소급해서 만들 수 없다).
+class NetWorthSnapshots extends Table {
+  IntColumn get id => integer().autoIncrement()();
+
+  /// 기기 로컬 날짜의 자정.
+  DateTimeColumn get snapshotDate => dateTime()();
+
+  TextColumn get assetType => text()();
+
+  TextColumn get currencyCode => text()();
+
+  IntColumn get amount => integer()();
+
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+    {snapshotDate, assetType, currencyCode},
+  ];
+}
+
 @DriftDatabase(
-  tables: [LedgerRecords, Assets, PortfolioTargets, FavoriteLedgerRecords],
+  tables: [
+    LedgerRecords,
+    Assets,
+    PortfolioTargets,
+    FavoriteLedgerRecords,
+    NetWorthSnapshots,
+  ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase._internal() : super(_openConnection());
@@ -92,7 +120,7 @@ class AppDatabase extends _$AppDatabase {
   factory AppDatabase() => _instance;
 
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 9;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -122,6 +150,9 @@ class AppDatabase extends _$AppDatabase {
           favoriteLedgerRecords,
           favoriteLedgerRecords.currencyCode,
         );
+      }
+      if (from < 9) {
+        await m.createTable(netWorthSnapshots);
       }
     },
   );
@@ -296,6 +327,42 @@ class AppDatabase extends _$AppDatabase {
   Stream<List<FavoriteLedgerRecord>> watchFavoriteLedgerRecords() {
     return (select(favoriteLedgerRecords)
       ..orderBy([(tbl) => OrderingTerm.desc(tbl.createdAt)])).watch();
+  }
+
+  /// [date]의 스냅샷을 [entries]로 통째로 교체한다. [entries]가 비어 있으면 그날 행만 지운다.
+  Future<void> replaceNetWorthSnapshotsOn(
+    DateTime date,
+    List<NetWorthSnapshotsCompanion> entries,
+  ) {
+    return transaction(() async {
+      await (delete(netWorthSnapshots)
+        ..where((tbl) => tbl.snapshotDate.equals(date))).go();
+      await batch((b) => b.insertAll(netWorthSnapshots, entries));
+    });
+  }
+
+  /// [date]보다 이전 날짜 중 가장 최근 스냅샷의 행들. 없으면 빈 목록.
+  Future<List<NetWorthSnapshot>> fetchLatestNetWorthSnapshotBefore(
+    DateTime date,
+  ) async {
+    final latestDate = netWorthSnapshots.snapshotDate.max();
+    final row =
+        await (selectOnly(netWorthSnapshots)
+              ..addColumns([latestDate])
+              ..where(netWorthSnapshots.snapshotDate.isSmallerThanValue(date)))
+            .getSingle();
+    final latest = row.read(latestDate);
+    if (latest == null) return const [];
+    return (select(netWorthSnapshots)
+      ..where((tbl) => tbl.snapshotDate.equals(latest))).get();
+  }
+
+  Future<List<NetWorthSnapshot>> fetchNetWorthSnapshots() {
+    return (select(netWorthSnapshots)..orderBy([
+      (tbl) => OrderingTerm.asc(tbl.snapshotDate),
+      (tbl) => OrderingTerm.asc(tbl.assetType),
+      (tbl) => OrderingTerm.asc(tbl.currencyCode),
+    ])).get();
   }
 
   Future<int> countFavoriteLedgerRecords() async {
