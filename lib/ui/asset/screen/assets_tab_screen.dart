@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:money_mate/data/model/entities/currency.dart';
+import 'package:money_mate/data/analytics/analytics_events.dart';
+import 'package:money_mate/data/analytics/analytics_service.dart';
 import 'package:money_mate/l10n/app_localizations.dart';
+import 'package:money_mate/ui/core/analytics/analytics_route_observer.dart';
 import 'package:money_mate/ui/asset/asset_category_card.dart';
 import 'package:money_mate/ui/asset/asset_total_header.dart';
 import 'package:money_mate/ui/asset/portfolio_allocation_card.dart';
@@ -39,14 +42,19 @@ class _AssetsTabScreenState extends State<AssetsTabScreen> {
   }
 
   void _openAddAsset() {
+    AnalyticsService.instance.logButtonClick(AnalyticsButton.assetAdd);
     Navigator.of(context).push(
-      MaterialPageRoute<void>(builder: (context) => const AddAssetScreen()),
+      MaterialPageRoute<void>(
+        settings: AnalyticsScreen.addAsset.routeSettings,
+        builder: (context) => const AddAssetScreen(),
+      ),
     );
   }
 
   void _openPortfolioTargetSetting() {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
+        settings: AnalyticsScreen.portfolioTargetSetting.routeSettings,
         builder: (context) => const PortfolioTargetSettingScreen(),
       ),
     );
@@ -135,6 +143,7 @@ class _AssetContentView extends StatelessWidget {
                       : 0.0;
               Navigator.of(context).push(
                 MaterialPageRoute<bool>(
+                  settings: AnalyticsScreen.assetDetail.routeSettings,
                   builder:
                       (_) => AssetDetailScreen(
                         asset: item.asset,

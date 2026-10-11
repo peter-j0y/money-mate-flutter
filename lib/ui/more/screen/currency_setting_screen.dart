@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:money_mate/data/model/entities/currency.dart';
 import 'package:money_mate/data/repositories/app_settings_repository.dart';
 import 'package:money_mate/data/repositories/app_settings_repository_impl.dart';
+import 'package:money_mate/data/analytics/analytics_events.dart';
+import 'package:money_mate/data/analytics/analytics_service.dart';
 import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/core/currency/current_currency.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
@@ -19,6 +21,10 @@ class _CurrencySettingScreenState extends State<CurrencySettingScreen> {
 
   Future<void> _onSelect(CurrencyCode code) async {
     if (code == _selected) return;
+    AnalyticsService.instance.logButtonClick(
+      AnalyticsButton.mainCurrencyChange,
+      parameters: {'currency': code.isoCode},
+    );
     setState(() => _selected = code);
     await _repository.setMainCurrency(code);
     CurrentCurrency.code = code;

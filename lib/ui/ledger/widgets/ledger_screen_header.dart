@@ -22,6 +22,8 @@ class LedgerScreenHeader extends StatelessWidget {
     this.trailing,
     this.padding = const EdgeInsets.fromLTRB(0, 16, 0, 8),
     this.closeButtonSize = 48,
+    this.closeIcon = Icons.close_rounded,
+    this.closeTooltip,
   });
 
   final String title;
@@ -30,6 +32,10 @@ class LedgerScreenHeader extends StatelessWidget {
   final Widget? trailing;
   final EdgeInsetsGeometry padding;
   final double closeButtonSize;
+
+  /// 왼쪽 버튼 아이콘. 모달처럼 닫는 화면은 X, push로 들어온 화면은 뒤로가기 화살표를 쓴다.
+  final IconData closeIcon;
+  final String? closeTooltip;
 
   @override
   Widget build(BuildContext context) {
@@ -47,8 +53,9 @@ class LedgerScreenHeader extends StatelessWidget {
                 height: closeButtonSize,
                 child: IconButton(
                   onPressed: onCloseTap,
+                  tooltip: closeTooltip,
                   icon: Icon(
-                    Icons.close_rounded,
+                    closeIcon,
                     size: 24,
                     color: context.appColors.textPrimary,
                   ),

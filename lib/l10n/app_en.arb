@@ -239,5 +239,23 @@
   "actualRatioWithValue": "Actual {value}%",
   "savePortfolioSettingsButton": "Save Portfolio Settings",
   "balanceTargetTo100": "Please make the target total 100%.",
-  "portfolioSaveSuccess": "Portfolio target ratios saved."
+  "portfolioSaveSuccess": "Portfolio target ratios saved.",
+
+  "statisticsTitle": "Statistics",
+  "statisticsMonthlySectionTitle": "Monthly overview",
+  "statisticsTrendSectionTitle": "Last 12 months",
+  "statisticsIncomeExpenseTitle": "Income & expense",
+  "statisticsCategoryExpenseTitle": "Expense by category",
+  "statisticsCategoryIncomeTitle": "Income by category",
+  "statisticsTotal": "Total",
+  "statisticsChartLine": "Line",
+  "statisticsChartBar": "Bar",
+  "statisticsNoTrendData": "No records in the last 12 months.",
+  "statisticsNoTrendExpense": "No expense records in the last 12 months.",
+  "statisticsNoTrendIncome": "No income records in the last 12 months.",
+  "statisticsNoMonthlyExpense": "No expense records this month.",
+  "statisticsNoMonthlyIncome": "No income records this month.",
+  "statisticsNoCategorySelected": "Select categories to display.",
+  "statisticsSelectedMonthTotal": "{month} · Total {total}",
+  "statisticsSelectedMonthSummary": "{month} · Income {income} · Expense {expense}"
 }

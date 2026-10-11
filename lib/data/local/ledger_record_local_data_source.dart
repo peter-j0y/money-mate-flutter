@@ -72,6 +72,14 @@ class LedgerRecordLocalDataSource {
     ).map(_mapToLedgerEntries);
   }
 
+  Stream<List<LedgerEntry>> watchRecordsBetween(DateTime start, DateTime end) {
+    return logDbStreamErrors(
+      'LedgerRecord.watchBetween',
+      () => _database.watchRecordsBetween(start, end),
+      context: {'start': start.toIso8601String(), 'end': end.toIso8601String()},
+    ).map(_mapToLedgerEntries);
+  }
+
   Future<List<LedgerEntry>> fetchRecordsPage({
     required int limit,
     required int offset,

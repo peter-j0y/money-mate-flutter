@@ -4,7 +4,10 @@ import 'package:intl/intl.dart';
 import 'package:money_mate/data/local/app_database.dart';
 import 'package:money_mate/data/model/entities/asset_entry.dart';
 import 'package:money_mate/data/model/entities/currency.dart';
+import 'package:money_mate/data/analytics/analytics_events.dart';
+import 'package:money_mate/data/analytics/analytics_service.dart';
 import 'package:money_mate/l10n/app_localizations.dart';
+import 'package:money_mate/ui/core/analytics/analytics_route_observer.dart';
 import 'package:money_mate/ui/asset/screen/portfolio_target_setting_screen.dart';
 import 'package:money_mate/ui/asset/view_models/add_asset_view_model.dart';
 import 'package:money_mate/ui/core/currency/current_currency.dart';
@@ -274,6 +277,10 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
     }
 
     final initial = widget.initialAsset;
+    AnalyticsService.instance.logButtonClick(
+      AnalyticsButton.assetSave,
+      parameters: {'mode': initial == null ? 'create' : 'edit'},
+    );
     // _amount는 이미 통화의 최소단위(minor unit) 기준이므로 그대로 저장한다.
     final isSuccess =
         initial == null
@@ -527,6 +534,8 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
             onSettingsTap: () async {
               final result = await Navigator.of(context).push<bool>(
                 MaterialPageRoute(
+                  settings:
+                      AnalyticsScreen.portfolioTargetSetting.routeSettings,
                   builder: (_) => const PortfolioTargetSettingScreen(),
                 ),
               );

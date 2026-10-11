@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:money_mate/data/analytics/analytics_events.dart';
+import 'package:money_mate/data/analytics/analytics_service.dart';
 import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/asset/view_models/assets_tab_view_model.dart';
 import 'package:money_mate/ui/asset/view_models/portfolio_target_setting_view_model.dart';
@@ -35,6 +37,9 @@ class _PortfolioTargetSettingScreenState
   }
 
   Future<void> _onSave() async {
+    AnalyticsService.instance.logButtonClick(
+      AnalyticsButton.portfolioTargetSave,
+    );
     final l10n = AppLocalizations.of(context)!;
     if (!_viewModel.isBalanced) {
       ScaffoldMessenger.of(

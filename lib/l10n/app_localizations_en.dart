@@ -653,4 +653,59 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get portfolioSaveSuccess => 'Portfolio target ratios saved.';
+
+  @override
+  String get statisticsTitle => 'Statistics';
+
+  @override
+  String get statisticsMonthlySectionTitle => 'Monthly overview';
+
+  @override
+  String get statisticsTrendSectionTitle => 'Last 12 months';
+
+  @override
+  String get statisticsIncomeExpenseTitle => 'Income & expense';
+
+  @override
+  String get statisticsCategoryExpenseTitle => 'Expense by category';
+
+  @override
+  String get statisticsCategoryIncomeTitle => 'Income by category';
+
+  @override
+  String get statisticsTotal => 'Total';
+
+  @override
+  String get statisticsChartLine => 'Line';
+
+  @override
+  String get statisticsChartBar => 'Bar';
+
+  @override
+  String get statisticsNoTrendData => 'No records in the last 12 months.';
+
+  @override
+  String get statisticsNoTrendExpense => 'No expense records in the last 12 months.';
+
+  @override
+  String get statisticsNoTrendIncome => 'No income records in the last 12 months.';
+
+  @override
+  String get statisticsNoMonthlyExpense => 'No expense records this month.';
+
+  @override
+  String get statisticsNoMonthlyIncome => 'No income records this month.';
+
+  @override
+  String get statisticsNoCategorySelected => 'Select categories to display.';
+
+  @override
+  String statisticsSelectedMonthTotal(String month, String total) {
+    return '$month · Total $total';
+  }
+
+  @override
+  String statisticsSelectedMonthSummary(String month, String income, String expense) {
+    return '$month · Income $income · Expense $expense';
+  }
 }
