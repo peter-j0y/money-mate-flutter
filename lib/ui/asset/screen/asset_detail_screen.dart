@@ -152,9 +152,7 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
                         children: [
                           _AmountCard(
                             amount: asset.amount,
-                            currency: CurrencyCode.fromCode(
-                              asset.currencyCode,
-                            ),
+                            currency: CurrencyCode.fromCode(asset.currencyCode),
                           ),
                           const SizedBox(height: 12),
                           Row(

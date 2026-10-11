@@ -100,10 +100,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
   }
 
   @override
-  AppSemanticColors lerp(
-    ThemeExtension<AppSemanticColors>? other,
-    double t,
-  ) {
+  AppSemanticColors lerp(ThemeExtension<AppSemanticColors>? other, double t) {
     if (other is! AppSemanticColors) {
       return this;
     }
@@ -114,7 +111,8 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
       warning: Color.lerp(warning, other.warning, t) ?? warning,
       background: Color.lerp(background, other.background, t) ?? background,
       surface: Color.lerp(surface, other.surface, t) ?? surface,
-      surfaceMuted: Color.lerp(surfaceMuted, other.surfaceMuted, t) ?? surfaceMuted,
+      surfaceMuted:
+          Color.lerp(surfaceMuted, other.surfaceMuted, t) ?? surfaceMuted,
       textPrimary: Color.lerp(textPrimary, other.textPrimary, t) ?? textPrimary,
       textSecondary:
           Color.lerp(textSecondary, other.textSecondary, t) ?? textSecondary,
