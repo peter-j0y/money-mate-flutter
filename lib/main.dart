@@ -14,6 +14,7 @@ import 'package:money_mate/data/repositories/app_settings_repository.dart';
 import 'package:money_mate/data/repositories/app_settings_repository_impl.dart';
 import 'package:money_mate/data/repositories/reminder_repository.dart';
 import 'package:money_mate/data/repositories/reminder_repository_impl.dart';
+import 'package:money_mate/data/review/review_prompt_service.dart';
 import 'package:money_mate/firebase_options.dart';
 import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/core/analytics/analytics_route_observer.dart';
@@ -80,6 +81,8 @@ Future<void> main() async {
   CurrentCurrency.code = await _resolveInitialMainCurrency(
     AppSettingsRepositoryImpl(),
   );
+  ReviewPromptService.instance = DefaultReviewPromptService();
+  await ReviewPromptService.instance.initializeAnchor();
   final app = MoneyMateApp(appVersion: packageInfo.version);
 
   runApp(app);

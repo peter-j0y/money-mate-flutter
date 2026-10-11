@@ -707,6 +707,18 @@ abstract class AppLocalizations {
   /// **'문의하기'**
   String get contactUs;
 
+  /// No description provided for @rateApp.
+  ///
+  /// In ko, this message translates to:
+  /// **'리뷰 남기기'**
+  String get rateApp;
+
+  /// No description provided for @cannotOpenStore.
+  ///
+  /// In ko, this message translates to:
+  /// **'스토어를 열 수 없어요.'**
+  String get cannotOpenStore;
+
   /// No description provided for @sectionTermsPolicy.
   ///
   /// In ko, this message translates to:

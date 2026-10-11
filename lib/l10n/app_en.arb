@@ -121,6 +121,8 @@
   "sectionSettings": "Settings",
   "sectionSupport": "Support",
   "contactUs": "Contact Us",
+  "rateApp": "Rate the App",
+  "cannotOpenStore": "Couldn't open the store.",
   "sectionTermsPolicy": "Terms & Policies",
   "privacyPolicy": "Privacy Policy",
   "termsOfService": "Terms of Service",

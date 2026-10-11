@@ -4,6 +4,8 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:money_mate/data/model/entities/currency.dart';
 import 'package:money_mate/data/analytics/analytics_events.dart';
+import 'package:money_mate/data/analytics/analytics_service.dart';
+import 'package:money_mate/data/review/review_prompt_service.dart';
 import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/core/analytics/analytics_route_observer.dart';
 import 'package:money_mate/ui/core/currency/current_currency.dart';
@@ -107,6 +109,17 @@ class MoreTabScreen extends StatelessWidget {
     }
   }
 
+  Future<void> _rateApp(BuildContext context) async {
+    AnalyticsService.instance.logButtonClick(AnalyticsButton.reviewMenu);
+    final l10n = AppLocalizations.of(context)!;
+    final opened = await ReviewPromptService.instance.openStoreListing();
+    if (!opened && context.mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.cannotOpenStore)));
+    }
+  }
+
   void _openPrivacyPolicy(BuildContext context) {
     _openExternalLink(
       context,
@@ -169,6 +182,13 @@ class MoreTabScreen extends StatelessWidget {
                   title: l10n.contactUs,
                   trailing: const _RowChevron(),
                   onTap: () => _contactSupport(context),
+                ),
+                _SettingsRow(
+                  icon: Icons.star_outline_rounded,
+                  accentColor: AppColors.hexFFD97706,
+                  title: l10n.rateApp,
+                  trailing: const _RowChevron(),
+                  onTap: () => _rateApp(context),
                 ),
               ],
             ),
