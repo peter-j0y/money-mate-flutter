@@ -331,6 +331,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get contactUs => '문의하기';
 
   @override
+  String get rateApp => '리뷰 남기기';
+
+  @override
+  String get cannotOpenStore => '스토어를 열 수 없어요.';
+
+  @override
   String get sectionTermsPolicy => '약관 및 정책';
 
   @override

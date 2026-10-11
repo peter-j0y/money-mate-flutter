@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:money_mate/data/model/entities/currency.dart';
 import 'package:money_mate/data/analytics/analytics_events.dart';
 import 'package:money_mate/data/analytics/analytics_service.dart';
+import 'package:money_mate/data/review/review_prompt_service.dart';
 import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/core/analytics/analytics_route_observer.dart';
 import 'package:money_mate/ui/core/currency/current_currency.dart';
@@ -234,6 +235,7 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
     }
 
     if (isSuccess) {
+      ReviewPromptService.instance.onLedgerRecordSaved();
       Navigator.pop(context, true);
       return;
     }

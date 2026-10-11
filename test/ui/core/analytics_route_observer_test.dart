@@ -17,6 +17,9 @@ class _RecordingAnalyticsService implements AnalyticsService {
     AnalyticsButton button, {
     Map<String, Object>? parameters,
   }) async {}
+
+  @override
+  Future<void> logEvent(AnalyticsEvent event) async {}
 }
 
 void main() {

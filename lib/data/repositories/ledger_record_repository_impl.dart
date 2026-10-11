@@ -46,4 +46,14 @@ class LedgerRecordRepositoryImpl implements LedgerRecordRepository {
   }) {
     return _localDataSource.fetchRecordsPage(limit: limit, offset: offset);
   }
+
+  @override
+  Future<int> countRecords() {
+    return _localDataSource.countRecords();
+  }
+
+  @override
+  Future<DateTime?> fetchOldestCreatedAt() {
+    return _localDataSource.fetchOldestCreatedAt();
+  }
 }

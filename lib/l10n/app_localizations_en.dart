@@ -331,6 +331,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get contactUs => 'Contact Us';
 
   @override
+  String get rateApp => 'Rate the App';
+
+  @override
+  String get cannotOpenStore => 'Couldn\'t open the store.';
+
+  @override
   String get sectionTermsPolicy => 'Terms & Policies';
 
   @override

@@ -13,4 +13,9 @@ abstract class LedgerRecordRepository {
     required int limit,
     required int offset,
   });
+
+  Future<int> countRecords();
+
+  /// 가장 먼저 입력된 기록의 `createdAt`. 기록이 없으면 null.
+  Future<DateTime?> fetchOldestCreatedAt();
 }

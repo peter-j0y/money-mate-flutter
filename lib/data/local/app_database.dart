@@ -155,6 +155,21 @@ class AppDatabase extends _$AppDatabase {
     return assetRows.isNotEmpty;
   }
 
+  Future<int> countLedgerRecords() async {
+    final count = ledgerRecords.id.count();
+    final row =
+        await (selectOnly(ledgerRecords)..addColumns([count])).getSingle();
+    return row.read(count) ?? 0;
+  }
+
+  /// 기록이 하나도 없으면 null. 사용자가 고른 `date`가 아니라 실제 입력 시각(`createdAt`) 기준이다.
+  Future<DateTime?> fetchOldestLedgerRecordCreatedAt() async {
+    final oldest = ledgerRecords.createdAt.min();
+    final row =
+        await (selectOnly(ledgerRecords)..addColumns([oldest])).getSingle();
+    return row.read(oldest);
+  }
+
   Future<int> insertLedgerRecord(LedgerRecordsCompanion entry) {
     return into(ledgerRecords).insert(entry);
   }
