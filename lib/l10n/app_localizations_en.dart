@@ -385,7 +385,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notificationDialogTitle => 'Build a Logging Habit';
 
   @override
-  String get notificationDialogBody => 'We\'ll remind you at your set time so you don\'t forget.\nYou can turn off notifications anytime in settings.';
+  String notificationDialogBody(String time) {
+    return 'We\'ll remind you every day at $time so you don\'t forget.\nYou can change the time or turn off reminders in More.';
+  }
 
   @override
   String get notificationDialogLater => 'Later';

@@ -1,3 +1,5 @@
+import 'package:money_mate/data/analytics/analytics_events.dart';
+import 'package:money_mate/data/analytics/analytics_service.dart';
 import 'package:money_mate/data/local/reminder_local_data_source.dart';
 import 'package:money_mate/data/local/reminder_notification_scheduler.dart';
 import 'package:money_mate/data/repositories/reminder_repository.dart';
@@ -26,12 +28,16 @@ class ReminderRepositoryImpl implements ReminderRepository {
 
   @override
   Future<void> setEnabled(bool enabled) async {
+    final wasEnabled = await _localDataSource.isEnabled();
     await _localDataSource.setEnabled(enabled);
     if (!enabled) {
       await _scheduler.cancelAll();
       return;
     }
     await _rescheduleFromStoredSettings();
+    if (!wasEnabled) {
+      await AnalyticsService.instance.logEvent(AnalyticsEvent.reminderEnabled);
+    }
   }
 
   @override

@@ -7,6 +7,7 @@ import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/core/analytics/analytics_route_observer.dart';
 import 'package:money_mate/ui/core/currency/current_currency.dart';
 import 'package:money_mate/ui/core/design_system/design_system.dart';
+import 'package:money_mate/ui/core/reminder_permission_prompt.dart';
 import 'package:money_mate/ui/ledger/widgets/ledger_category_grid.dart';
 import 'package:money_mate/ui/ledger/widgets/expense_payment_method_selector.dart';
 import 'package:money_mate/ui/ledger/widgets/ledger_category_options.dart';
@@ -235,8 +236,10 @@ class _AddLedgerRecordScreenState extends State<AddLedgerRecordScreen> {
     }
 
     if (isSuccess) {
+      final navigator = Navigator.of(context);
       ReviewPromptService.instance.onLedgerRecordSaved();
-      Navigator.pop(context, true);
+      ReminderPermissionPrompt.instance.onLedgerRecordSaved(navigator);
+      navigator.pop(true);
       return;
     }
 

@@ -15,7 +15,7 @@ void main() {
     tester.platformDispatcher.localeTestValue = const Locale('ko', 'KR');
     tester.platformDispatcher.localesTestValue = const [Locale('ko', 'KR')];
     addTearDown(tester.platformDispatcher.clearAllTestValues);
-    // 첫 실행 알림 권한 팝업이 탭 전환을 가리지 않도록 이미 요청한 상태로 시작한다.
+    // 알림 권한 팝업이 탭 전환을 가리지 않도록 이미 요청한 상태로 시작한다.
     SharedPreferences.setMockInitialValues({
       'notification_permission_requested': true,
     });
