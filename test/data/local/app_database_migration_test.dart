@@ -66,7 +66,7 @@ void main() {
     ]);
     addTearDown(database.close);
 
-    expect(await _userVersion(database), 8);
+    expect(await _userVersion(database), 9);
     expect(
       await _columns(database, 'favorite_ledger_records'),
       contains('currency_code'),
@@ -84,7 +84,7 @@ void main() {
     ]);
     addTearDown(database.close);
 
-    expect(await _userVersion(database), 8);
+    expect(await _userVersion(database), 9);
     expect(await _columns(database, 'assets'), contains('currency_code'));
     expect(
       await _columns(database, 'ledger_records'),
@@ -102,7 +102,7 @@ void main() {
     ]);
     addTearDown(database.close);
 
-    expect(await _userVersion(database), 8);
+    expect(await _userVersion(database), 9);
     expect(
       await _columns(database, 'favorite_ledger_records'),
       contains('currency_code'),
@@ -130,8 +130,32 @@ void main() {
     ]);
     addTearDown(database.close);
 
-    expect(await _userVersion(database), 8);
+    expect(await _userVersion(database), 9);
     final records = await database.fetchMonthlyRecords(DateTime(2026, 9));
     expect(records.single.currencyCode, 'KRW');
+  });
+
+  test('v1.2(schema 8)에서 올라오면 순자산 스냅샷 테이블이 생기고 기존 자산이 유지된다', () async {
+    final database = await _openMigrated([
+      _createLedgerRecordsV1,
+      _createAssetsV2,
+      _createPortfolioTargetsV3,
+      _createFavoritesV6,
+      'ALTER TABLE ledger_records ADD COLUMN "currency_code" TEXT NOT NULL DEFAULT \'KRW\'',
+      'ALTER TABLE assets ADD COLUMN "currency_code" TEXT NOT NULL DEFAULT \'KRW\'',
+      'ALTER TABLE favorite_ledger_records ADD COLUMN "currency_code" TEXT NOT NULL DEFAULT \'KRW\'',
+      "INSERT INTO assets (asset_type, asset_name, amount) VALUES ('cash', '통장', 500000)",
+      'PRAGMA user_version = 8',
+    ]);
+    addTearDown(database.close);
+
+    expect(await _userVersion(database), 9);
+    expect(
+      await _columns(database, 'net_worth_snapshots'),
+      containsAll(['snapshot_date', 'asset_type', 'currency_code', 'amount']),
+    );
+    expect(await database.fetchNetWorthSnapshots(), isEmpty);
+    final assets = await database.watchAssets().first;
+    expect(assets.single.amount, 500000);
   });
 }

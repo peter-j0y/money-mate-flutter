@@ -10,6 +10,7 @@ import 'package:money_mate/data/analytics/analytics_service.dart';
 import 'package:money_mate/data/analytics/firebase_analytics_service.dart';
 import 'package:money_mate/data/local/app_database.dart';
 import 'package:money_mate/data/model/entities/currency.dart';
+import 'package:money_mate/data/net_worth/net_worth_snapshot_recorder.dart';
 import 'package:money_mate/data/repositories/app_settings_repository.dart';
 import 'package:money_mate/data/repositories/app_settings_repository_impl.dart';
 import 'package:money_mate/data/review/review_prompt_service.dart';
@@ -81,6 +82,8 @@ Future<void> main() async {
   ReviewPromptService.instance = DefaultReviewPromptService();
   await ReviewPromptService.instance.initializeAnchor();
   ReminderPermissionPrompt.instance = DefaultReminderPermissionPrompt();
+  // 앱 수명 동안 자산 변경을 감시하며 오늘의 순자산 스냅샷을 저장한다 (UI 없음).
+  NetWorthSnapshotRecorder().start();
   final app = MoneyMateApp(appVersion: packageInfo.version);
 
   runApp(app);
