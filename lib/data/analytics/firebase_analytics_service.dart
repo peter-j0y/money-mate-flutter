@@ -28,6 +28,11 @@ class FirebaseAnalyticsService implements AnalyticsService {
     );
   }
 
+  @override
+  Future<void> logEvent(AnalyticsEvent event) {
+    return _guard(() => _analytics.logEvent(name: event.eventName));
+  }
+
   /// 분석 이벤트 실패가 사용자 동작(저장, 화면 이동 등)을 막지 않도록 예외를 삼킨다.
   Future<void> _guard(Future<void> Function() action) async {
     try {

@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:money_mate/data/analytics/analytics_events.dart';
+import 'package:money_mate/data/analytics/analytics_service.dart';
 import 'package:money_mate/data/repositories/ledger_record_repository_impl.dart';
 import 'package:money_mate/data/repositories/ledger_record_repository.dart';
 import 'package:money_mate/l10n/app_localizations.dart';
@@ -60,6 +62,7 @@ class AddLedgerRecordViewModel extends ChangeNotifier {
           memo: memo,
         ),
       );
+      await _logIfFirstRecord();
       return true;
     } catch (_) {
       _errorKind = _AddLedgerRecordError.saveFailed;
@@ -68,5 +71,13 @@ class AddLedgerRecordViewModel extends ChangeNotifier {
       _isSaving = false;
       notifyListeners();
     }
+  }
+
+  /// 저장 직후 기록이 1건이면 첫 기록으로 본다. 로깅 실패가 저장 결과를 바꾸지 않도록 오류는 삼킨다.
+  Future<void> _logIfFirstRecord() async {
+    try {
+      if (await _repository.countRecords() != 1) return;
+      await AnalyticsService.instance.logEvent(AnalyticsEvent.firstRecordSaved);
+    } catch (_) {}
   }
 }

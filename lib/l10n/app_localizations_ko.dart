@@ -331,6 +331,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get contactUs => '문의하기';
 
   @override
+  String get rateApp => '리뷰 남기기';
+
+  @override
+  String get cannotOpenStore => '스토어를 열 수 없어요.';
+
+  @override
   String get sectionTermsPolicy => '약관 및 정책';
 
   @override
@@ -379,7 +385,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get notificationDialogTitle => '기록하는 습관 만들기';
 
   @override
-  String get notificationDialogBody => '설정한 시간에 기록을 잊지 않도록 알려드려요.\n알림은 언제든지 설정에서 끌 수 있어요.';
+  String notificationDialogBody(String time) {
+    return '매일 $time에 기록을 잊지 않도록 알려드려요.\n시간 변경과 알림 끄기는 더보기에서 할 수 있어요.';
+  }
 
   @override
   String get notificationDialogLater => '다음에';

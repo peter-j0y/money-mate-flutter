@@ -10,10 +10,10 @@ import 'package:money_mate/data/analytics/analytics_service.dart';
 import 'package:money_mate/data/analytics/firebase_analytics_service.dart';
 import 'package:money_mate/data/local/app_database.dart';
 import 'package:money_mate/data/model/entities/currency.dart';
+import 'package:money_mate/data/net_worth/net_worth_snapshot_recorder.dart';
 import 'package:money_mate/data/repositories/app_settings_repository.dart';
 import 'package:money_mate/data/repositories/app_settings_repository_impl.dart';
-import 'package:money_mate/data/repositories/reminder_repository.dart';
-import 'package:money_mate/data/repositories/reminder_repository_impl.dart';
+import 'package:money_mate/data/review/review_prompt_service.dart';
 import 'package:money_mate/firebase_options.dart';
 import 'package:money_mate/l10n/app_localizations.dart';
 import 'package:money_mate/ui/core/analytics/analytics_route_observer.dart';
@@ -24,10 +24,9 @@ import 'package:money_mate/ui/core/design_system/design_system.dart';
 import 'package:money_mate/ui/ledger/widgets/ledger_tab_screen.dart';
 import 'package:money_mate/ui/core/bottom_navigation_bar.dart';
 import 'package:money_mate/ui/core/keyboard_done_bar.dart';
-import 'package:money_mate/ui/core/notification_permission_dialog.dart';
+import 'package:money_mate/ui/core/reminder_permission_prompt.dart';
 import 'package:money_mate/ui/more/screen/more_tab_screen.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 /// 앱 지원 언어(ko/en) 외의 기기 언어는 영어로 노출한다.
 Locale _resolveAppLocale(Locale? deviceLocale) {
@@ -80,6 +79,11 @@ Future<void> main() async {
   CurrentCurrency.code = await _resolveInitialMainCurrency(
     AppSettingsRepositoryImpl(),
   );
+  ReviewPromptService.instance = DefaultReviewPromptService();
+  await ReviewPromptService.instance.initializeAnchor();
+  ReminderPermissionPrompt.instance = DefaultReminderPermissionPrompt();
+  // 앱 수명 동안 자산 변경을 감시하며 오늘의 순자산 스냅샷을 저장한다 (UI 없음).
+  NetWorthSnapshotRecorder().start();
   final app = MoneyMateApp(appVersion: packageInfo.version);
 
   runApp(app);
@@ -144,9 +148,6 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   int _currentIndex = 0;
   DateTime _selectedLedgerDate = DateTime.now();
   late final List<int> _tabRefreshVersion;
-  final AppSettingsRepository _appSettingsRepository =
-      AppSettingsRepositoryImpl();
-  final ReminderRepository _reminderRepository = ReminderRepositoryImpl();
 
   List<BottomNavTabItem> _tabs(AppLocalizations l10n) => [
     BottomNavTabItem(
@@ -164,9 +165,6 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   void initState() {
     super.initState();
     _tabRefreshVersion = List<int>.filled(3, 0);
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => _maybeRequestNotificationPermission(),
-    );
     _logCurrentTabScreen();
   }
 
@@ -191,21 +189,6 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
 
   void _logCurrentTabScreen() {
     AnalyticsService.instance.logScreenView(_tabScreens[_currentIndex]);
-  }
-
-  Future<void> _maybeRequestNotificationPermission() async {
-    final alreadyRequested =
-        await _appSettingsRepository.hasRequestedNotificationPermission();
-    if (alreadyRequested || !mounted) return;
-
-    final agreed = await NotificationPermissionDialog.show(context);
-    var granted = false;
-    if (agreed) {
-      final status = await Permission.notification.request();
-      granted = status.isGranted;
-    }
-    await _reminderRepository.setEnabled(granted);
-    await _appSettingsRepository.setNotificationPermissionRequested();
   }
 
   void _onBottomTabTap(int index) {

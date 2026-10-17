@@ -169,6 +169,8 @@
   "sectionSettings": "설정",
   "sectionSupport": "고객지원",
   "contactUs": "문의하기",
+  "rateApp": "리뷰 남기기",
+  "cannotOpenStore": "스토어를 열 수 없어요.",
   "sectionTermsPolicy": "약관 및 정책",
   "privacyPolicy": "개인정보처리방침",
   "termsOfService": "이용약관",
@@ -187,7 +189,12 @@
   "reminderBody4": "지금 기록해두지 않으면 내일 또 같은 지출을 반복할지도 몰라요!",
 
   "notificationDialogTitle": "기록하는 습관 만들기",
-  "notificationDialogBody": "설정한 시간에 기록을 잊지 않도록 알려드려요.\n알림은 언제든지 설정에서 끌 수 있어요.",
+  "notificationDialogBody": "매일 {time}에 기록을 잊지 않도록 알려드려요.\n시간 변경과 알림 끄기는 더보기에서 할 수 있어요.",
+  "@notificationDialogBody": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
   "notificationDialogLater": "다음에",
   "notificationDialogAllow": "알림 받기",
   "notificationOffTitle": "알림 권한이 꺼져 있어요",

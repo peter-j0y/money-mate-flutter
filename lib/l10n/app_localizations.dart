@@ -707,6 +707,18 @@ abstract class AppLocalizations {
   /// **'문의하기'**
   String get contactUs;
 
+  /// No description provided for @rateApp.
+  ///
+  /// In ko, this message translates to:
+  /// **'리뷰 남기기'**
+  String get rateApp;
+
+  /// No description provided for @cannotOpenStore.
+  ///
+  /// In ko, this message translates to:
+  /// **'스토어를 열 수 없어요.'**
+  String get cannotOpenStore;
+
   /// No description provided for @sectionTermsPolicy.
   ///
   /// In ko, this message translates to:
@@ -806,8 +818,8 @@ abstract class AppLocalizations {
   /// No description provided for @notificationDialogBody.
   ///
   /// In ko, this message translates to:
-  /// **'설정한 시간에 기록을 잊지 않도록 알려드려요.\n알림은 언제든지 설정에서 끌 수 있어요.'**
-  String get notificationDialogBody;
+  /// **'매일 {time}에 기록을 잊지 않도록 알려드려요.\n시간 변경과 알림 끄기는 더보기에서 할 수 있어요.'**
+  String notificationDialogBody(String time);
 
   /// No description provided for @notificationDialogLater.
   ///

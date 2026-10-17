@@ -56,6 +56,12 @@ class FakeLedgerRecordRepository implements LedgerRecordRepository {
     required int limit,
     required int offset,
   }) => throw UnimplementedError();
+
+  @override
+  Future<int> countRecords() async => records.length;
+
+  @override
+  Future<DateTime?> fetchOldestCreatedAt() => throw UnimplementedError();
 }
 
 class FakeStatisticsPreferencesRepository

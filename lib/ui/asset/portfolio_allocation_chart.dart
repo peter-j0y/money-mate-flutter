@@ -45,7 +45,10 @@ class PortfolioAllocationChart extends StatelessWidget {
 }
 
 class PortfolioAllocationChartItem {
-  const PortfolioAllocationChartItem({required this.ratio, required this.color});
+  const PortfolioAllocationChartItem({
+    required this.ratio,
+    required this.color,
+  });
 
   final double ratio;
   final Color color;

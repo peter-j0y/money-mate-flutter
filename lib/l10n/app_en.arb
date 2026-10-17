@@ -121,6 +121,8 @@
   "sectionSettings": "Settings",
   "sectionSupport": "Support",
   "contactUs": "Contact Us",
+  "rateApp": "Rate the App",
+  "cannotOpenStore": "Couldn't open the store.",
   "sectionTermsPolicy": "Terms & Policies",
   "privacyPolicy": "Privacy Policy",
   "termsOfService": "Terms of Service",
@@ -139,7 +141,7 @@
   "reminderBody4": "If you don't log it now, you might repeat the same spending tomorrow!",
 
   "notificationDialogTitle": "Build a Logging Habit",
-  "notificationDialogBody": "We'll remind you at your set time so you don't forget.\nYou can turn off notifications anytime in settings.",
+  "notificationDialogBody": "We'll remind you every day at {time} so you don't forget.\nYou can change the time or turn off reminders in More.",
   "notificationDialogLater": "Later",
   "notificationDialogAllow": "Allow Notifications",
   "notificationOffTitle": "Notifications are turned off",

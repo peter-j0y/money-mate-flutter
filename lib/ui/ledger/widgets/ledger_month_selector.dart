@@ -28,10 +28,7 @@ class LedgerMonthSelector extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
             onTap: onLabelTap,
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 4,
-                vertical: 2,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
               child: Text(
                 monthLabel,
                 style: TextStyle(

@@ -39,7 +39,10 @@ class PortfolioTargetLocalDataSource {
   }
 
   Future<List<PortfolioTarget>> getTargets() {
-    return logDbErrors('PortfolioTarget.getAll', () => _database.getPortfolioTargets());
+    return logDbErrors(
+      'PortfolioTarget.getAll',
+      () => _database.getPortfolioTargets(),
+    );
   }
 
   Stream<List<PortfolioTarget>> watchTargets() {

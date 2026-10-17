@@ -37,9 +37,28 @@ enum AnalyticsButton {
   assetAdd('click_asset_add'),
   assetSave('click_asset_save'),
   portfolioTargetSave('click_portfolio_target_save'),
-  mainCurrencyChange('click_main_currency_change');
+  mainCurrencyChange('click_main_currency_change'),
+  reviewMenu('click_review_menu');
 
   const AnalyticsButton(this.eventName);
+
+  final String eventName;
+}
+
+/// 버튼 클릭이 아닌, 앱이 스스로 일으킨 동작 이벤트.
+///
+/// 이름 제약은 [AnalyticsButton]과 같다.
+enum AnalyticsEvent {
+  /// 조건을 충족해 OS 리뷰 시트를 요청했다. 실제로 시트가 노출됐는지는 OS가 알려주지 않는다.
+  reviewPromptRequested('review_prompt_requested'),
+
+  /// 가계부 기록을 처음 저장했다(저장 후 기록이 1건). 활성화 전환율의 기준이다.
+  firstRecordSaved('first_record_saved'),
+
+  /// 리마인더 알림이 꺼진 상태에서 켜졌다. 켜진 경로(다이얼로그, 더보기 토글)는 구분하지 않는다.
+  reminderEnabled('reminder_enabled');
+
+  const AnalyticsEvent(this.eventName);
 
   final String eventName;
 }

@@ -170,8 +170,7 @@ class _CurrencyRow extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color:
-              selected ? selectedBackgroundColor : context.appColors.surface,
+          color: selected ? selectedBackgroundColor : context.appColors.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: selected ? selectedColor : context.appColors.border,

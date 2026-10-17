@@ -21,7 +21,9 @@ class MoneyMateBottomNavigationBar extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: context.appColors.surface,
-        border: Border(top: BorderSide(color: context.appColors.border, width: 1)),
+        border: Border(
+          top: BorderSide(color: context.appColors.border, width: 1),
+        ),
       ),
       child: SafeArea(
         top: false,

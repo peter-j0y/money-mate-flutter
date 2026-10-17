@@ -14,6 +14,8 @@ abstract class AnalyticsService {
     AnalyticsButton button, {
     Map<String, Object>? parameters,
   });
+
+  Future<void> logEvent(AnalyticsEvent event);
 }
 
 class NoopAnalyticsService implements AnalyticsService {
@@ -27,4 +29,7 @@ class NoopAnalyticsService implements AnalyticsService {
     AnalyticsButton button, {
     Map<String, Object>? parameters,
   }) async {}
+
+  @override
+  Future<void> logEvent(AnalyticsEvent event) async {}
 }

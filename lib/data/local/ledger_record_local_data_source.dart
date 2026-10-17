@@ -92,6 +92,20 @@ class LedgerRecordLocalDataSource {
     return _mapToLedgerEntries(rows);
   }
 
+  Future<int> countRecords() {
+    return logDbErrors(
+      'LedgerRecord.count',
+      () => _database.countLedgerRecords(),
+    );
+  }
+
+  Future<DateTime?> fetchOldestCreatedAt() {
+    return logDbErrors(
+      'LedgerRecord.fetchOldestCreatedAt',
+      () => _database.fetchOldestLedgerRecordCreatedAt(),
+    );
+  }
+
   List<LedgerEntry> _mapToLedgerEntries(List<LedgerRecord> rows) {
     return rows.map(mapRow).toList(growable: false);
   }
